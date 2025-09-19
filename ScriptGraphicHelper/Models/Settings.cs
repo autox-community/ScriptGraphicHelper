@@ -15,7 +15,7 @@ namespace ScriptGraphicHelper.Models
         [JsonProperty("formatSelectedIndex")]
         public int FormatSelectedIndex { get; set; } = 0;
         [JsonProperty("addRange")]
-        public bool AddRange { get; set; } = false;
+        public bool AddRange { get; set; } = true;
         [JsonProperty("addInfo")]
         public bool AddInfo { get; set; } = false;
         [JsonProperty("rangeTolerance")]

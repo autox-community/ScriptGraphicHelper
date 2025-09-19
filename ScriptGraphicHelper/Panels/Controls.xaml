@@ -25,7 +25,8 @@
         </Style>
     </UserControl.Styles>
 
-    <ScrollViewer HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden">
+    <ScrollViewer >
+		
         <StackPanel
             HorizontalAlignment="Left"
             VerticalAlignment="Top"
@@ -46,7 +47,7 @@
                     CornerRadius="0">
                     <ComboBox
                         Name="EmulatorOptions"
-                        Width="95"
+                        Width="150"
                         HorizontalAlignment="Right"
                         VerticalAlignment="Center"
                         HorizontalContentAlignment="Center"
@@ -54,10 +55,11 @@
                         Background="Transparent"
                         BorderBrush="#666666"
                         BorderThickness="0"
-                        FontSize="14"
+                        FontSize="15"
                         Items="{Binding EmulatorInfo, Mode=TwoWay}"
                         SelectedIndex="{Binding EmulatorSelectedIndex, Mode=TwoWay}">
                         <i:Interaction.Behaviors>
+							<!--点击事件-->
                             <ic:EventTriggerBehavior EventName="Tapped">
                                 <icc:InvokeCommandAction Command="{Binding GetList}" />
                             </ic:EventTriggerBehavior>
@@ -65,47 +67,58 @@
                     </ComboBox>
                 </Border>
             </StackPanel>
+			
             <Button
                 Name="ScreenShot"
-                Width="130"
+                Width="185"
+				FontSize="15"
                 Margin="0,6"
                 HorizontalContentAlignment="Center"
                 BorderBrush="#666666"
                 Command="{Binding ScreenShot_Click}">
                 截图
             </Button>
+			
             <Button
                 Name="Load"
-                Width="130"
+                Width="185"
+				FontSize="15"
                 Margin="0,6"
                 HorizontalContentAlignment="Center"
                 Command="{Binding Load_Click}">
                 载入
             </Button>
+			
             <Button
                 Name="Save"
-                Width="130"
+                Width="185"
+				FontSize="15"
                 Margin="0,6"
                 HorizontalContentAlignment="Center"
                 Command="{Binding Save_Click}">
                 保存
             </Button>
+			
             <Button
                 Name="TurnRight"
-                Width="130"
+                Width="185"
+				FontSize="15"
                 Margin="0,6"
                 HorizontalContentAlignment="Center"
                 Command="{Binding TurnRight_Click}">
                 右转
             </Button>
+			
             <Button
                 Name="Test"
-                Width="130"
+                Width="185"
+				FontSize="15"
                 Margin="0,6"
                 HorizontalContentAlignment="Center"
                 Command="{Binding Test_Click}">
                 测试
             </Button>
+			
             <StackPanel
                 Margin="0,6"
                 Orientation="Horizontal"
@@ -122,7 +135,7 @@
                     CornerRadius="0">
                     <ComboBox
                         Name="Sim"
-                        Width="95"
+                        Width="150"
                         HorizontalAlignment="Right"
                         VerticalAlignment="Center"
                         HorizontalContentAlignment="Center"
@@ -130,7 +143,7 @@
                         Background="Transparent"
                         BorderBrush="#666666"
                         BorderThickness="0"
-                        FontSize="14"
+                        FontSize="15"
                         SelectedIndex="{Binding SimSelectedIndex, Mode=TwoWay}">
                         <ComboBoxItem>100%</ComboBoxItem>
                         <ComboBoxItem>95%</ComboBoxItem>
@@ -141,6 +154,7 @@
                     </ComboBox>
                 </Border>
             </StackPanel>
+			
             <StackPanel
                 Margin="0,6"
                 Orientation="Horizontal"
@@ -157,15 +171,16 @@
                     CornerRadius="0">
                     <TextBox
                         Name="TestResult"
-                        Width="95"
+                        Width="150"
                         Background="Transparent"
                         BorderBrush="#666666"
                         BorderThickness="0"
-                        FontSize="14"
+                        FontSize="15"
                         IsReadOnly="True"
                         Text="{Binding TestResult, Mode=TwoWay}" />
                 </Border>
             </StackPanel>
+			
             <StackPanel
                 Margin="0,6"
                 Orientation="Horizontal"
@@ -182,7 +197,7 @@
                     CornerRadius="0">
                     <ComboBox
                         x:Name="Format"
-                        Width="95"
+                        Width="150"
                         HorizontalAlignment="Right"
                         VerticalAlignment="Center"
                         HorizontalContentAlignment="Center"
@@ -190,11 +205,12 @@
                         Background="Transparent"
                         BorderBrush="#666666"
                         BorderThickness="0"
-                        FontSize="14"
+                        FontSize="15"
                         Items="{Binding FormatItems}"
                         SelectedIndex="{Binding FormatSelectedIndex, Mode=TwoWay}" />
                 </Border>
             </StackPanel>
+			
             <StackPanel
                 Margin="0,6"
                 Orientation="Horizontal"
@@ -210,7 +226,7 @@
                     BorderThickness="0,0,0,1"
                     CornerRadius="0">
                     <ComboBox
-                        Width="95"
+                        Width="150"
                         HorizontalAlignment="Right"
                         VerticalAlignment="Center"
                         HorizontalContentAlignment="Center"
@@ -218,7 +234,7 @@
                         Background="Transparent"
                         BorderBrush="#666666"
                         BorderThickness="0"
-                        FontSize="14"
+                        FontSize="15"
                         SelectedIndex="{Binding ScaleFactor, Mode=TwoWay, Converter={StaticResource ScaleFactor}}">
                         <ComboBoxItem>30%</ComboBoxItem>
                         <ComboBoxItem>40%</ComboBoxItem>
@@ -236,6 +252,7 @@
                     </ComboBox>
                 </Border>
             </StackPanel>
+			
             <StackPanel
                 Margin="0,6"
                 Orientation="Horizontal"
@@ -252,11 +269,11 @@
                     CornerRadius="0">
                     <TextBox
                         Name="Rect"
-                        Width="95"
+                        Width="150"
                         Background="Transparent"
                         BorderBrush="#666666"
                         BorderThickness="0"
-                        FontSize="14"
+                        FontSize="15"
                         Text="{Binding Rect, Mode=TwoWay}">
                         <TextBox.ContextMenu>
                             <ContextMenu>
@@ -267,24 +284,29 @@
                     </TextBox>
                 </Border>
             </StackPanel>
+			
             <Button
-                Width="130"
+                Width="185"
+				FontSize="15"
                 Margin="0,10,0,7"
                 HorizontalContentAlignment="Center"
                 Command="{Binding CutImg_Click}">
                 裁图
             </Button>
+			
             <Button
                 Name="Create"
-                Width="130"
+                Width="185"
+				FontSize="15"
                 Margin="0,10,0,7"
                 HorizontalContentAlignment="Center"
                 Command="{Binding Create_Click}">
                 生成
             </Button>
+			
             <TextBox
                 Name="CreateStr"
-                Width="130"
+                Width="185"
                 Height="120"
                 Margin="0,10,0,10"
                 HorizontalAlignment="Left"
@@ -298,22 +320,27 @@
                 Text="{Binding CreateStr, Mode=TwoWay}"
                 TextWrapping="Wrap"
                 ToolTip.Tip="生成字符串" />
+			
             <Button
                 Name="CreateStrCopy"
-                Width="130"
+                Width="185"
+				FontSize="15"
                 Margin="0,6"
                 HorizontalContentAlignment="Center"
                 Command="{Binding CreateStr_Copy_Click}">
                 复制
             </Button>
+			
             <Button
                 Name="CreateStrClear"
-                Width="130"
+                Width="185"
+				FontSize="15"
                 Margin="0,6"
                 HorizontalContentAlignment="Center"
                 Command="{Binding Clear_Click}">
                 清空
             </Button>
+			
         </StackPanel>
     </ScrollViewer>
 </UserControl>

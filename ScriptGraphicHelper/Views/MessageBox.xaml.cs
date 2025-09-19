@@ -53,7 +53,7 @@ namespace ScriptGraphicHelper.Views
             this.ExtendClientAreaChromeHints = Avalonia.Platform.ExtendClientAreaChromeHints.NoChrome;
         }
 
-        public MessageBox(string msg) : this("Ã· æ", msg) { }
+        public MessageBox(string msg) : this("ÊèêÁ§∫", msg) { }
 
 
         private void Window_Opened(object sender, EventArgs e)

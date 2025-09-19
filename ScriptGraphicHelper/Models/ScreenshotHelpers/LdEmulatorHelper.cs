@@ -14,11 +14,20 @@ namespace ScriptGraphicHelper.Models.ScreenshotHelpers
     class LdEmulatorHelper : BaseHelper
     {
         public override Action<Bitmap>? OnSuccessed { get; set; }
+
         public override Action<string>? OnFailed { get; set; }
+
         public override string Path { get; } = string.Empty;
+
         public override string Name { get; } = string.Empty;
+
         public string BmpPath { get; set; } = string.Empty;
-        public LdEmulatorHelper(int version)//初始化 , 获取雷电模拟器路径
+
+        /// <summary>
+        /// 初始化 , 获取雷电模拟器路径
+        /// </summary>
+        /// <param name="version"></param>
+        public LdEmulatorHelper(int version)
         {
             try
             {
@@ -128,9 +137,12 @@ namespace ScriptGraphicHelper.Models.ScreenshotHelpers
             readStream.Close();
             return OutputStr;
         }
-
-        public string[] List(string ldName)//获取模拟器信息
-                                           //返回数组 , 顺序为:序号，标题，顶层窗口句柄，绑定窗口句柄，是否进入android，进程PID，VBox进程PID
+        /// <summary>
+        /// 获取模拟器信息
+        /// </summary>
+        /// <param name="ldName"></param>
+        /// <returns>返回数组, 顺序为: 序号，标题，顶层窗口句柄，绑定窗口句柄，是否进入android，进程PID，VBox进程PID</returns>
+        public string[] List(string ldName)
         {
             var resultArray = PipeCmd("list2").Trim("\n".ToCharArray()).Split("\n".ToCharArray());
             for (var i = 0; i < resultArray.Length; i++)
@@ -257,35 +269,58 @@ namespace ScriptGraphicHelper.Models.ScreenshotHelpers
             }
 
         }
-        public void Launch(string ldName)//启动模拟器
+        /// <summary>
+        /// 启动模拟器
+        /// </summary>
+        /// <param name="ldName"></param>
+        public void Launch(string ldName)
         {
             PipeCmd("launch --name " + ldName);
         }
+
         public void Launch(int ldIndex)
         {
             PipeCmd("launch --index " + ldIndex.ToString());
         }
-        public void Quit()//关闭模拟器
+
+        /// <summary>
+        /// 关闭模拟器
+        /// </summary>
+        public void Quit()
         {
             PipeCmd("quitall");
         }
+
         public void Quit(string ldName)
         {
             PipeCmd("quit --name " + ldName);
         }
+
         public void Quit(int ldIndex)
         {
             PipeCmd("quit --index " + ldIndex.ToString());
         }
-        public void Reboot(string ldName)//重启模拟器
+
+        /// <summary>
+        /// 重启模拟器
+        /// </summary>
+        /// <param name="ldName"></param>
+        public void Reboot(string ldName)
         {
             PipeCmd("reboot --name " + ldName);
         }
+
         public void Reboot(int ldIndex)
         {
             PipeCmd("reboot --index " + ldIndex.ToString());
         }
-        public void RebootToApp(string ldName, string appid = "null")//重启模拟器并打开指定应用
+
+        /// <summary>
+        /// 重启模拟器并打开指定应用
+        /// </summary>
+        /// <param name="ldName"></param>
+        /// <param name="appid"></param>
+        public void RebootToApp(string ldName, string appid = "null")
         {
             PipeCmd("action --name " + ldName + " --key call.reboot--value " + appid);
 
@@ -293,25 +328,51 @@ namespace ScriptGraphicHelper.Models.ScreenshotHelpers
         public void RebootToApp(int ldIndex, string appid = "null")
         {
             PipeCmd("action --index " + ldIndex.ToString() + " --key call.reboot--value " + appid);
-
         }
-        public void Add(string ldName)//新建模拟器
+
+        /// <summary>
+        /// 新建模拟器
+        /// </summary>
+        /// <param name="ldName"></param>
+        public void Add(string ldName)
         {
             PipeCmd("add --name " + ldName);
         }
-        public void Copy(string ldName, int ldIndex)//复制模拟器
+
+        /// <summary>
+        /// 复制模拟器 
+        /// </summary>
+        /// <param name="ldName"></param>
+        /// <param name="ldIndex"></param>
+        public void Copy(string ldName, int ldIndex)
         {
             PipeCmd("copy --name " + ldName + " --from " + ldIndex.ToString());
         }
-        public void Remove(string ldName)//删除模拟器
+
+        /// <summary>
+        /// 删除模拟器
+        /// </summary>
+        /// <param name="ldName"></param>
+        public void Remove(string ldName)
         {
             PipeCmd("remove  --name " + ldName);
         }
-        public void Remove(int ldIndex)//删除模拟器
+
+        /// <summary>
+        /// 删除模拟器
+        /// </summary>
+        /// <param name="ldIndex"></param>
+        public void Remove(int ldIndex)
         {
             PipeCmd("remove  --index " + ldIndex.ToString());
         }
-        public void RunApp(string ldName, string appid)//启动app
+
+        /// <summary>
+        /// 启动app
+        /// </summary>
+        /// <param name="ldName"></param>
+        /// <param name="appid"></param>
+        public void RunApp(string ldName, string appid)
         {
             PipeCmd("runapp --name " + ldName + " --packagename " + appid);
         }
@@ -319,7 +380,13 @@ namespace ScriptGraphicHelper.Models.ScreenshotHelpers
         {
             PipeCmd("runapp --index " + ldIndex.ToString() + " --packagename " + appid);
         }
-        public void Killapp(string ldName, string appid)//关闭app
+
+        /// <summary>
+        /// 关闭app
+        /// </summary>
+        /// <param name="ldName"></param>
+        /// <param name="appid"></param>
+        public void Killapp(string ldName, string appid)
         {
             PipeCmd("killapp --name " + ldName + " --packagename " + appid);
         }
@@ -327,31 +394,58 @@ namespace ScriptGraphicHelper.Models.ScreenshotHelpers
         {
             PipeCmd("killapp --index " + ldIndex.ToString() + " --packagename " + appid);
         }
-        public void Installapp(string ldName, string filePath)//安装app
+
+        /// <summary>
+        /// 安装app
+        /// </summary>
+        /// <param name="ldName"></param>
+        /// <param name="filePath"></param>
+        public void Installapp(string ldName, string filePath)
         {
             PipeCmd("installapp --name " + ldName + " --filename " + filePath);
         }
+
         public void Installapp(int ldIndex, string filePath)
         {
             PipeCmd("installapp --index " + ldIndex.ToString() + " --filename " + filePath);
         }
-        public void Uninstallapp(string ldName, string appid)//卸载app
+
+        /// <summary>
+        /// 卸载app
+        /// </summary>
+        /// <param name="ldName"></param>
+        /// <param name="appid"></param>
+        public void Uninstallapp(string ldName, string appid)
         {
             PipeCmd("uninstallapp --name " + ldName + " --packagename " + appid);
         }
+
         public void Uninstallapp(int ldIndex, string appid)
         {
             PipeCmd("uninstallapp --index " + ldIndex.ToString() + " --packagename " + appid);
         }
-        public void Keyboard(string ldName, string keyValue)//执行安卓按键(back/home/menu/volumeup/volumedown)
+
+        /// <summary>
+        /// 执行安卓按键(back/home/menu/volumeup/volumedown)
+        /// </summary>
+        /// <param name="ldName"></param>
+        /// <param name="keyValue"></param>
+        public void Keyboard(string ldName, string keyValue)
         {
             PipeCmd("action --name " + ldName + " --key call.keyboard --value " + keyValue);
         }
+
         public void Keyboard(int ldIndex, string keyValue)
         {
             PipeCmd("action --index " + ldIndex.ToString() + " --key call.keyboard --value " + keyValue);
         }
-        public void Locate(string ldName, string lngLat)//修改经纬度
+
+        /// <summary>
+        /// 修改经纬度
+        /// </summary>
+        /// <param name="ldName"></param>
+        /// <param name="lngLat"></param>
+        public void Locate(string ldName, string lngLat)
         {
             PipeCmd("action --name " + ldName + " --key call.locate --value " + lngLat);
         }
@@ -359,63 +453,141 @@ namespace ScriptGraphicHelper.Models.ScreenshotHelpers
         {
             PipeCmd("action --index " + ldIndex.ToString() + " --key call.locate --value " + lngLat);
         }
-        public void Shake(string ldName)//摇一摇
+
+        /// <summary>
+        /// 摇一摇
+        /// </summary>
+        /// <param name="ldName"></param>
+        public void Shake(string ldName)
         {
             PipeCmd("action --name " + ldName + " --key call.shake --value null");
         }
+
         public void Shake(int ldIndex)
         {
             PipeCmd("action --index " + ldIndex.ToString() + " --key call.shake --value null");
         }
-        public void Input(string ldName, string inputStr)//文字输入
+
+        /// <summary>
+        /// 文字输入
+        /// </summary>
+        /// <param name="ldName"></param>
+        /// <param name="inputStr"></param>
+        public void Input(string ldName, string inputStr)
         {
             PipeCmd("action --name " + ldName + " --key call.input --value " + inputStr);
         }
+
         public void Input(int ldIndex, string inputStr)
         {
             PipeCmd("action --index " + ldIndex.ToString() + " --key call.input --value " + inputStr);
         }
-        public void Modify(string ldName, short width, short height, short dpi, short cpu, short memory, string manufacturer, string model, long phoneNumber, string imei = "auto", string imsi = "auto", string simserial = "auto", string androidid = "auto", string mac = "auto")//模拟器属性设置
+
+        /// <summary>
+        /// 模拟器属性设置
+        /// </summary>
+        /// <param name="ldName"></param>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
+        /// <param name="dpi"></param>
+        /// <param name="cpu"></param>
+        /// <param name="memory"></param>
+        /// <param name="manufacturer"></param>
+        /// <param name="model"></param>
+        /// <param name="phoneNumber"></param>
+        /// <param name="imei"></param>
+        /// <param name="imsi"></param>
+        /// <param name="simserial"></param>
+        /// <param name="androidid"></param>
+        /// <param name="mac"></param>
+        public void Modify(string ldName, short width, short height, short dpi, short cpu, short memory, string manufacturer, string model, long phoneNumber, string imei = "auto", string imsi = "auto", string simserial = "auto", string androidid = "auto", string mac = "auto")
         {
             PipeCmd("modify --name " + ldName + " --resolution " + width.ToString() + "," + height.ToString() + "," + dpi.ToString() + " --cpu " +
                cpu.ToString() + " --memory " + memory.ToString() + " --manufacturer " + manufacturer + " --model " + model + " --pnumber " +
                 phoneNumber.ToString() + " --imei " + imei + " --imsi " + imsi + " --simserial " + simserial + " --androidid " + androidid + " --mac " + mac);
         }
+
         public void Modify(int ldIndex, short width, short height, short dpi, short cpu, short memory, string manufacturer, string model, long phoneNumber, string imei = "auto", string imsi = "auto", string simserial = "auto", string androidid = "auto", string mac = "auto")
         {
             PipeCmd("modify --index " + ldIndex.ToString() + " --resolution " + width.ToString() + "," + height.ToString() + "," + dpi.ToString() + " --cpu " +
                cpu.ToString() + " --memory " + memory.ToString() + " --manufacturer " + manufacturer + " --model " + model + " --pnumber " +
                 phoneNumber.ToString() + " --imei " + imei + " --imsi " + imsi + " --simserial " + simserial + " --androidid " + androidid + " --mac " + mac);
         }
-        public void Scan(string ldName, string filePath)//扫描二维码,需要app先启动扫描,再调用这个命令
+
+        /// <summary>
+        /// 扫描二维码,需要app先启动扫描,再调用这个命令
+        /// </summary>
+        /// <param name="ldName"></param>
+        /// <param name="filePath"></param>
+        public void Scan(string ldName, string filePath)//
         {
             PipeCmd("qrpicture --name " + ldName + " --file " + filePath);
         }
+
         public void Scan(int ldIndex, string filePath)
         {
             PipeCmd("qrpicture --index " + ldIndex.ToString() + " --file " + filePath);
         }
-        public void SortWnd()//一键排序 , 需先在多开器配置排序规则
+
+        /// <summary>
+        /// 一键排序 , 需先在多开器配置排序规则
+        /// </summary>
+        public void SortWnd()//
         {
             PipeCmd("sortWnd");
         }
-        public void ClearApp(int ldIndex, string appid)//清除应用数据
+
+        /// <summary>
+        /// 清除应用数据
+        /// </summary>
+        /// <param name="ldIndex"></param>
+        /// <param name="appid"></param>
+        public void ClearApp(int ldIndex, string appid)
         {
             PipeCmd("-s " + ldIndex.ToString() + " pm clear " + appid, true);
         }
-        public void InputKey(int ldIndex, short keyCode)//模拟按键 , 具体键值请百度
+
+        /// <summary>
+        /// 模拟按键 , 具体键值请百度
+        /// </summary>
+        /// <param name="ldIndex"></param>
+        /// <param name="keyCode"></param>
+        public void InputKey(int ldIndex, short keyCode)
         {
             PipeCmd("-s " + ldIndex.ToString() + " input keyevent " + keyCode, true);
         }
-        public void InputText(int ldIndex, string text)//文本输入 , 不支持中文
+
+        /// <summary>
+        /// 文本输入 , 不支持中文
+        /// </summary>
+        /// <param name="ldIndex"></param>
+        /// <param name="text"></param>
+        public void InputText(int ldIndex, string text)
         {
             PipeCmd("-s " + ldIndex.ToString() + " input text " + text, true);
         }
-        public void Click(int ldIndex, short X, short Y)//点击
+
+        /// <summary>
+        /// 点击
+        /// </summary>
+        /// <param name="ldIndex"></param>
+        /// <param name="X"></param>
+        /// <param name="Y"></param>
+        public void Click(int ldIndex, short X, short Y)
         {
             PipeCmd("-s " + ldIndex.ToString() + " input tap " + X.ToString() + " " + Y.ToString(), true);
         }
-        public void Swipe(int ldIndex, short startX, short startY, short endX, short endY, short time = 1000)//滑动
+
+        /// <summary>
+        /// 滑动
+        /// </summary>
+        /// <param name="ldIndex"></param>
+        /// <param name="startX"></param>
+        /// <param name="startY"></param>
+        /// <param name="endX"></param>
+        /// <param name="endY"></param>
+        /// <param name="time"></param>
+        public void Swipe(int ldIndex, short startX, short startY, short endX, short endY, short time = 1000)
         {
             PipeCmd("-s " + ldIndex.ToString() + " input swipe " + startX.ToString() + " " + startY.ToString() + " " + endX.ToString() + " " + endY.ToString() + " " + time.ToString(), true);
         }

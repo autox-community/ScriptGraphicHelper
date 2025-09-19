@@ -23,40 +23,64 @@
     WindowStartupLocation="CenterScreen"
     mc:Ignorable="d">
 
+	<!--快捷键-->
     <Window.KeyBindings>
-        <KeyBinding
+        
+		<!--A键 列表添加颜色-->
+		<KeyBinding
             Command="{Binding Key_AddColorInfo}"
             CommandParameter="A"
             Gesture="A" />
-        <KeyBinding
+
+		
+		<!--S键 列表添加颜色-->
+		<KeyBinding
             Command="{Binding Key_AddColorInfo}"
             CommandParameter="S"
             Gesture="S" />
-        <KeyBinding
+
+		<!--D键 列表添加颜色-->
+		<KeyBinding
             Command="{Binding Key_AddColorInfo}"
             CommandParameter="D"
             Gesture="D" />
+		
+		<!--F1键 清空颜色列表-->
         <KeyBinding Command="{Binding Key_ColorInfo_Clear}" Gesture="F1" />
-        <KeyBinding Command="{Binding Key_SetConfig}" Gesture="F2" />
-        <KeyBinding
+
+		<!--F2键 打开设置界面-->
+		<KeyBinding Command="{Binding Key_SetConfig}" Gesture="F2" />
+        
+		<!--"+" 加号 放大图片-->
+		<KeyBinding
             Command="{Binding Key_ScaleFactorChanged}"
             CommandParameter="Add"
             Gesture="Add" />
-        <KeyBinding
+        
+		<!--"-" 减号 缩小图片-->
+		<KeyBinding
             Command="{Binding Key_ScaleFactorChanged}"
             CommandParameter="Subtract"
             Gesture="Subtract" />
-        <KeyBinding
+        
+		<!--tab 键 缩小图片-->
+		<KeyBinding
             Command="{Binding Key_ScaleFactorChanged}"
             CommandParameter="Tab"
             Gesture="Tab" />
-        <KeyBinding Command="{Binding Key_GetClipboardData}" Gesture="Ctrl+V" />
+		
+        <!--ctrl + v 获取剪贴板数据 (文件/文字)-->
+		<KeyBinding Command="{Binding Key_GetClipboardData}" Gesture="Ctrl+V" />
+		
     </Window.KeyBindings>
+	
+	
     <Design.DataContext>
         <vm:MainWindowViewModel />
     </Design.DataContext>
 
     <Grid Background="#2d2d30">
+		<!--右键菜单-->
         <Grid.ContextMenu>
             <ContextMenu>
                 <MenuItem Command="{Binding ResetEmulatorOptions_Click}" Header="重置模式选择" />
@@ -70,6 +94,7 @@
             </ContextMenu>
         </Grid.ContextMenu>
 
+		<!--标题栏右键菜单-->
         <Panels:TitleBar VerticalAlignment="Top" PointerPressed="TitleBar_DragMove">
             <Panels:TitleBar.ContextMenu>
                 <ContextMenu>
@@ -79,19 +104,26 @@
                 </ContextMenu>
             </Panels:TitleBar.ContextMenu>
         </Panels:TitleBar>
+		
+		<!--左侧工具栏-->
         <Panels:Controls
             Margin="20,50,10,20"
             VerticalAlignment="Top"
             HorizontalContentAlignment="Left" />
+		
+		<!--中间图片-->
         <Panels:Img
             Margin="{Binding ImgMargin, Mode=TwoWay}"
             VerticalAlignment="Top"
             HorizontalContentAlignment="Left" />
+		
+		<!--右侧颜色列表-->
         <Panels:ColorInfos
             Margin="10,50,20,20"
             VerticalAlignment="Top"
             HorizontalContentAlignment="Right" />
 
+		<!--鼠标画矩形-->
         <Canvas>
             <Rectangle
                 Name="SelectRect"
@@ -105,6 +137,7 @@
                 StrokeThickness="2" />
         </Canvas>
 
+		<!--放大镜-->
         <StackPanel
             x:Name="Panel_Loupe"
             Margin="{Binding LoupeMargin, Mode=TwoWay}"
@@ -122,6 +155,8 @@
                 Width="241"
                 Background="#666666"
                 Orientation="Horizontal">
+				
+				<!--x坐标-->
                 <TextBlock
                     Margin="5,3,0,8"
                     FontSize="18"
@@ -133,7 +168,9 @@
                     Margin="8,8,0,8"
                     FontSize="14"
                     Text="{Binding PointX, Mode=TwoWay}" />
-                <TextBlock
+				
+				<!--y坐标-->
+				<TextBlock
                     Margin="5,3,0,8"
                     FontSize="18"
                     Foreground="#bbbbbb">
@@ -144,6 +181,8 @@
                     Margin="8,8,0,8"
                     FontSize="14"
                     Text="{Binding PointY, Mode=TwoWay}" />
+				
+				<!--颜色-->
                 <TextBlock
                     Margin="10,3,0,8"
                     FontSize="18"
@@ -155,8 +194,11 @@
                     Margin="8,8,0,8"
                     FontSize="14"
                     Text="{Binding PointColor, Mode=TwoWay}" />
+				
             </StackPanel>
         </StackPanel>
+		
+		<!--顶部提示信息-->
         <Border
             Name="HintMessage"
             Width="650"
@@ -179,6 +221,8 @@
             HorizontalAlignment="Right"
             VerticalAlignment="Top"
             Orientation="Horizontal">
+			
+			<!--设置按钮-->
             <Button
                 Width="46"
                 Height="30"
@@ -203,6 +247,8 @@
                     </Style>
                 </Button.Styles>
             </Button>
+			
+			<!--关于按钮-->
             <Button
                 Width="46"
                 Height="30"
@@ -227,6 +273,8 @@
                     </Style>
                 </Button.Styles>
             </Button>
+			
+			<!--最小化按钮-->
             <Button
                 Width="46"
                 Height="30"
@@ -251,6 +299,8 @@
                     </Style>
                 </Button.Styles>
             </Button>
+			
+			<!--还原按钮-->
             <Button
                 x:Name="Default_btn"
                 Width="46"
@@ -277,6 +327,8 @@
                     </Style>
                 </Button.Styles>
             </Button>
+			
+			<!--全屏按钮-->
             <Button
                 x:Name="FullScreen_btn"
                 Width="46"
@@ -302,6 +354,8 @@
                     </Style>
                 </Button.Styles>
             </Button>
+			
+			<!--关闭按钮-->
             <Button
                 Width="46"
                 Height="30"

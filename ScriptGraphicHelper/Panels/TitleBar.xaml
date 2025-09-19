@@ -11,12 +11,15 @@
 
     <Grid Height="30" Background="#e8e8e8">
         <Grid>
+			<!--logo-->
             <Image
                 Width="20"
                 Margin="10,0,8,0"
                 HorizontalAlignment="Left"
                 VerticalAlignment="Center"
                 Source="/assets/ico.ico" />
+			
+			<!--名称-->
             <TextBlock
                 Margin="38,1,0,0"
                 HorizontalAlignment="Left"
@@ -24,8 +27,9 @@
                 FontSize="13"
                 FontWeight="Bold"
                 Foreground="#000000">
-                综合图色助手
-            </TextBlock>
+				综合图色助手 v1.4.0
+			</TextBlock>
+			
             <TabControl
                 Margin="170,0,0,0"
                 HorizontalAlignment="Left"

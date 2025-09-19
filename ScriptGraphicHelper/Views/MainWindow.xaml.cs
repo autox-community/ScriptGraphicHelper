@@ -42,11 +42,17 @@ namespace ScriptGraphicHelper.Views
 
         private void Window_Opened(object sender, EventArgs e)
         {
+            // 拖放事件 (拖动图片到窗口,可以快速打开图片)
             AddHandler(DragDrop.DropEvent, (this.DataContext as MainWindowViewModel).DropImage_Event);
+            
             this.Handle = this.PlatformImpl.Handle.Handle;
+            
+            // 设置窗口大小
             this.ClientSize = new Size(Settings.Instance.Width, Settings.Instance.Height);
+
+            // 设置顶部提示的关闭倒计时
             this.Timer.Tick += new EventHandler(HintMessage_Closed);
-            this.Timer.Interval = new TimeSpan(0, 0, 8);
+            this.Timer.Interval = new TimeSpan(0, 0, 3);
             this.Timer.Start();
         }
 

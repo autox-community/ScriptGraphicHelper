@@ -27,7 +27,7 @@
     </Window.Styles>
     <Grid Background="#2d2d30">
         <StackPanel Margin="25,20">
-            <StackPanel Margin="10" Orientation="Horizontal">
+            <!--<StackPanel Margin="10" Orientation="Horizontal">
                 <TextBlock
                     Width="75"
                     VerticalAlignment="Center"
@@ -56,7 +56,7 @@
                 <TextBlock Classes="h1" Tapped="Address_Tapped">
                     scriptGraphicHelper
                 </TextBlock>
-            </StackPanel>
+            </StackPanel>-->
         </StackPanel>
     </Grid>
 </Window>

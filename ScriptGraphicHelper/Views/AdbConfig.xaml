@@ -5,9 +5,9 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     Title="Adb无线调试"
-    Width="250"
+    Width="500"
     Height="290"
-    CanResize="false"
+    CanResize="True"
     Icon="/assets/ico.ico"
     KeyDown="Window_KeyDown"
     Opened="WindowOpened"
@@ -33,7 +33,7 @@
                     CornerRadius="0">
                     <TextBox
                         Name="Address"
-                        Width="150"
+                        Width="390"
                         HorizontalAlignment="Left"
                         VerticalAlignment="Top"
                         Background="Transparent"
@@ -58,7 +58,7 @@
                     CornerRadius="0">
                     <TextBox
                         Name="Port"
-                        Width="150"
+                        Width="390"
                         HorizontalAlignment="Left"
                         VerticalAlignment="Top"
                         Background="Transparent"
@@ -67,25 +67,25 @@
             </StackPanel>
 
             <Button
-                Width="210"
+                Width="450"
                 Height="40"
                 Margin="20"
                 HorizontalAlignment="Left"
                 VerticalAlignment="Bottom"
                 HorizontalContentAlignment="Center"
                 VerticalContentAlignment="Center"
-                Content="跳过"
+                Content="跳过 (直接获取当前 adb devices 命令的设备列表)"
                 Tapped="Skip_Tapped" />
         </StackPanel>
         <Button
-            Width="210"
+            Width="450"
             Height="40"
             Margin="20"
             HorizontalAlignment="Left"
             VerticalAlignment="Bottom"
             HorizontalContentAlignment="Center"
             VerticalContentAlignment="Center"
-            Content="确认"
+            Content="确认 (执行 adb connect 连接一个新设备,再获取设备列表)"
             Tapped="Ok_Tapped" />
     </Grid>
 </Window>

@@ -140,7 +140,7 @@ namespace ScriptGraphicHelper.ViewModels
             }
         }
 
-        private Thickness imgMargin = new(170, 50, 280, 20);
+        private Thickness imgMargin = new(220, 50, 280, 20);
         public Thickness ImgMargin
         {
             get => this.imgMargin;
@@ -184,6 +184,9 @@ namespace ScriptGraphicHelper.ViewModels
         }
 
         private double scaleFactor = 1.0;
+        /// <summary>
+        /// 缩放比例
+        /// </summary>
         public double ScaleFactor
         {
             get => this.scaleFactor;
@@ -338,12 +341,12 @@ namespace ScriptGraphicHelper.ViewModels
                 if (this.CurrentFormat.AnchorIsEnabled is true)
                 {
                     this.DataGrid_IsVisible = false;
-                    this.ImgMargin = new Thickness(170, 50, 340, 20);
+                    this.ImgMargin = new Thickness(220, 50, 340, 20);
                 }
                 else
                 {
                     this.DataGrid_IsVisible = true;
-                    this.ImgMargin = new Thickness(170, 50, 280, 20);
+                    this.ImgMargin = new Thickness(220, 50, 280, 20);
                 }
             }
         }

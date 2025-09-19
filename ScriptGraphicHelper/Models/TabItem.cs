@@ -25,7 +25,9 @@ namespace ScriptGraphicHelper.Models
         }
     }
 
-
+    /// <summary>
+    /// 图片 tab
+    /// </summary>
     public class TabItem : INotifyPropertyChanged
     {
         private int width;
@@ -41,10 +43,20 @@ namespace ScriptGraphicHelper.Models
 
         public string Header { get; set; } = string.Empty;
 
+        /// <summary>
+        /// 图片
+        /// </summary>
         public Bitmap Img { get; set; }
 
+        /// <summary>
+        /// 点击关闭后的回调
+        /// </summary>
         public ICommand? Command { get; set; }
 
+        /// <summary>
+        /// 初始化一个 tab
+        /// </summary>
+        /// <param name="img">图片数据</param>
         public TabItem(Bitmap img)
         {
             this.Header = DateTime.Now.ToString("HH-mm-ss");

@@ -3,7 +3,7 @@
   "height": 900.0,
   "simSelectedIndex": 0,
   "formatSelectedIndex": 0,
-  "addRange": false,
+  "addRange": true,
   "addInfo": false,
   "rangeTolerance": 50,
   "diySim": 95,

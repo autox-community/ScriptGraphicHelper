@@ -55,7 +55,7 @@ public class Dmsoft
         var regCode = Settings.Instance.DmRegcode;
         if (regCode == string.Empty || regCode == "")
         {
-            MessageBox.ShowAsync("´íÎó, ĞèÒªÔÚsetting.jsonÎÄ¼şÖĞÌîĞ´´óÄ®×¢²áÂë");
+            MessageBox.ShowAsync("é”™è¯¯, éœ€è¦åœ¨setting.jsonæ–‡ä»¶ä¸­å¡«å†™å¤§æ¼ æ³¨å†Œç ");
             return false;
         }
 
@@ -66,7 +66,7 @@ public class Dmsoft
         }
         else
         {
-            MessageBox.ShowAsync("×¢²á´óÄ®Ê§°Ü, ·µ»ØÖµ: " + result.ToString());
+            MessageBox.ShowAsync("æ³¨å†Œå¤§æ¼ å¤±è´¥, è¿”å›å€¼: " + result.ToString());
             return false;
         }
     }
@@ -82,12 +82,12 @@ public class Dmsoft
         }
         catch (Exception e)
         {
-            MessageBox.ShowAsync(e.Message + ", ÎŞ·¨ÔÚÏµÍ³ÖĞÕÒµ½´óÄ®²å¼ş!");
+            MessageBox.ShowAsync(e.Message + ", æ— æ³•åœ¨ç³»ç»Ÿä¸­æ‰¾åˆ°å¤§æ¼ æ’ä»¶!");
         }
 
     }
 
-    // µ÷ÓÃ´Ë½Ó¿Ú½øĞĞcom¶ÔÏóÊÍ·Å
+    // è°ƒç”¨æ­¤æ¥å£è¿›è¡Œcomå¯¹è±¡é‡Šæ”¾
     public void ReleaseObj()
     {
         if (this.Obj_object != null)

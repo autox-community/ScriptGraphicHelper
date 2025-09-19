@@ -1,8 +1,11 @@
 ﻿using Avalonia;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
+
 using ScriptGraphicHelper.Views;
+
 using SkiaSharp;
+
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
@@ -10,7 +13,10 @@ using System.Threading.Tasks;
 
 namespace ScriptGraphicHelper.Models.ScreenshotHelpers
 {
-    class HwndHelper : BaseHelper
+    /// <summary>
+    /// 大漠句柄
+    /// </summary>
+    public class HwndHelper : BaseHelper
     {
         public override Action<Bitmap>? OnSuccessed { get; set; }
         public override Action<string>? OnFailed { get; set; }
