@@ -1,0 +1,96 @@
+<Window
+    x:Class="ScriptGraphicHelper.Views.Config"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Title="配置"
+    Width="285"
+    Height="360"
+    CanResize="false"
+    Icon="/assets/ico.ico"
+    Opened="Window_Opened"
+    mc:Ignorable="d">
+    <Grid Background="#2d2d30">
+        <StackPanel Margin="20,15,20,15">
+            <StackPanel Margin="10" Orientation="Horizontal">
+                <TextBlock
+                    Width="85"
+                    VerticalAlignment="Center"
+                    Text="生成添加范围" />
+                <ToggleSwitch
+                    Name="AddRange"
+                    Margin="105,0,0,0"
+                    OffContent=""
+                    OnContent="" />
+            </StackPanel>
+            <StackPanel Margin="10" Orientation="Horizontal">
+                <TextBlock
+                    Width="85"
+                    VerticalAlignment="Center"
+                    Text="生成添加信息" />
+                <ToggleSwitch
+                    Name="AddInfo"
+                    Margin="105,0,0,0"
+                    OffContent=""
+                    OnContent="" />
+            </StackPanel>
+            <StackPanel Margin="10" Orientation="Horizontal">
+                <TextBlock
+                    Width="85"
+                    VerticalAlignment="Center"
+                    Text="是否偏移查找" />
+                <ToggleSwitch
+                    Name="IsOffset"
+                    Margin="105,0,0,0"
+                    OffContent=""
+                    OnContent="" />
+            </StackPanel>
+
+            <StackPanel
+                Margin="10"
+                HorizontalAlignment="Right"
+                Orientation="Horizontal">
+                <TextBlock
+                    Width="85"
+                    VerticalAlignment="Center"
+                    Text="自定义相似度" />
+                <Border
+                    Margin="25,0,0,0"
+                    BorderBrush="#666666"
+                    BorderThickness="0,0,0,1">
+                    <TextBox
+                        Name="DiySim"
+                        Width="120"
+                        HorizontalContentAlignment="Center"
+                        Background="Transparent"
+                        BorderThickness="0" />
+                </Border>
+            </StackPanel>
+            <StackPanel Margin="10" Orientation="Horizontal">
+                <TextBlock
+                    Width="85"
+                    VerticalAlignment="Center"
+                    Text="大漠注册码" />
+                <Border
+                    Margin="25,0,0,0"
+                    BorderBrush="#666666"
+                    BorderThickness="0,0,0,1">
+                    <TextBox
+                        Name="DmRegcode"
+                        Width="120"
+                        Background="Transparent"
+                        BorderThickness="0" />
+                </Border>
+            </StackPanel>
+            <Button
+                Name="Ok"
+                Width="230"
+                Height="35"
+                Margin="10,20,10,10"
+                HorizontalContentAlignment="Center"
+                Content="确认"
+                Tapped="Ok_Tapped" />
+        </StackPanel>
+    </Grid>
+</Window>

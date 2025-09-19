@@ -1,0 +1,91 @@
+<Window
+    x:Class="ScriptGraphicHelper.Views.AdbConfig"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Title="Adb无线调试"
+    Width="250"
+    Height="290"
+    CanResize="false"
+    Icon="/assets/ico.ico"
+    KeyDown="Window_KeyDown"
+    Opened="WindowOpened"
+    mc:Ignorable="d">
+
+    <Grid Background="#2d2d30">
+
+        <StackPanel>
+            <StackPanel
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top"
+                Orientation="Horizontal">
+                <TextBlock
+                    Margin="20,30"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Center">
+                    地址
+                </TextBlock>
+                <Border
+                    Margin="10,30"
+                    BorderBrush="#666666"
+                    BorderThickness="0,0,0,2"
+                    CornerRadius="0">
+                    <TextBox
+                        Name="Address"
+                        Width="150"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Top"
+                        Background="Transparent"
+                        BorderThickness="0" />
+                </Border>
+            </StackPanel>
+            <StackPanel
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top"
+                Orientation="Horizontal">
+                <TextBlock
+                    Name="Description"
+                    Margin="20,10"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Center">
+                    端口
+                </TextBlock>
+                <Border
+                    Margin="10,10"
+                    BorderBrush="#666666"
+                    BorderThickness="0,0,0,2"
+                    CornerRadius="0">
+                    <TextBox
+                        Name="Port"
+                        Width="150"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Top"
+                        Background="Transparent"
+                        BorderThickness="0" />
+                </Border>
+            </StackPanel>
+
+            <Button
+                Width="210"
+                Height="40"
+                Margin="20"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Bottom"
+                HorizontalContentAlignment="Center"
+                VerticalContentAlignment="Center"
+                Content="跳过"
+                Tapped="Skip_Tapped" />
+        </StackPanel>
+        <Button
+            Width="210"
+            Height="40"
+            Margin="20"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Bottom"
+            HorizontalContentAlignment="Center"
+            VerticalContentAlignment="Center"
+            Content="确认"
+            Tapped="Ok_Tapped" />
+    </Grid>
+</Window>

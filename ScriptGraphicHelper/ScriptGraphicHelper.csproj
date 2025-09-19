@@ -1,0 +1,222 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<OutputType>WinExe</OutputType>
+		<TargetFramework>net6.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<Platforms>x64;x86</Platforms>
+		<ApplicationIcon>assets\ico.ico</ApplicationIcon>
+		<Version>1.3.8</Version>
+		<NeutralLanguage></NeutralLanguage>
+		<RepositoryType>https://gitee.com/yiszza/ScriptGraphicHelper</RepositoryType>
+		<Authors>yiszza</Authors>
+		<Company>ScriptGraphicHelper</Company>
+		<Configurations>Debug;Release;MacOS-build;osx-publish</Configurations>
+		<ApplicationManifest>app.manifest</ApplicationManifest>
+		<SatelliteResourceLanguages>zh-Hans</SatelliteResourceLanguages>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<Optimize>True</Optimize>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<Optimize>True</Optimize>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='osx-publish|x64'">
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<Optimize>True</Optimize>
+	</PropertyGroup>
+	<ItemGroup>
+		<AvaloniaResource Include="assets\**" />
+	</ItemGroup>
+
+
+	<ItemGroup>
+		<AvaloniaXaml Include="App.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</AvaloniaXaml>
+		<AvaloniaXaml Include="Panels\ColorInfos.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</AvaloniaXaml>
+		<AvaloniaXaml Include="Panels\Controls.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</AvaloniaXaml>
+		<AvaloniaXaml Include="Panels\Img.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</AvaloniaXaml>
+		<AvaloniaXaml Include="Panels\TitleBar.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</AvaloniaXaml>
+		<AvaloniaXaml Include="Views\AdbConfig.xaml">
+			<SubType>Designer</SubType>
+			<Generator>MSBuild:Compile</Generator>
+		</AvaloniaXaml>
+		<AvaloniaXaml Include="Views\Config.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</AvaloniaXaml>
+		<AvaloniaXaml Include="Views\Info.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</AvaloniaXaml>
+		<AvaloniaXaml Include="Views\MainWindow.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</AvaloniaXaml>
+		<AvaloniaXaml Include="Views\MessageBox.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</AvaloniaXaml>
+		<AvaloniaXaml Include="Views\AJConfig.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</AvaloniaXaml>
+		<AvaloniaXaml Include="Views\ATConfig.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</AvaloniaXaml>
+		<AvaloniaXaml Include="Views\HwndConfig.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</AvaloniaXaml>
+		<AvaloniaXaml Include="Views\ImgEditor.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</AvaloniaXaml>
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="..\.editorconfig" Link=".editorconfig" />
+	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Avalonia" Version="0.10.13" />
+		<PackageReference Include="Avalonia.Desktop" Version="0.10.13" />
+		<PackageReference Include="Avalonia.Diagnostics" Version="0.10.13" />
+		<PackageReference Include="Avalonia.ReactiveUI" Version="0.10.13" />
+		<PackageReference Include="Avalonia.Svg.Skia" Version="0.10.12" />
+		<PackageReference Include="Avalonia.Xaml.Behaviors" Version="0.10.13.3" />
+		<PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="4.1.0" />
+		<PackageReference Include="Microsoft.Win32.Registry" Version="5.0.0" />
+		<PackageReference Include="MQTTnet" Version="3.1.2" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+	</ItemGroup>
+
+
+	<ItemGroup>
+		<Compile Update="App.xaml.cs">
+			<DependentUpon>App.xaml</DependentUpon>
+		</Compile>
+		<Compile Update="Panels\Controls.xaml.cs">
+			<DependentUpon>Controls.xaml</DependentUpon>
+		</Compile>
+		<Compile Update="Panels\Img.xaml.cs">
+			<DependentUpon>Img.xaml</DependentUpon>
+		</Compile>
+		<Compile Update="Panels\TitleBar.xaml.cs">
+			<DependentUpon>TitleBar.xaml</DependentUpon>
+		</Compile>
+		<Compile Update="Views\Config.xaml.cs">
+			<DependentUpon>Config.xaml</DependentUpon>
+		</Compile>
+		<Compile Update="Views\HwndConfig.xaml.cs">
+			<DependentUpon>HwndConfig.xaml</DependentUpon>
+		</Compile>
+		<Compile Update="Views\MainWindow.xaml.cs" />
+		<Compile Update="Views\MessageBox.xaml.cs">
+			<DependentUpon>MessageBox.xaml</DependentUpon>
+		</Compile>
+		<Compile Update="Views\ATConfig.xaml.cs">
+			<DependentUpon>ATConfig.xaml</DependentUpon>
+		</Compile>
+		<Compile Update="Views\ImgEditor.xaml.cs">
+			<DependentUpon>ImgEditor.xaml</DependentUpon>
+		</Compile>
+	</ItemGroup>
+	
+	<ItemGroup Condition=" '$(Configuration)' == 'Release' ">
+		<None Update="assets\Adb\adb.exe">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="assets\Adb\AdbWinApi.dll">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="assets\Adb\AdbWinUsbApi.dll">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="assets\aiming.cur">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="assets\mouse.dll">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
+	
+	<ItemGroup Condition=" '$(Configuration)' == 'Debug' ">
+		<None Update="assets\adb\adb.exe">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="assets\adb\AdbWinApi.dll">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="assets\adb\AdbWinUsbApi.dll">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="assets\aiming.cur">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="Assets\mouse.dll">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
+	
+	<ItemGroup>
+		<None Update="assets\settings.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="assets\diyFormat.csx">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="assets\diyFormat.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="assets\使用说明.txt">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="Assets\send_script.js">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="Assets\cap_script.js">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="Assets\init_script.js">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
+
+	<ItemGroup Condition=" '$(Configuration)' == 'osx-publish' ">
+		<None Update="assets\libmouse.dylib">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
+	
+	<ItemGroup Condition=" '$(Configuration)' == 'osx-publish' ">
+		<PackageReference Include="Dotnet.Bundle" Version="*" />
+	</ItemGroup>
+
+	<PropertyGroup Condition=" '$(Configuration)' == 'osx-publish' ">
+		<UseAppHost>true</UseAppHost>
+		<CFBundleName>ScriptGraphicHelper</CFBundleName>
+		<!-- Also defines .app file name -->
+		<CFBundleDisplayName>ScriptGraphicHelper</CFBundleDisplayName>
+		<CFBundleIdentifier>org.yiszza.scriptgraphichelper</CFBundleIdentifier>
+		<CFBundleShortVersionString>综合图色助手</CFBundleShortVersionString>
+		<CFBundleVersion>1.4.0</CFBundleVersion>
+		<CFBundleExecutable>TestApp</CFBundleExecutable>
+		<CFBundleIconFile>assets\ico.ico</CFBundleIconFile>
+		<!-- Will be copied from output directory -->
+		<NSPrincipalClass>NSApplication</NSPrincipalClass>
+		<NSHighResolutionCapable>true</NSHighResolutionCapable>
+	</PropertyGroup>
+
+</Project>

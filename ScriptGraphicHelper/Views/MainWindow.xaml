@@ -1,0 +1,335 @@
+<Window
+    x:Class="ScriptGraphicHelper.Views.MainWindow"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:Panels="clr-namespace:ScriptGraphicHelper.Panels;assembly=ScriptGraphicHelper"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:i="using:Avalonia.Xaml.Interactivity"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia"
+    xmlns:vm="using:ScriptGraphicHelper.ViewModels"
+    Title="综合图色助手 v1.4.0"
+    Width="{Binding WindowWidth, Mode=TwoWay}"
+    Height="{Binding WindowHeight, Mode=TwoWay}"
+    CanResize="True"
+    Closing="Window_Closing"
+    Cursor="{Binding WindowCursor, Mode=TwoWay}"
+    DragDrop.AllowDrop="True"
+    FontSize="14"
+    FontStyle="Normal"
+    Icon="/assets/ico.ico"
+    KeyDown="Window_KeyDown"
+    Opened="Window_Opened"
+    WindowStartupLocation="CenterScreen"
+    mc:Ignorable="d">
+
+    <Window.KeyBindings>
+        <KeyBinding
+            Command="{Binding Key_AddColorInfo}"
+            CommandParameter="A"
+            Gesture="A" />
+        <KeyBinding
+            Command="{Binding Key_AddColorInfo}"
+            CommandParameter="S"
+            Gesture="S" />
+        <KeyBinding
+            Command="{Binding Key_AddColorInfo}"
+            CommandParameter="D"
+            Gesture="D" />
+        <KeyBinding Command="{Binding Key_ColorInfo_Clear}" Gesture="F1" />
+        <KeyBinding Command="{Binding Key_SetConfig}" Gesture="F2" />
+        <KeyBinding
+            Command="{Binding Key_ScaleFactorChanged}"
+            CommandParameter="Add"
+            Gesture="Add" />
+        <KeyBinding
+            Command="{Binding Key_ScaleFactorChanged}"
+            CommandParameter="Subtract"
+            Gesture="Subtract" />
+        <KeyBinding
+            Command="{Binding Key_ScaleFactorChanged}"
+            CommandParameter="Tab"
+            Gesture="Tab" />
+        <KeyBinding Command="{Binding Key_GetClipboardData}" Gesture="Ctrl+V" />
+    </Window.KeyBindings>
+    <Design.DataContext>
+        <vm:MainWindowViewModel />
+    </Design.DataContext>
+
+    <Grid Background="#2d2d30">
+        <Grid.ContextMenu>
+            <ContextMenu>
+                <MenuItem Command="{Binding ResetEmulatorOptions_Click}" Header="重置模式选择" />
+                <MenuItem Command="{Binding Key_GetClipboardData}" Header="导入图片或数据" />
+                <MenuItem Command="{Binding Key_SetConfig}" Header="打开配置" />
+                <MenuItem Command="{Binding Key_ColorInfo_Clear}" Header="清空列表" />
+                <MenuItem
+                    Command="{Binding Key_ScaleFactorChanged}"
+                    CommandParameter="Tab"
+                    Header="缩放图片" />
+            </ContextMenu>
+        </Grid.ContextMenu>
+
+        <Panels:TitleBar VerticalAlignment="Top" PointerPressed="TitleBar_DragMove">
+            <Panels:TitleBar.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="最小化" Tapped="Minsize_Tapped" />
+                    <MenuItem Header="全屏/还原" Tapped="WindowStateChange_Tapped" />
+                    <MenuItem Header="关闭" Tapped="Close_Tapped" />
+                </ContextMenu>
+            </Panels:TitleBar.ContextMenu>
+        </Panels:TitleBar>
+        <Panels:Controls
+            Margin="20,50,10,20"
+            VerticalAlignment="Top"
+            HorizontalContentAlignment="Left" />
+        <Panels:Img
+            Margin="{Binding ImgMargin, Mode=TwoWay}"
+            VerticalAlignment="Top"
+            HorizontalContentAlignment="Left" />
+        <Panels:ColorInfos
+            Margin="10,50,20,20"
+            VerticalAlignment="Top"
+            HorizontalContentAlignment="Right" />
+
+        <Canvas>
+            <Rectangle
+                Name="SelectRect"
+                Width="{Binding RectWidth, Mode=TwoWay}"
+                Height="{Binding RectHeight, Mode=TwoWay}"
+                Margin="{Binding RectMargin, Mode=TwoWay}"
+                Fill="Transparent"
+                Focusable="False"
+                IsVisible="{Binding Rect_IsVisible, Mode=TwoWay}"
+                Stroke="Red"
+                StrokeThickness="2" />
+        </Canvas>
+
+        <StackPanel
+            x:Name="Panel_Loupe"
+            Margin="{Binding LoupeMargin, Mode=TwoWay}"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            IsEnabled="False"
+            IsVisible="{Binding Loupe_IsVisible, Mode=TwoWay}">
+            <Image
+                x:Name="Loupe"
+                Width="241"
+                Height="241"
+                Source="{Binding LoupeWriteBmp}"
+                Stretch="UniformToFill" />
+            <StackPanel
+                Width="241"
+                Background="#666666"
+                Orientation="Horizontal">
+                <TextBlock
+                    Margin="5,3,0,8"
+                    FontSize="18"
+                    Foreground="#bbbbbb">
+                    x
+                </TextBlock>
+                <TextBlock
+                    Width="40"
+                    Margin="8,8,0,8"
+                    FontSize="14"
+                    Text="{Binding PointX, Mode=TwoWay}" />
+                <TextBlock
+                    Margin="5,3,0,8"
+                    FontSize="18"
+                    Foreground="#bbbbbb">
+                    y
+                </TextBlock>
+                <TextBlock
+                    Width="40"
+                    Margin="8,8,0,8"
+                    FontSize="14"
+                    Text="{Binding PointY, Mode=TwoWay}" />
+                <TextBlock
+                    Margin="10,3,0,8"
+                    FontSize="18"
+                    Foreground="#bbbbbb">
+                    c
+                </TextBlock>
+                <TextBlock
+                    Width="80"
+                    Margin="8,8,0,8"
+                    FontSize="14"
+                    Text="{Binding PointColor, Mode=TwoWay}" />
+            </StackPanel>
+        </StackPanel>
+        <Border
+            Name="HintMessage"
+            Width="650"
+            Height="45"
+            Margin="0,30,0,0"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Top"
+            Background="#e8e8e8"
+            CornerRadius="5">
+            <TextBlock
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                FontSize="16"
+                FontWeight="Normal"
+                Foreground="#303030"
+                Text="F1清空列表, F2更改配置,方向键微调鼠标, Tab/＋/-缩放图片, Ctrl+V导入图片或数据" />
+        </Border>
+
+        <StackPanel
+            HorizontalAlignment="Right"
+            VerticalAlignment="Top"
+            Orientation="Horizontal">
+            <Button
+                Width="46"
+                Height="30"
+                Padding="15,0,15,0"
+                VerticalAlignment="Center"
+                Background="Transparent"
+                Command="{Binding Key_SetConfig}">
+                <Image
+                    Width="16"
+                    Height="16"
+                    VerticalAlignment="Center">
+                    <Image.Source>
+                        <svg:SvgImage Source="/assets/settings.svg" />
+                    </Image.Source>
+                </Image>
+                <Button.Styles>
+                    <Style Selector="Button /template/ ContentPresenter">
+                        <Setter Property="CornerRadius" Value="0" />
+                    </Style>
+                    <Style Selector="Button:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+                        <Setter Property="Background" Value="#ffffff" />
+                    </Style>
+                </Button.Styles>
+            </Button>
+            <Button
+                Width="46"
+                Height="30"
+                Padding="15,0,15,0"
+                VerticalAlignment="Center"
+                Background="Transparent"
+                Tapped="Info_Tapped">
+                <Image
+                    Width="16"
+                    Height="16"
+                    VerticalAlignment="Center">
+                    <Image.Source>
+                        <svg:SvgImage Source="/assets/info.svg" />
+                    </Image.Source>
+                </Image>
+                <Button.Styles>
+                    <Style Selector="Button /template/ ContentPresenter">
+                        <Setter Property="CornerRadius" Value="0" />
+                    </Style>
+                    <Style Selector="Button:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+                        <Setter Property="Background" Value="#ffffff" />
+                    </Style>
+                </Button.Styles>
+            </Button>
+            <Button
+                Width="46"
+                Height="30"
+                Padding="15,0,15,0"
+                VerticalAlignment="Center"
+                Background="Transparent"
+                Tapped="Minsize_Tapped">
+                <Image
+                    Width="16"
+                    Height="16"
+                    VerticalAlignment="Center">
+                    <Image.Source>
+                        <svg:SvgImage Source="/assets/minsize.svg" />
+                    </Image.Source>
+                </Image>
+                <Button.Styles>
+                    <Style Selector="Button /template/ ContentPresenter">
+                        <Setter Property="CornerRadius" Value="0" />
+                    </Style>
+                    <Style Selector="Button:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+                        <Setter Property="Background" Value="#ffffff" />
+                    </Style>
+                </Button.Styles>
+            </Button>
+            <Button
+                x:Name="Default_btn"
+                Width="46"
+                Height="30"
+                Padding="15,0,15,0"
+                VerticalAlignment="Center"
+                Background="Transparent"
+                IsVisible="False"
+                Tapped="WindowStateChange_Tapped">
+                <Image
+                    Width="16"
+                    Height="16"
+                    VerticalAlignment="Center">
+                    <Image.Source>
+                        <svg:SvgImage Source="/assets/default.svg" />
+                    </Image.Source>
+                </Image>
+                <Button.Styles>
+                    <Style Selector="Button /template/ ContentPresenter">
+                        <Setter Property="CornerRadius" Value="0" />
+                    </Style>
+                    <Style Selector="Button:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+                        <Setter Property="Background" Value="#ffffff" />
+                    </Style>
+                </Button.Styles>
+            </Button>
+            <Button
+                x:Name="FullScreen_btn"
+                Width="46"
+                Height="30"
+                Padding="15,0,15,0"
+                VerticalAlignment="Center"
+                Background="Transparent"
+                Tapped="WindowStateChange_Tapped">
+                <Image
+                    Width="16"
+                    Height="16"
+                    VerticalAlignment="Center">
+                    <Image.Source>
+                        <svg:SvgImage Source="/assets/fullscreen.svg" />
+                    </Image.Source>
+                </Image>
+                <Button.Styles>
+                    <Style Selector="Button /template/ ContentPresenter">
+                        <Setter Property="CornerRadius" Value="0" />
+                    </Style>
+                    <Style Selector="Button:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+                        <Setter Property="Background" Value="#ffffff" />
+                    </Style>
+                </Button.Styles>
+            </Button>
+            <Button
+                Width="46"
+                Height="30"
+                Padding="15,0,15,0"
+                VerticalAlignment="Center"
+                Background="Transparent"
+                CornerRadius="0"
+                Tapped="Close_Tapped">
+                <Image
+                    Width="16"
+                    Height="16"
+                    VerticalAlignment="Center">
+                    <Image.Source>
+                        <svg:SvgImage Source="/assets/close.svg" />
+                    </Image.Source>
+                </Image>
+                <Button.Styles>
+                    <Style Selector="Button /template/ ContentPresenter">
+                        <Setter Property="CornerRadius" Value="0" />
+                    </Style>
+                    <Style Selector="Button:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+                        <Setter Property="Background" Value="#bfe81123" />
+                    </Style>
+                </Button.Styles>
+            </Button>
+        </StackPanel>
+
+    </Grid>
+
+</Window>
+

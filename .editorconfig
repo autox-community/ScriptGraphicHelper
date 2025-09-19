@@ -1,0 +1,7 @@
+﻿[*.cs]
+
+# CS8600: 将 null 文本或可能的 null 值转换为不可为 null 类型。
+dotnet_diagnostic.CS8600.severity = none
+
+# CS8602: 解引用可能出现空引用。
+dotnet_diagnostic.CS8602.severity = none

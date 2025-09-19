@@ -1,0 +1,8 @@
+{
+  "ImportInfo": "dm",
+  "RangeFormat": "{startX},{startY},{endX},{endY}",
+  "FirstColorFormat": "{color}",
+  "FollowColorFormat": "{x}|{y}|{color}",
+  "FindStrFormat": "new array({ImportInfo},\"{range}\",\"{firstColorStr}\",\"{followColorStr}\",0.9,1)",
+  "CompareStrFormat": "new array({ImportInfo},\"{colorStr}\",0.9)"
+}
