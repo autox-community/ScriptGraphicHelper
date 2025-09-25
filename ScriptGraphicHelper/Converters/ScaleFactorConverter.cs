@@ -1,10 +1,11 @@
 ﻿using Avalonia.Data.Converters;
+
 using System;
 using System.Globalization;
 
 namespace ScriptGraphicHelper.Converters
 {
-    class ScaleFactorConverter : IValueConverter
+    public class ScaleFactorConverter : IValueConverter
     {
         public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
         {

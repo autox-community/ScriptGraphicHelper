@@ -4,10 +4,13 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
+
 using Newtonsoft.Json;
+
 using ScriptGraphicHelper.Models;
 using ScriptGraphicHelper.Models.UnmanagedMethods;
 using ScriptGraphicHelper.ViewModels;
+
 using System;
 using System.ComponentModel;
 using System.IO;
@@ -44,9 +47,13 @@ namespace ScriptGraphicHelper.Views
         {
             // 拖放事件 (拖动图片到窗口,可以快速打开图片)
             AddHandler(DragDrop.DropEvent, (this.DataContext as MainWindowViewModel).DropImage_Event);
-            
-            this.Handle = this.PlatformImpl.Handle.Handle;
-            
+
+            // NOTE: 添加一个判断, 防止在 IDE 预览时值为 null, 报错导致无法预览, 不影响运行时
+            if (this.PlatformImpl != null && this.PlatformImpl.Handle != null)
+            {
+                this.Handle = this.PlatformImpl.Handle.Handle;
+            }
+
             // 设置窗口大小
             this.ClientSize = new Size(Settings.Instance.Width, Settings.Instance.Height);
 

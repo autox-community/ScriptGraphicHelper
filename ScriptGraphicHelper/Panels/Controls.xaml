@@ -55,15 +55,15 @@
                         Background="Transparent"
                         BorderBrush="#666666"
                         BorderThickness="0"
-                        FontSize="15"
+                        FontSize="15"						
                         Items="{Binding EmulatorInfo, Mode=TwoWay}"
                         SelectedIndex="{Binding EmulatorSelectedIndex, Mode=TwoWay}">
-                        <i:Interaction.Behaviors>
+						<i:Interaction.Behaviors>
 							<!--点击事件-->
-                            <ic:EventTriggerBehavior EventName="Tapped">
-                                <icc:InvokeCommandAction Command="{Binding GetList}" />
-                            </ic:EventTriggerBehavior>
-                        </i:Interaction.Behaviors>
+							<ic:EventTriggerBehavior EventName="Tapped">
+								<icc:InvokeCommandAction Command="{Binding GetList}" />
+							</ic:EventTriggerBehavior>
+						</i:Interaction.Behaviors>
                     </ComboBox>
                 </Border>
             </StackPanel>

@@ -374,7 +374,7 @@ namespace ScriptGraphicHelper.ViewModels
             {
                 this.EmulatorSelectedIndex = -1;
                 ScreenshotHelperBridge.Dispose();
-                this.EmulatorInfo.Clear();
+                this.EmulatorInfo?.Clear();
                 this.EmulatorInfo = ScreenshotHelperBridge.Init();
                 MessageBox.ShowAsync(e.ToString());
             }

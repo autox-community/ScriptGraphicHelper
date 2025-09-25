@@ -1,28 +1,82 @@
+<!-- 
+代码关键点解析:
+
 <Window
-    x:Class="ScriptGraphicHelper.Views.MainWindow"
-    xmlns="https://github.com/avaloniaui"
+控件的类型,编译后大概率是 c# 中的 new Window()
+
+xmlns="https://github.com/avaloniaui"
+avalonia 的 xaml 标志,通过这个才能让编译器知道这个文件是 avalonia 的
+
+x:Class="ScriptGraphicHelper.Views.MainWindow"
+与这个 xaml 关联的 c# 代码 (命名空间和类名), xaml 编译器会将两者进行关联
+
+xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+导入 微软xaml元数据和指令为 x,  xaml 中用 x 开头的属性和指令都是这个里面的内容,
+比如 x:Name x:Class x:Static
+
+xmlns:Panels="clr-namespace:ScriptGraphicHelper.Panels;assembly=ScriptGraphicHelper"
+xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia"
+导入第三方的 dll,并设置别名,在内容中可以用这个别名来调用里面的代码,
+同一个程序集可以省略 "assembly="
+
+xmlns:i="using:Avalonia.Xaml.Interactivity"
+clr-namespace 导入本程序集代码 的简写版 (只能用来导入本程序集的类)
+
+xmlns:alias="definition"
+定义命名空间, 可以通过 clr-namespace 在别的地方引用
+
+xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"	
+mc:Ignorable="d"
+d:DesignHeight="30"
+d:DesignWidth="500"
+这个值指示 XAML 解析器（无论是在设计时还是运行时），可以安全地​​忽略​​所有以 d:前缀开头的属性或元素。
+如果解析器无法理解或处理这些带 d:前缀的内容，它不会抛出错误
+-->
+<Window
+    xmlns="https://github.com/avaloniaui" 
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:Panels="clr-namespace:ScriptGraphicHelper.Panels;assembly=ScriptGraphicHelper"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:i="using:Avalonia.Xaml.Interactivity"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	
+	mc:Ignorable="d"
+	
+    x:Class="ScriptGraphicHelper.Views.MainWindow"
+	
+	xmlns:Panels="clr-namespace:ScriptGraphicHelper.Panels;assembly=ScriptGraphicHelper"
     xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia"
+    xmlns:i="using:Avalonia.Xaml.Interactivity"
     xmlns:vm="using:ScriptGraphicHelper.ViewModels"
-    Title="综合图色助手 v1.4.0"
+    
+	Title="综合图色助手"
     Width="{Binding WindowWidth, Mode=TwoWay}"
     Height="{Binding WindowHeight, Mode=TwoWay}"
-    CanResize="True"
-    Closing="Window_Closing"
     Cursor="{Binding WindowCursor, Mode=TwoWay}"
+    CanResize="True"
     DragDrop.AllowDrop="True"
     FontSize="14"
     FontStyle="Normal"
     Icon="/assets/ico.ico"
-    KeyDown="Window_KeyDown"
-    Opened="Window_Opened"
     WindowStartupLocation="CenterScreen"
-    mc:Ignorable="d">
-
+	
+    KeyDown="Window_KeyDown"
+	Opened="Window_Opened"
+    Closing="Window_Closing"
+    >
+	<!--
+	    告诉 IDE 这个 xaml 绑定的 ViewModel 是哪个,可以让 IDE 更智能的分析代码 和 预览界面,
+		不参与运行时,
+	    运行时 ViewModel 需要在 c# 代码中 new(), 
+		比如 这个 xaml 是在 App.xaml.cs 实例化  MainWindow 后指定的 ViewModel
+		desktop.MainWindow = new MainWindow
+        {
+            DataContext = new MainWindowViewModel(),
+        };
+	-->
+	<Design.DataContext>
+		<vm:MainWindowViewModel />
+	</Design.DataContext>
+	
 	<!--快捷键-->
     <Window.KeyBindings>
         
@@ -31,7 +85,6 @@
             Command="{Binding Key_AddColorInfo}"
             CommandParameter="A"
             Gesture="A" />
-
 		
 		<!--S键 列表添加颜色-->
 		<KeyBinding
@@ -73,11 +126,6 @@
 		<KeyBinding Command="{Binding Key_GetClipboardData}" Gesture="Ctrl+V" />
 		
     </Window.KeyBindings>
-	
-	
-    <Design.DataContext>
-        <vm:MainWindowViewModel />
-    </Design.DataContext>
 
     <Grid Background="#2d2d30">
 		<!--右键菜单-->

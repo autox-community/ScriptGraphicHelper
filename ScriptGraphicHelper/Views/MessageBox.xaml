@@ -22,6 +22,7 @@
                 Name="Message"
                 HorizontalAlignment="Center"
                 VerticalAlignment="Center"
+				FontSize="18"
                 Foreground="#2d2d30"
                 TextWrapping="Wrap" />
         </ScrollViewer>
