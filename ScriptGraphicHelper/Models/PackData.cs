@@ -1,6 +1,8 @@
 ﻿using System.IO;
 using System.Text;
 
+using ScriptGraphicHelper.Utils;
+
 namespace ScriptGraphicHelper.Models
 {
     public class PackData

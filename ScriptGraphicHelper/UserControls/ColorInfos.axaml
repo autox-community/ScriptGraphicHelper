@@ -1,0 +1,256 @@
+<UserControl
+    x:Class="ScriptGraphicHelper.UserControls.ColorInfos"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:cv="using:ScriptGraphicHelper.Tools.Converters"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+	<UserControl.Resources>
+		<cv:Color2HexConverter x:Key="color2Hex" />
+		<cv:Color2BrushConverter x:Key="color2Brush" />
+		<cv:AnchorConverter x:Key="anchor" />
+	</UserControl.Resources>
+
+	<Border
+        BorderBrush="#666666"
+        BorderThickness="2"
+        CornerRadius="3">
+
+		<ScrollViewer HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden">
+			<Grid>
+
+				<!--颜色列表-->
+				<DataGrid
+                    Height="{Binding DataGridHeight, Mode=TwoWay}"
+                    AutoGenerateColumns="False"
+                    CanUserResizeColumns="False"
+                    CanUserSortColumns="False"
+                    DragDrop.AllowDrop="True"
+                    IsVisible="{Binding DataGrid_IsVisible, Mode=TwoWay}"
+                    ItemsSource="{Binding ColorInfos, Mode=TwoWay}"
+                    LoadingRow="DataGrid_LoadingRow"
+                    RowHeight="40"
+                    ScrollViewer.VerticalScrollBarVisibility="Visible"
+                    SelectedIndex="{Binding DataGridSelectedIndex, Mode=TwoWay}"
+                    SelectionMode="Single">
+					<DataGrid.Columns>
+						<DataGridTemplateColumn
+                            Width="Auto"
+							MinWidth="40"
+                            Header="序号"
+                            IsReadOnly="True">
+							<DataGridTemplateColumn.CellTemplate>
+								<DataTemplate>
+									<Border BorderBrush="#666666" BorderThickness="0,2,2,0">
+										<TextBlock
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            Text="{Binding Index}" />
+									</Border>
+								</DataTemplate>
+							</DataGridTemplateColumn.CellTemplate>
+						</DataGridTemplateColumn>
+						<DataGridTemplateColumn
+                            Width="Auto"
+							MinWidth="80"
+                            Header="坐标"
+                            IsReadOnly="True">
+							<DataGridTemplateColumn.CellTemplate>
+								<DataTemplate>
+									<Border BorderBrush="#666666" BorderThickness="0,2,0,0">
+										<SelectableTextBlock
+											SelectionBrush="Orange"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            Text="{Binding Point}" />
+									</Border>
+								</DataTemplate>
+							</DataGridTemplateColumn.CellTemplate>
+						</DataGridTemplateColumn>
+						<DataGridTemplateColumn
+							MinWidth="80"
+                            Width="Auto"
+                            Header="颜色"
+                            IsReadOnly="True">
+							<DataGridTemplateColumn.CellTemplate>
+								<DataTemplate>
+									<Border BorderBrush="#666666" BorderThickness="0,2,0,0">
+										<StackPanel Orientation="Horizontal" Spacing="5" Margin="3,0,3,0">
+											<!--颜色块-->
+											<Border BorderBrush="Black" BorderThickness="1" Width="30" Height="30">
+												<Rectangle Fill="{Binding Color, Converter={StaticResource color2Brush}}"/>
+											</Border>
+											<!--颜色文本-->
+											<SelectableTextBlock
+												SelectionBrush="Orange"
+												HorizontalAlignment="Center"
+												VerticalAlignment="Center"
+												Text="{Binding Color, Converter={StaticResource color2Hex}}" />
+										</StackPanel>
+									</Border>
+								</DataTemplate>
+							</DataGridTemplateColumn.CellTemplate>
+						</DataGridTemplateColumn>
+						<DataGridTemplateColumn Width="Auto" MinWidth="40" Header="状态">
+							<DataGridTemplateColumn.CellTemplate>
+								<DataTemplate>
+									<!--底部边框 (所有列共同组成 行下面的横线)-->
+									<Border BorderBrush="#666666" BorderThickness="2,2,0,0">
+										<Grid
+                                            Width="20"
+                                            Height="20"
+                                            HorizontalAlignment="Center">
+											<CheckBox IsChecked="{Binding IsChecked, Mode=TwoWay}"/>
+										</Grid>
+									</Border>
+								</DataTemplate>
+							</DataGridTemplateColumn.CellTemplate>
+						</DataGridTemplateColumn>
+					</DataGrid.Columns>
+				</DataGrid>
+
+				<!--锚点比色 (多了个 锚点 字段)-->
+				<DataGrid
+                    Height="{Binding DataGridHeight, Mode=TwoWay}"
+                    AutoGenerateColumns="False"
+                    CanUserResizeColumns="False"
+                    CanUserSortColumns="False"
+                    IsVisible="{Binding !DataGrid_IsVisible, Mode=TwoWay}"
+                    ItemsSource="{Binding ColorInfos, Mode=TwoWay}"
+                    LoadingRow="DataGrid_LoadingRow"
+                    RowHeight="40"
+                    SelectedIndex="{Binding DataGridSelectedIndex, Mode=TwoWay}"
+                    SelectionMode="Extended">
+					<DataGrid.Columns>
+						<DataGridTemplateColumn
+                            Width="40"
+                            Header="序号"
+                            IsReadOnly="True">
+							<DataGridTemplateColumn.CellTemplate>
+								<DataTemplate>
+									<Border BorderBrush="#666666" BorderThickness="0,2,0,0">
+										<TextBlock
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            Text="{Binding Index}" />
+									</Border>
+								</DataTemplate>
+							</DataGridTemplateColumn.CellTemplate>
+						</DataGridTemplateColumn>
+						<DataGridTemplateColumn Width="60" Header="锚点">
+							<DataGridTemplateColumn.CellTemplate>
+								<DataTemplate>
+									<Border BorderBrush="#666666" BorderThickness="0,2,0,0">
+										<ComboBox
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            HorizontalContentAlignment="Center"
+                                            VerticalContentAlignment="Center"
+                                            Background="Transparent"
+                                            BorderThickness="0"
+                                            ItemsSource="{Binding AnchorItems}"
+                                            SelectedIndex="{Binding Anchor, Converter={StaticResource anchor}}" />
+									</Border>
+
+								</DataTemplate>
+							</DataGridTemplateColumn.CellTemplate>
+						</DataGridTemplateColumn>
+						<DataGridTemplateColumn
+                            Width="80"
+                            Header="坐标"
+                            IsReadOnly="True">
+							<DataGridTemplateColumn.CellTemplate>
+								<DataTemplate>
+									<Border BorderBrush="#666666" BorderThickness="0,2,0,0">
+										<TextBlock
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            Text="{Binding Point}" />
+									</Border>
+
+								</DataTemplate>
+							</DataGridTemplateColumn.CellTemplate>
+						</DataGridTemplateColumn>
+						<DataGridTemplateColumn
+                            Width="80"
+                            Header="颜色"
+                            IsReadOnly="True">
+							<DataGridTemplateColumn.CellTemplate>
+								<DataTemplate>
+									<Border BorderBrush="#666666" BorderThickness="0,2,0,0">
+										<TextBlock
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            Text="{Binding Color, Converter={StaticResource color2Hex}}" />
+									</Border>
+								</DataTemplate>
+							</DataGridTemplateColumn.CellTemplate>
+						</DataGridTemplateColumn>
+						<DataGridTemplateColumn Width="40" Header="状态">
+							<DataGridTemplateColumn.CellTemplate>
+								<DataTemplate>
+									<Border BorderBrush="#666666" BorderThickness="0,2,0,0">
+										<Grid
+                                            Width="20"
+                                            Height="20"
+                                            HorizontalAlignment="Center">
+											<CheckBox IsChecked="{Binding IsChecked, Mode=TwoWay}">
+												<CheckBox.Styles>
+													<Style Selector="CheckBox:checked">
+														<Setter Property="Foreground" Value="{Binding MarkBrush, Converter={StaticResource color2Brush}}" />
+													</Style>
+													<Style Selector="CheckBox:checked Border#NormalRectangle">
+														<Setter Property="FocusAdorner" Value="{Binding Color, Converter={StaticResource color2Brush}}" />
+														<Setter Property="Background" Value="{Binding Color, Converter={StaticResource color2Brush}}" />
+														<Setter Property="BorderBrush" Value="Black" />
+														<Setter Property="BorderThickness" Value="1" />
+														<Setter Property="CornerRadius" Value="2" />
+													</Style>
+													<Style Selector="CheckBox:unChecked Border#NormalRectangle">
+														<Setter Property="BorderBrush" Value="Black" />
+														<Setter Property="BorderThickness" Value="1" />
+														<Setter Property="CornerRadius" Value="20" />
+													</Style>
+												</CheckBox.Styles>
+											</CheckBox>
+										</Grid>
+									</Border>
+								</DataTemplate>
+							</DataGridTemplateColumn.CellTemplate>
+						</DataGridTemplateColumn>
+					</DataGrid.Columns>
+				</DataGrid>
+				<Grid.ContextMenu>
+					<ContextMenu FontSize="20">
+						<MenuItem Command="{Binding Point_Copy_Click}" Header="复制坐标" />
+						<MenuItem Command="{Binding Color_Copy_Click}" Header="复制颜色值" />
+						<Separator/>
+						<MenuItem Command="{Binding ColorInfo_Reset_Click}" Header="坐标重置颜色" />
+						<MenuItem Command="{Binding ColorInfo_SelectItemClear_Click}" Header="删除选中行" />
+						<Separator/>
+						<MenuItem Command="{Binding Key_ColorInfo_Clear}" Header="清空列表" />
+					</ContextMenu>
+				</Grid.ContextMenu>
+			</Grid>
+		</ScrollViewer>
+
+	</Border>
+
+
+	<UserControl.Styles>
+		<Style Selector="DataGridColumnHeader">
+			<Setter Property="HorizontalAlignment" Value="Center" />
+			<Setter Property="HorizontalContentAlignment" Value="Center" />
+			<Setter Property="Padding" Value="0,10,0,10" />
+			<Setter Property="Height" Value="40" />
+		</Style>
+		<Styles>
+			<!--选中行颜色-->
+			<Style Selector="DataGridRow:selected /template/ Rectangle#BackgroundRectangle">
+				<Setter Property="Fill" Value="#FAF0E6" />
+			</Style>
+		</Styles>
+	</UserControl.Styles>
+</UserControl>

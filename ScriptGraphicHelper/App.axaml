@@ -1,0 +1,23 @@
+<Application
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:ScriptGraphicHelper"
+	RequestedThemeVariant="Light"
+	x:Class="ScriptGraphicHelper.App"
+	>
+	
+	<Application.DataTemplates>
+		<local:ViewLocator />
+	</Application.DataTemplates>
+	
+	<Application.Styles>
+		
+		<!--avalonia 样式-->
+		<FluentTheme />
+		
+		<!--DataGrid 样式 (avares 是获取程序集中的 Assets, Avalonia 的 Assets 会被打包到 dll 中)-->
+		<StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Simple.xaml"/>
+		
+	</Application.Styles>
+
+</Application>

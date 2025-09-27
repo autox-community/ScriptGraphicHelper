@@ -1,16 +1,3 @@
-using Avalonia;
-using Avalonia.Controls;
-using Avalonia.Input;
-using Avalonia.Media;
-using Avalonia.Media.Imaging;
-using Avalonia.Threading;
-using Newtonsoft.Json;
-using ScriptGraphicHelper.Converters;
-using ScriptGraphicHelper.Models;
-using ScriptGraphicHelper.Models.UnmanagedMethods;
-using ScriptGraphicHelper.ViewModels.Core;
-using ScriptGraphicHelper.Views;
-using SkiaSharp;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -19,11 +6,35 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Windows.Input;
+
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Input;
+using Avalonia.Logging;
+using Avalonia.Media;
+using Avalonia.Media.Imaging;
+using Avalonia.Platform.Storage;
+using Avalonia.Threading;
+
+using CommunityToolkit.Mvvm.DependencyInjection;
+
+using ExCSS;
+
+using Newtonsoft.Json;
+
+using ScriptGraphicHelper.Helpers;
+using ScriptGraphicHelper.Models;
+using ScriptGraphicHelper.Tools;
+using ScriptGraphicHelper.Tools.Converters;
+using ScriptGraphicHelper.Utils.ViewModel;
+using ScriptGraphicHelper.Views;
+
+using SkiaSharp;
+
+using Cursor = Avalonia.Input.Cursor;
 using Image = Avalonia.Controls.Image;
 using Point = Avalonia.Point;
-using Range = ScriptGraphicHelper.Models.Range;
-using TabItem = ScriptGraphicHelper.Models.TabItem;
-using Cursor = Avalonia.Input.Cursor;
+using TabItem = ScriptGraphicHelper.Helpers.TabItem;
 
 namespace ScriptGraphicHelper.ViewModels
 {
@@ -31,28 +42,17 @@ namespace ScriptGraphicHelper.ViewModels
     {
         public MainWindowViewModel()
         {
-            if (File.Exists(AppDomain.CurrentDomain.BaseDirectory + @"assets\settings.json"))
+            // 读取 json 配置文件
+            Settings.Instance = SettingsTools.InitSettings();
+
+            if (Settings.Instance.ShowConsole)
             {
-                // json 配置文件存在, 读取配置文件
-                var settingsStr = File.ReadAllText(AppDomain.CurrentDomain.BaseDirectory + @"assets\settings.json").Replace("\\\\", "\\").Replace("\\", "\\\\");
-                var settings = JsonConvert.DeserializeObject<Settings>(settingsStr);
-                if (settings is null)
-                {
-                    settings = new Settings
-                    {
-                        Formats = FormatConfig.CreateFormats()
-                    };
-                }
-                Settings.Instance = settings;
+                NativeApi.AllocConsole();
             }
-            else
-            {
-                // 配置文件不存在,则创建
-                Settings.Instance = new Settings
-                {
-                    Formats = FormatConfig.CreateFormats()
-                };
-            }
+
+#if DEBUG
+            NativeApi.AllocConsole();
+#endif
 
             // 获取 开启 的生成格式
             this.FormatItems = FormatConfig.GetEnabledFormats();
@@ -63,221 +63,219 @@ namespace ScriptGraphicHelper.ViewModels
 
             // 相似度
             this.SimSelectedIndex = Settings.Instance.SimSelectedIndex;
+
+            // 代码生成格式选择
             this.FormatSelectedIndex = Settings.Instance.FormatSelectedIndex;
 
             this.ColorInfos = new ObservableCollection<ColorInfo>();
 
             // 放大镜
-            this.LoupeWriteBmp = LoupeWriteBitmap.Init(241, 241);
-            this.Loupe_IsVisible = false;
+            this.LoupeWriteBmp = LoupeHelper.Init(241, 241);
+
+            // 放大镜刷新间隔
+            this.LoupeRefreshInterval = Settings.Instance.LoupeRefreshInterval;
+
             this.Rect_IsVisible = false;
+
             this.DataGridHeight = 40;
 
             // 模拟器 (夜神,逍遥,雷电)
             this.EmulatorSelectedIndex = -1;
+
+            // 获取可选择的模式
             this.EmulatorInfo = ScreenshotHelperBridge.Init();
         }
 
-        private Point StartPoint;
+        private Point _startPoint;
 
         /// <summary>
         /// 图片 点 鼠标按下
         /// </summary>
         public ICommand Img_PointerPressed => new Command((param) =>
         {
-            if (param != null)
+            if (param == null)
             {
-                var parameters = (CommandParameters)param;
-                var eventArgs = (PointerPressedEventArgs)parameters.EventArgs;
+                return;
+            }
 
-                // 左键按下
-                if (eventArgs.GetCurrentPoint(null).Properties.IsLeftButtonPressed)
-                {
-                    // 关闭放大镜
-                    this.Loupe_IsVisible = false;
+            var parameters = (CommandParameters)param;
+            var eventArgs = (PointerPressedEventArgs)parameters.EventArgs;
 
-                    // 获取点击的 xy
-                    this.StartPoint = eventArgs.GetPosition(null);
-                    // 设置矩形 距离左边的距离
-                    this.RectMargin = new Thickness(this.StartPoint.X, this.StartPoint.Y, 0, 0);
-                    // 矩形显示 (开始框选图片)
-                    this.Rect_IsVisible = true;
-                }
+            // 左键按下
+            if (eventArgs.GetCurrentPoint(null).Properties.IsLeftButtonPressed)
+            {
+                // 获取点击的 xy
+                this._startPoint = eventArgs.GetPosition(null);
+                // 设置矩形 距离左边的距离
+                this.RectMargin = new Thickness(this._startPoint.X, this._startPoint.Y, 0, 0);
+                // 矩形显示 (开始框选图片)
+                this.Rect_IsVisible = true;
             }
         });
+
+        private DateTime _lastPixelTime = DateTime.MinValue;
 
         /// <summary>
         /// 图片 点 鼠标移动
         /// </summary>
         public ICommand Img_PointerMoved => new Command((param) =>
         {
-            if (param != null)
+            if (param == null)
             {
-                var parameters = (CommandParameters)param;
-                var eventArgs = (PointerEventArgs)parameters.EventArgs;
+                return;
+            }
+            var parameters = (CommandParameters)param;
+            var eventArgs = (PointerEventArgs)parameters.EventArgs;
 
-                var point = eventArgs.GetPosition(null);
+            var point = eventArgs.GetPosition(null);
 
-                // 矩形已经显示 (正在框选图片)
-                if (this.Rect_IsVisible)
+            // 矩形已经显示 (正在框选图片)
+            if (this.Rect_IsVisible)
+            {
+                var width = point.X - this._startPoint.X - 1;
+                var height = point.Y - this._startPoint.Y - 1;
+                if (width > 0 && height > 0)
                 {
-                    var width = point.X - this.StartPoint.X - 1;
-                    var height = point.Y - this.StartPoint.Y - 1;
-                    if (width > 0 && height > 0)
-                    {
-                        // 设置矩形的宽高
-                        this.RectWidth = width;
-                        this.RectHeight = height;
-                    }
-                }
-                else
-                {
-                    // 矩形没有显示, 则操作放大镜
-
-                    // 设置放大镜的位置
-                    this.LoupeMargin = point.Y > 500
-                    ? new Thickness(point.X + 20, point.Y - 261, 0, 0)
-                    : new Thickness(point.X + 20, point.Y + 20, 0, 0);
-
-                    var position = eventArgs.GetPosition((Image)parameters.Sender);
-
-                    var imgPoint = new Point(
-                        Math.Floor(position.X / this.ScaleFactor),
-                        Math.Floor(position.Y / this.ScaleFactor));
-
-                    this.PointX = (int)imgPoint.X;
-                    this.PointY = (int)imgPoint.Y;
-
-                    // 获取当前点的颜色
-                    var color = GraphicHelper.GetPixel(this.PointX, this.PointY);
-                    this.PointColor = "#" + color[0].ToString("X2") + color[1].ToString("X2") + color[2].ToString("X2");
-
-                    var sx = this.PointX - 7;
-                    var sy = this.PointY - 7;
-
-                    // 获取 15x15 大小的矩阵颜色
-                    var colors = new List<byte[]>();
-                    for (var j = 0; j < 15; j++)
-                    {
-                        for (var i = 0; i < 15; i++)
-                        {
-                            var x = sx + i;
-                            var y = sy + j;
-
-                            if (x >= 0 && y >= 0 && x < this.ImgWidth && y < this.ImgHeight)
-                            {
-                                // 获取颜色
-                                colors.Add(GraphicHelper.GetPixel(x, y));
-                            }
-                            else
-                            {
-                                // 出界则为黑色
-                                colors.Add(new byte[] { 0, 0, 0 });
-                            }
-                        }
-                    }
-                    // 放大镜 显示颜色矩阵
-                    this.LoupeWriteBmp.WriteColor(colors);
+                    // 设置矩形的宽高
+                    this.RectWidth = width;
+                    this.RectHeight = height;
                 }
             }
+
+            // 操作放大镜
+
+            // 降低放大镜的刷新频率, 提高软件性能 (刷新过快也没啥用)
+            var now = DateTime.UtcNow;
+            if ((now - _lastPixelTime).TotalMilliseconds < this.LoupeRefreshInterval) // 间隔
+                return;
+
+            _lastPixelTime = now;
+
+            var position = eventArgs.GetPosition((Image)parameters.Sender);
+
+            var imgPoint = new Point(
+                Math.Floor(position.X / this.ScaleFactor),
+                Math.Floor(position.Y / this.ScaleFactor));
+
+            this.PointX = (int)imgPoint.X;
+            this.PointY = (int)imgPoint.Y;
+
+            // 获取当前点的颜色
+            var color = GraphicHelper.GetPixel(this.PointX, this.PointY);
+            this.PointColor = "#" + color[0].ToString("X2") + color[1].ToString("X2") + color[2].ToString("X2");
+
+            var sx = this.PointX - 7;
+            var sy = this.PointY - 7;
+
+            // 获取 15x15 大小的矩阵颜色
+            var colors = new List<byte[]>();
+            for (var j = 0; j < 15; j++)
+            {
+                for (var i = 0; i < 15; i++)
+                {
+                    var x = sx + i;
+                    var y = sy + j;
+
+                    if (x >= 0 && y >= 0 && x < this.ImgWidth && y < this.ImgHeight)
+                    {
+                        // 获取颜色
+                        colors.Add(GraphicHelper.GetPixel(x, y));
+                    }
+                    else
+                    {
+                        // 出界则为黑色
+                        colors.Add(new byte[] { 255, 250, 250 });
+                    }
+                }
+            }
+            // 放大镜 显示颜色矩阵
+            this.LoupeWriteBmp.WriteColor(colors);
+            // 刷新图片
+            MainWindow.MyLoupeImg?.InvalidateVisual();
         });
 
+        private DateTime _addColorInfoTime = DateTime.Now;
 
-        private DateTime AddColorInfoTime = DateTime.Now;
         /// <summary>
         /// 图片 点 鼠标释放
         /// </summary>
         public ICommand Img_PointerReleased => new Command((param) =>
         {
-            if (param != null)
+            if (param == null)
             {
-                var parameters = (CommandParameters)param;
+                return;
+            }
 
-                // 矩形已经显示 (正在框选图片)
-                if (this.Rect_IsVisible)
+            var parameters = (CommandParameters)param;
+
+            // 矩形已经显示 (正在框选图片)
+            if (this.Rect_IsVisible)
+            {
+                var eventArgs = (PointerEventArgs)parameters.EventArgs;
+                var position = eventArgs.GetPosition((Image)parameters.Sender);
+
+                // 当前鼠标的结束点
+                var endPoint = new Point(Math.Floor(position.X / this.ScaleFactor), Math.Floor(position.Y / this.ScaleFactor));
+
+                // 用 结束点 减去宽高, 得到起始点
+                var startX = (int)(endPoint.X - Math.Floor(this.RectWidth / this.ScaleFactor));
+                var startY = (int)(endPoint.Y - Math.Floor(this.RectHeight / this.ScaleFactor));
+
+                // 移动距离大,是在框选
+                if (this.RectWidth > 10 && this.RectHeight > 10)
                 {
-                    var eventArgs = (PointerEventArgs)parameters.EventArgs;
-                    var position = eventArgs.GetPosition((Image)parameters.Sender);
+                    // 框选的范围 (用于填写到文本框)
+                    this.Rect = string.Format("[{0},{1},{2},{3}]", startX, startY, Math.Min(endPoint.X, this.ImgWidth - 1), Math.Min(endPoint.Y, this.ImgHeight - 1));
+                }
+                else
+                {
+                    // 移动距离较小,是在添加颜色
 
-                    var point = new Point(Math.Floor(position.X / this.ScaleFactor), Math.Floor(position.Y / this.ScaleFactor));
-
-                    var sx = (int)(point.X - Math.Floor(this.RectWidth / this.ScaleFactor));
-                    var sy = (int)(point.Y - Math.Floor(this.rectHeight / this.ScaleFactor));
-
-                    if (this.RectWidth > 10 && this.rectHeight > 10)
+                    // 两次添加颜色信息的间隔大于 200 毫秒,则本次正常添加
+                    if ((DateTime.Now - this._addColorInfoTime).TotalMilliseconds > 200)
                     {
-                        // 框选的范围 (用于填写到文本框)
-                        this.Rect = string.Format("[{0},{1},{2},{3}]", sx, sy, Math.Min(point.X, this.ImgWidth - 1), Math.Min(point.Y, this.ImgHeight - 1));
-                    }
-                    else
-                    {
-                        // 两次添加颜色信息的间隔大于 200 毫秒,则本次正常添加
-                        if ((DateTime.Now - this.AddColorInfoTime).TotalMilliseconds > 200)
+                        // 记录本次添加颜色的时间
+                        this._addColorInfoTime = DateTime.Now;
+
+                        // 获取颜色
+                        var color = GraphicHelper.GetPixel(startX, startY);
+
+                        if (this.ColorInfos.Count == 0)
                         {
-                            // 记录本次添加颜色的时间
-                            this.AddColorInfoTime = DateTime.Now;
-
-                            // 获取颜色
-                            var color = GraphicHelper.GetPixel(sx, sy);
-
-                            if (this.ColorInfos.Count == 0)
-                            {
-                                ColorInfo.Width = this.ImgWidth;
-                                ColorInfo.Height = this.ImgHeight;
-                            }
-
-                            var anchor = AnchorMode.None;
-
-                            var quarterWidth = this.ImgWidth / 4;
-
-                            if (sx > quarterWidth * 3)
-                            {
-                                anchor = AnchorMode.Right;
-                            }
-                            else if (sx > quarterWidth)
-                            {
-                                anchor = AnchorMode.Center;
-                            }
-                            else
-                            {
-                                anchor = AnchorMode.Left;
-                            }
-
-                            // 添加 颜色信息
-                            this.ColorInfos.Add(new ColorInfo(this.ColorInfos.Count, anchor, sx, sy, color));
-
-                            // 增加 表格的高度
-                            this.DataGridHeight = (this.ColorInfos.Count + 1) * 40;
+                            ColorInfo.Width = this.ImgWidth;
+                            ColorInfo.Height = this.ImgHeight;
                         }
+
+                        var anchor = AnchorMode.None;
+
+                        var quarterWidth = this.ImgWidth / 4;
+
+                        if (startX > quarterWidth * 3)
+                        {
+                            anchor = AnchorMode.Right;
+                        }
+                        else if (startX > quarterWidth)
+                        {
+                            anchor = AnchorMode.Center;
+                        }
+                        else
+                        {
+                            anchor = AnchorMode.Left;
+                        }
+
+                        // 添加 颜色信息
+                        this.ColorInfos.Add(new ColorInfo(this.ColorInfos.Count, anchor, startX, startY, color));
+
+                        // 增加 表格的高度
+                        this.DataGridHeight = (this.ColorInfos.Count + 1) * 40;
                     }
                 }
-                // 隐藏矩形 (结束框选图片)
-                this.Rect_IsVisible = false;
-                this.RectWidth = 0;
-                this.RectHeight = 0;
-                this.RectMargin = new Thickness(0, 0, 0, 0);
-
-                // 显示放大镜
-                this.Loupe_IsVisible = true;
             }
-        });
-
-        /// <summary>
-        /// 图片 点 鼠标进入
-        /// </summary>
-        public ICommand Img_PointerEnter => new Command((param) =>
-        {
-            // 显示放大镜
-            this.Loupe_IsVisible = true;
-        });
-
-        /// <summary>
-        /// 图片 点 鼠标离开
-        /// </summary>
-        public ICommand Img_PointerLeave => new Command((param) =>
-        {
-            // 隐藏放大镜
-            this.Loupe_IsVisible = false;
+            // 隐藏矩形 (结束框选图片)
+            this.Rect_IsVisible = false;
+            this.RectWidth = 0;
+            this.RectHeight = 0;
+            this.RectMargin = new Thickness(0, 0, 0, 0);
         });
 
         /// <summary>
@@ -307,7 +305,6 @@ namespace ScriptGraphicHelper.ViewModels
         {
             try
             {
-                
                 if (ScreenshotHelperBridge.State == LinkState.success)
                 {
                     // 已经连接过,则直接保存
@@ -362,11 +359,17 @@ namespace ScriptGraphicHelper.ViewModels
                     // 目标模式 截屏失败回调
                     ScreenshotHelperBridge.Helpers[ScreenshotHelperBridge.Select].OnFailed = new Action<string>((errorMessage) =>
                     {
-                        MessageBox.ShowAsync(errorMessage);
+                        MessageBoxWindow.ShowAsync(errorMessage);
 
                         // 设置鼠标样式为 普通箭头
                         this.WindowCursor = new Cursor(StandardCursorType.Arrow);
                     });
+
+                    // 没有获取到设备列表,则重置
+                    if (this.EmulatorInfo.Count == 0)
+                    {
+                        ResetEmulatorOptions_Click();
+                    }
                 }
 
             }
@@ -376,7 +379,7 @@ namespace ScriptGraphicHelper.ViewModels
                 ScreenshotHelperBridge.Dispose();
                 this.EmulatorInfo?.Clear();
                 this.EmulatorInfo = ScreenshotHelperBridge.Init();
-                MessageBox.ShowAsync(e.ToString());
+                MessageBoxWindow.ShowAsync(e.ToString());
             }
             // 设置鼠标样式为 普通箭头
             this.WindowCursor = new Cursor(StandardCursorType.Arrow);
@@ -389,13 +392,12 @@ namespace ScriptGraphicHelper.ViewModels
         {
             try
             {
-
                 this.WindowCursor = new Cursor(StandardCursorType.Wait);
                 if (ScreenshotHelperBridge.Select == -1
                     || ScreenshotHelperBridge.Index == -1 ||
                     ScreenshotHelperBridge.Info[ScreenshotHelperBridge.Index].Value == "null")
                 {
-                    MessageBox.ShowAsync("请先配置 -> (模拟器/tcp/句柄)");
+                    MessageBoxWindow.ShowAsync("请先配置 -> (模拟器/tcp/句柄)");
                     this.WindowCursor = new Cursor(StandardCursorType.Arrow);
                     return;
                 }
@@ -406,7 +408,7 @@ namespace ScriptGraphicHelper.ViewModels
             }
             catch (Exception ex)
             {
-                MessageBox.ShowAsync(ex.ToString());
+                MessageBoxWindow.ShowAsync(ex.ToString());
             }
         }
 
@@ -447,34 +449,36 @@ namespace ScriptGraphicHelper.ViewModels
         {
             try
             {
-                if (e.Data.Contains(DataFormats.FileNames))
+                foreach (var item in e.Data.GetFiles())
                 {
-                    foreach (var name in e.Data.GetFileNames())
-                    {
-                        if (name != "" && name != string.Empty)
-                        {
-                            var stream = new FileStream(name, FileMode.Open, FileAccess.Read);
-                            this.Img = new Bitmap(stream);
-                            stream.Position = 0;
-                            var sKBitmap = SKBitmap.Decode(stream); // TODO: 这里好像会报错
-                            GraphicHelper.KeepScreen(sKBitmap);
-                            sKBitmap.Dispose();
-                            stream.Dispose();
+                    var filePath = item.TryGetLocalPath();
 
-                            var item = new TabItem(this.Img);
-                            item.Command = new Command((param) =>
-                            {
-                                this.TabItems.Remove(item);
-                            });
-                            this.TabItems.Add(item);
-                            this.TabControlSelectedIndex = this.TabItems.Count - 1;
-                        }
+                    if (!string.IsNullOrWhiteSpace(filePath))
+                    {
+                        using var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+                        // 显示图片到界面
+                        this.Img = new Bitmap(stream);
+
+                        stream.Position = 0; // 重置到 0 位置,再去解析, 否则读不到. ( 估计上面的 new Bitmap() 会操作这个 Position)
+                        using var sKBitmap = SKBitmap.Decode(stream);
+
+                        // 保存图片到内存中
+                        GraphicHelper.KeepScreen(sKBitmap);
+
+                        // 添加一个 tab
+                        var tabItem = new TabItem(this.Img);
+                        tabItem.Command = new Command((param) =>
+                        {
+                            this.TabItems.Remove(tabItem);
+                        });
+                        this.TabItems.Add(tabItem);
+                        this.TabControlSelectedIndex = this.TabItems.Count - 1;
                     }
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.ShowAsync(ex.ToString());
+                MessageBoxWindow.ShowAsync(ex.ToString());
             }
         }
 
@@ -485,53 +489,31 @@ namespace ScriptGraphicHelper.ViewModels
         {
             try
             {
-                var fileName = string.Empty;
-
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                var tl = Ioc.Default.GetService<TopLevel>();
+                var fileList = await tl.StorageProvider.OpenFilePickerAsync(new Avalonia.Platform.Storage.FilePickerOpenOptions()
                 {
-                    OpenFileName ofn = new();
-                    ofn.hwnd = MainWindow.Instance.Handle;
-                    ofn.structSize = Marshal.SizeOf(ofn);
-                    ofn.filter = "位图文件 (*.png;*.bmp;*.jpg)\0*.png;*.bmp;*.jpg\0";
-                    ofn.file = new string(new char[256]);
-                    ofn.maxFile = ofn.file.Length;
-                    ofn.fileTitle = new string(new char[64]);
-                    ofn.maxFileTitle = ofn.fileTitle.Length;
-                    ofn.title = "请选择文件";
-
-                    if (NativeApi.GetOpenFileName(ofn))
+                    Title = "请选择文件",
+                    AllowMultiple = false,
+                    FileTypeFilter = new List<FilePickerFileType>()
                     {
-                        fileName = ofn.file;
-                    }
-                }
-                else
-                {
-                    var dlg = new OpenFileDialog
-                    {
-                        Title = "请选择文件",
-                        AllowMultiple = false,
-                        Filters = new List<FileDialogFilter>
+                        new FilePickerFileType("位图文件")
                         {
-                            new FileDialogFilter
+                            Patterns = new List<string>()
                             {
-                                Name = "位图文件",
-                                Extensions = new List<string>()
-                                {
-                                "png",
-                                "bmp",
-                                "jpg"
-                                }
+                                "*.png","*.bmp","*.jpg"
                             }
                         }
-                    };
-                    var fileNames = await dlg.ShowAsync(MainWindow.Instance);
-                    if (fileNames.Length != 0)
-                    {
-                        fileName = fileNames[0];
                     }
+                });
+
+                var fileName = string.Empty;
+                if (fileList.Count > 0)
+                {
+                    // 文件的完整地址
+                    fileName = fileList[0].Path.LocalPath;
                 }
 
-                if (fileName != "" && fileName != string.Empty)
+                if (!string.IsNullOrWhiteSpace(fileName))
                 {
                     var stream = new FileStream(fileName, FileMode.Open, FileAccess.Read);
                     this.Img = new Bitmap(stream);
@@ -552,7 +534,7 @@ namespace ScriptGraphicHelper.ViewModels
             }
             catch (Exception e)
             {
-                MessageBox.ShowAsync(e.ToString());
+                MessageBoxWindow.ShowAsync(e.ToString());
             }
         }
 
@@ -568,58 +550,31 @@ namespace ScriptGraphicHelper.ViewModels
 
             try
             {
-                var fileName = string.Empty;
-
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                var tl = Ioc.Default.GetService<TopLevel>();
+                var storageFile = await tl.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions()
                 {
-                    OpenFileName ofn = new();
-
-                    ofn.hwnd = MainWindow.Instance.Handle;
-                    ofn.structSize = Marshal.SizeOf(ofn);
-                    ofn.filter = "位图文件 (*.png;*.bmp;*.jpg)\0*.png;*.bmp;*.jpg\0";
-                    ofn.file = new string(new char[256]);
-                    ofn.maxFile = ofn.file.Length;
-                    ofn.fileTitle = new string(new char[64]);
-                    ofn.maxFileTitle = ofn.fileTitle.Length;
-                    ofn.title = "保存文件";
-                    ofn.defExt = ".png";
-                    if (NativeApi.GetSaveFileName(ofn))
+                    SuggestedFileName = "Screen_" + DateTime.Now.ToString("yy-MM-dd-HH-mm-ss"),
+                    Title = "保存文件",
+                    FileTypeChoices = new List<FilePickerFileType>()
                     {
-                        fileName = ofn.file;
-                    }
-                }
-                else
-                {
-                    var dlg = new SaveFileDialog
-                    {
-                        InitialFileName = "Screen_" + DateTime.Now.ToString("yy-MM-dd-HH-mm-ss"),
-                        Title = "保存文件",
-                        Filters = new List<FileDialogFilter>
+                        new FilePickerFileType("位图文件")
                         {
-                            new FileDialogFilter
-                            {
-                                Name = "位图文件",
-                                Extensions = new List<string>()
-                                {
-                                    "png",
-                                    "bmp",
-                                    "jpg"
-                                }
-                            }
+                            Patterns = new List<string>(){"*.png", "*.bmp", "*.jpg"}
                         }
-                    };
-                    fileName = await dlg.ShowAsync(MainWindow.Instance);
-                }
-
-
-                if (fileName != null && fileName != "" && fileName != string.Empty)
+                    }
+                });
+                if (storageFile != null)
                 {
-                    this.Img.Save(fileName);
+                    var filePath = storageFile.TryGetLocalPath();
+                    if (!string.IsNullOrWhiteSpace(filePath))
+                    {
+                        this.Img.Save(filePath);
+                    }
                 }
             }
             catch (Exception e)
             {
-                MessageBox.ShowAsync(e.ToString());
+                MessageBoxWindow.ShowAsync(e.ToString());
             }
         }
 
@@ -631,9 +586,12 @@ namespace ScriptGraphicHelper.ViewModels
             if (this.Img != null && this.ColorInfos.Count > 0)
             {
                 var sims = new int[] { 100, 95, 90, 85, 80, 0 };
+                // 比色
                 if (this.CurrentFormat.IsCompareMode is true)
                 {
                     CompareResult result;
+
+                    // 锚点比色
                     if (this.CurrentFormat.AnchorIsEnabled is true)
                     {
                         var width = ColorInfo.Width;
@@ -649,25 +607,30 @@ namespace ScriptGraphicHelper.ViewModels
 
                     if (!result.Result)
                     {
-                        MessageBox.ShowAsync(result.ErrorMessage);
+                        MessageBoxWindow.ShowAsync(result.ErrorMessage);
                     }
                     this.TestResult = result.Result.ToString();
                 }
                 else
                 {
-                    if (colorInfos.Count < 2)
+                    // 找色
+
+                    if (this.ColorInfos.Count < 2)
                     {
-                        MessageBox.ShowAsync("错误", "多点找色至少需要勾选两个颜色才可进行测试!");
+                        MessageBoxWindow.ShowAsync("错误", "多点找色至少需要勾选两个颜色才可进行测试!");
                         this.TestResult = "error";
                         return;
                     }
+
                     Point result;
+
+                    // 锚点找色
                     if (this.CurrentFormat.AnchorIsEnabled is true)
                     {
                         var width = ColorInfo.Width;
                         var height = ColorInfo.Height;
                         var testStr = CreateColorStrHelper.Create(FormatMode.AnchorsFindStrTest, this.ColorInfos);
-                        result = GraphicHelper.AnchorsFindColor(new Range(0, 0, width - 1, height - 1), width, height, testStr.Trim('"'), sims[this.SimSelectedIndex]);
+                        result = GraphicHelper.AnchorsFindColor(new MyRange(0, 0, width - 1, height - 1), width, height, testStr.Trim('"'), sims[this.SimSelectedIndex]);
                     }
                     else
                     {
@@ -703,7 +666,7 @@ namespace ScriptGraphicHelper.ViewModels
                 {
                     this.Rect = string.Format("[{0}]", rect.ToString());
                 }
-                else if (FormatConfig.GetFormat(this.FormatItems[this.formatSelectedIndex])!.AnchorIsEnabled is true)
+                else if (FormatConfig.GetFormat(this.FormatItems[this.FormatSelectedIndex])!.AnchorIsEnabled is true)
                 {
                     this.Rect = rect.ToString(2);
                 }
@@ -712,8 +675,8 @@ namespace ScriptGraphicHelper.ViewModels
                     this.Rect = rect.ToString();
                 }
 
-                this.CreateStr = CreateColorStrHelper.Create(this.CurrentFormat.Name, this.ColorInfos, rect);
-                
+                this.CreateStr = CreateColorStrHelper.Create(this.CurrentFormat?.Name, this.ColorInfos, rect);
+
                 // 复制
                 CreateStr_Copy_Click();
             }
@@ -726,11 +689,12 @@ namespace ScriptGraphicHelper.ViewModels
         {
             try
             {
-                await Application.Current.Clipboard.SetTextAsync(this.CreateStr);
+                var tl = Ioc.Default.GetService<TopLevel>();
+                await tl.Clipboard.SetTextAsync(this.CreateStr);
             }
             catch (Exception ex)
             {
-                MessageBox.ShowAsync("设置剪贴板失败 , 你的剪贴板可能被其他软件占用\r\n\r\n" + ex.Message, "error");
+                MessageBoxWindow.ShowAsync("设置剪贴板失败 , 你的剪贴板可能被其他软件占用\r\n\r\n" + ex.Message, "error");
             }
         }
 
@@ -757,10 +721,6 @@ namespace ScriptGraphicHelper.ViewModels
         /// </summary>
         public ICommand Key_AddColorInfo => new Command((param) =>
         {
-            if (!this.Loupe_IsVisible)
-            {
-                return;
-            }
             var x = this.PointX;
             var y = this.PointY;
             var key = (string)param;
@@ -858,12 +818,14 @@ namespace ScriptGraphicHelper.ViewModels
         {
             try
             {
-                var formats = await Application.Current.Clipboard.GetFormatsAsync();
+                var tl = Ioc.Default.GetService<TopLevel>();
+                var formats = await tl.Clipboard.GetFormatsAsync();
+
                 var fileName = string.Empty;
 
                 if (Array.IndexOf(formats, "FileNames") != -1)
                 {
-                    var fileNames = (List<string>)await Application.Current.Clipboard.GetDataAsync(DataFormats.FileNames);
+                    var fileNames = (List<string>)await tl.Clipboard.GetDataAsync(DataFormats.FileNames);
                     if (fileNames.Count != 0)
                     {
                         fileName = fileNames[0];
@@ -890,8 +852,8 @@ namespace ScriptGraphicHelper.ViewModels
                 }
                 else
                 {
-                    var text = await Application.Current.Clipboard.GetTextAsync();
-                    if (text != string.Empty)
+                    var text = await tl.Clipboard.GetTextAsync();
+                    if (!string.IsNullOrWhiteSpace(text))
                     {
                         this.ColorInfos.Clear();
                         var sims = new int[] { 100, 95, 90, 85, 80, 0 };
@@ -917,7 +879,7 @@ namespace ScriptGraphicHelper.ViewModels
             }
             catch (Exception ex)
             {
-                MessageBox.ShowAsync(ex.ToString());
+                MessageBoxWindow.ShowAsync(ex.ToString());
             }
         }
 
@@ -935,7 +897,7 @@ namespace ScriptGraphicHelper.ViewModels
         /// </summary>
         public async void Key_SetConfig()
         {
-            var config = new Config();
+            var config = new ConfigWindow();
             var setting = Settings.Instance;
             var ldpath3 = setting.LdPath3;
             var ldpath4 = setting.LdPath4;
@@ -956,11 +918,12 @@ namespace ScriptGraphicHelper.ViewModels
         {
             try
             {
-                await Application.Current.Clipboard.SetTextAsync(this.Rect);
+                var tl = Ioc.Default.GetService<TopLevel>();
+                await tl.Clipboard.SetTextAsync(this.Rect);
             }
             catch (Exception ex)
             {
-                MessageBox.ShowAsync("设置剪贴板失败 , 你的剪贴板可能被其他软件占用\r\n\r\n" + ex.Message, "error");
+                MessageBoxWindow.ShowAsync("设置剪贴板失败 , 你的剪贴板可能被其他软件占用\r\n\r\n" + ex.Message, "error");
             }
         }
 
@@ -985,11 +948,13 @@ namespace ScriptGraphicHelper.ViewModels
                 }
                 var point = this.ColorInfos[this.DataGridSelectedIndex].Point;
                 var pointStr = string.Format("{0},{1}", point.X, point.Y);
-                await Application.Current.Clipboard.SetTextAsync(pointStr);
+
+                var tl = Ioc.Default.GetService<TopLevel>();
+                await tl.Clipboard.SetTextAsync(pointStr);
             }
             catch (Exception ex)
             {
-                MessageBox.ShowAsync("设置剪贴板失败\r\n\r\n" + ex.Message, "错误");
+                MessageBoxWindow.ShowAsync("设置剪贴板失败\r\n\r\n" + ex.Message, "错误");
             }
         }
 
@@ -1006,11 +971,13 @@ namespace ScriptGraphicHelper.ViewModels
                 }
                 var color = this.ColorInfos[this.DataGridSelectedIndex].Color;
                 var hexColor = string.Format("#{0}{1}{2}", color.R.ToString("X2"), color.G.ToString("X2"), color.B.ToString("X2"));
-                await Application.Current.Clipboard.SetTextAsync(hexColor);
+
+                var tl = Ioc.Default.GetService<TopLevel>();
+                await tl.Clipboard.SetTextAsync(hexColor);
             }
             catch (Exception ex)
             {
-                MessageBox.ShowAsync("设置剪贴板失败\r\n\r\n" + ex.Message, "错误");
+                MessageBoxWindow.ShowAsync("设置剪贴板失败\r\n\r\n" + ex.Message, "错误");
             }
         }
 
@@ -1026,7 +993,7 @@ namespace ScriptGraphicHelper.ViewModels
                 var x = (int)colorInfo.Point.X;
                 var y = (int)colorInfo.Point.Y;
                 var color = GraphicHelper.GetPixel(x, y);
-                colorInfo.Color = Color.FromRgb(color[0], color[1], color[2]);
+                colorInfo.Color = Avalonia.Media.Color.FromRgb(color[0], color[1], color[2]);
                 if (x >= this.ImgWidth || y >= this.ImgHeight)
                 {
                     colorInfo.IsChecked = false;
@@ -1057,13 +1024,13 @@ namespace ScriptGraphicHelper.ViewModels
         public async void CutImg_Click()
         {
             var range = GetRange();
-            var imgEditor = new ImgEditor(range, GraphicHelper.GetRectData(range));
+            var imgEditor = new ImgEditorWindow(range, GraphicHelper.GetRectData(range));
             await imgEditor.ShowDialog(MainWindow.Instance);
-            if (ImgEditor.Result_ACK && ImgEditor.ResultColorInfos != null && ImgEditor.ResultColorInfos.Count != 0)
+            if (ImgEditorWindow.Result_ACK && ImgEditorWindow.ResultColorInfos != null && ImgEditorWindow.ResultColorInfos.Count != 0)
             {
-                this.ColorInfos = new ObservableCollection<ColorInfo>(ImgEditor.ResultColorInfos);
-                ImgEditor.ResultColorInfos.Clear();
-                ImgEditor.Result_ACK = false;
+                this.ColorInfos = new ObservableCollection<ColorInfo>(ImgEditorWindow.ResultColorInfos);
+                ImgEditorWindow.ResultColorInfos.Clear();
+                ImgEditorWindow.Result_ACK = false;
                 this.DataGridHeight = (this.ColorInfos.Count + 1) * 40;
             }
         }
@@ -1072,11 +1039,11 @@ namespace ScriptGraphicHelper.ViewModels
         /// 获取范围
         /// </summary>
         /// <returns></returns>
-        private Range GetRange()
+        private MyRange GetRange()
         {
             //if (ColorInfos.Count == 0)
             //{
-            //    return new Range(0, 0, ImgWidth - 1, ImgHeight - 1);
+            //    return new MyRange(0, 0, ImgWidth - 1, ImgHeight - 1);
             //}
             if (this.Rect != string.Empty)
             {
@@ -1084,7 +1051,7 @@ namespace ScriptGraphicHelper.ViewModels
                 {
                     var range = this.Rect.TrimStart('[').TrimEnd(']').Split(',');
 
-                    return new Range(int.Parse(range[0].Trim()), int.Parse(range[1].Trim()), int.Parse(range[2].Trim()), int.Parse(range[3].Trim()));
+                    return new MyRange(int.Parse(range[0].Trim()), int.Parse(range[1].Trim()), int.Parse(range[2].Trim()), int.Parse(range[3].Trim()));
                 }
             }
             var imgWidth = this.ImgWidth - 1;
@@ -1128,8 +1095,7 @@ namespace ScriptGraphicHelper.ViewModels
                 }
             }
             var tolerance = Settings.Instance.RangeTolerance;
-            return new Range(left >= tolerance ? left - tolerance : 0, top >= tolerance ? top - tolerance : 0, right + tolerance > imgWidth ? imgWidth : right + tolerance, bottom + tolerance > imgHeight ? imgHeight : bottom + tolerance, mode_1, mode_2);
-
+            return new MyRange(left >= tolerance ? left - tolerance : 0, top >= tolerance ? top - tolerance : 0, right + tolerance > imgWidth ? imgWidth : right + tolerance, bottom + tolerance > imgHeight ? imgHeight : bottom + tolerance, mode_1, mode_2);
         }
     }
 

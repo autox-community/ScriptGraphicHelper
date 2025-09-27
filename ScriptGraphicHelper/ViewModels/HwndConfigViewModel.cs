@@ -1,10 +1,13 @@
 ﻿using Avalonia;
 using Avalonia.Input;
 using Avalonia.Platform;
-using ReactiveUI;
+
+using CommunityToolkit.Mvvm.ComponentModel;
+
 using ScriptGraphicHelper.Models;
-using ScriptGraphicHelper.ViewModels.Core;
+using ScriptGraphicHelper.Utils.ViewModel;
 using ScriptGraphicHelper.Views;
+
 using System;
 using System.Collections.ObjectModel;
 using System.Runtime.InteropServices;
@@ -29,66 +32,37 @@ namespace ScriptGraphicHelper.ViewModels
         internal static extern bool SystemParametersInfo(uint uiAction, uint uiParam, IntPtr pvParam, uint fWinIni);
     }
 
-    public class HwndConfigViewModel : ViewModelBase
+    public partial class HwndConfigViewModel : ViewModelBase
     {
-        private HwndConfig? configWindow;
-        public HwndConfig? ConfigWindow
-        {
-            get => this.configWindow;
-            set => this.RaiseAndSetIfChanged(ref this.configWindow, value);
-        }
+        [ObservableProperty]
+        private HwndConfigWindow? _configWindow;
 
-
+        [ObservableProperty]
         private ObservableCollection<MoveCategory> hwndInfos = new();
-        public ObservableCollection<MoveCategory> HwndInfos
+
+        [ObservableProperty]
+        private MoveCategory? _selectedItem;
+
+        partial void OnSelectedItemChanged(MoveCategory? value)
         {
-            get => this.hwndInfos;
-            set => this.RaiseAndSetIfChanged(ref this.hwndInfos, value);
+            this.BindHwnd = value.Hwnd;
         }
 
-        private MoveCategory? selectedItem;
-        public MoveCategory? SelectedItem
-        {
-            get => this.selectedItem;
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.selectedItem, value);
-                this.BindHwnd = value.Hwnd;
-            }
-        }
+        [ObservableProperty]
+        private int _bindHwnd = -1;
 
-
-        private int bindHwnd = -1;
-        public int BindHwnd
-        {
-            get => this.bindHwnd;
-            set => this.RaiseAndSetIfChanged(ref this.bindHwnd, value);
-        }
-
-        private int bindGraphicMode = 0;
-        public int BindGraphicMode
-        {
-            get => this.bindGraphicMode;
-            set => this.RaiseAndSetIfChanged(ref this.bindGraphicMode, value);
-        }
-
-        private int bindAttribute = 0;
-        public int BindAttribute
-        {
-            get => this.bindAttribute;
-            set => this.RaiseAndSetIfChanged(ref this.bindAttribute, value);
-        }
-
-        private int bindMode = 0;
-        public int BindMode
-        {
-            get => this.bindMode;
-            set => this.RaiseAndSetIfChanged(ref this.bindMode, value);
-        }
-
+        [ObservableProperty]
+        private int _bindGraphicMode = 0;
+        
+        [ObservableProperty]
+        private int _bindAttribute = 0;
+     
+        [ObservableProperty]
+        private int _bindMode = 0;
+      
         private Dmsoft Dm = Dmsoft.Instance;
 
-        public HwndConfigViewModel(HwndConfig hwndConfig)
+        public HwndConfigViewModel(HwndConfigWindow hwndConfig)
         {
             this.hwndInfos = new ObservableCollection<MoveCategory>();
             this.ConfigWindow = hwndConfig;
@@ -98,7 +72,7 @@ namespace ScriptGraphicHelper.ViewModels
         {
             if (this.BindHwnd == -1)
             {
-                MessageBox.ShowAsync("请选择句柄!");
+                MessageBoxWindow.ShowAsync("请选择句柄!");
                 return;
             }
             var graphicModes = new string[] { "normal", "gdi", "gdi2", "dx2", "dx3", "dx.graphic.2d", "dx.graphic.2d.2", "dx.graphic.3d", "dx.graphic.3d.8", "dx.graphic.opengl", "dx.graphic.opengl.esv2", "dx.graphic.3d.10plus" };
@@ -119,7 +93,7 @@ namespace ScriptGraphicHelper.ViewModels
                 var eventArgs = (PointerPressedEventArgs)parameters.EventArgs;
                 if (eventArgs.GetCurrentPoint(null).Properties.IsLeftButtonPressed)
                 {
-                    var cur = Win32Api.LoadCursorFromFile(AppDomain.CurrentDomain.BaseDirectory + @"assets/aiming.cur");
+                    var cur = Win32Api.LoadCursorFromFile(AppDomain.CurrentDomain.BaseDirectory + @"Assets/img/aiming.cur");
                     Win32Api.SetSystemCursor(cur, Win32Api.OCR_NORMAL);
                 }
 
@@ -132,7 +106,6 @@ namespace ScriptGraphicHelper.ViewModels
             Win32Api.SystemParametersInfo(Win32Api.SPI_SETCURSORS, 0, IntPtr.Zero, Win32Api.SPIF_SENDWININICHANGE);
             var hwnd = this.Dm.GetMousePointWindow() ?? -1;
             var parentHwnd = this.Dm.GetWindow(hwnd, 7) ?? -1;
-            var assets = AvaloniaLocator.Current.GetService<IAssetLoader>();
             this.HwndInfos.Add(new MoveCategory(parentHwnd, this.Dm.GetWindowTitle(parentHwnd) ?? string.Empty, this.Dm.GetWindowClass(parentHwnd) ?? string.Empty));
             EnumWindows(parentHwnd, this.HwndInfos[0]);
         });

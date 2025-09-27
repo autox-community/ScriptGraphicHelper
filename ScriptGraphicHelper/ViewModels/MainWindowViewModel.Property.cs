@@ -1,355 +1,221 @@
-﻿using Avalonia;
-using Avalonia.Input;
-using Avalonia.Media.Imaging;
-using Avalonia.Platform;
-using ReactiveUI;
-using ScriptGraphicHelper.Models;
-using ScriptGraphicHelper.ViewModels.Core;
-using SkiaSharp;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
+
+using Avalonia;
+using Avalonia.Input;
+using Avalonia.Media.Imaging;
+using Avalonia.Platform;
+
+using CommunityToolkit.Mvvm.ComponentModel;
+
+using Newtonsoft.Json.Linq;
+
+using ScriptGraphicHelper.Helpers;
+using ScriptGraphicHelper.Models;
+using ScriptGraphicHelper.Utils.ViewModel;
+
+using SkiaSharp;
 
 namespace ScriptGraphicHelper.ViewModels
 {
     public partial class MainWindowViewModel : ViewModelBase
     {
-        private Cursor windowCursor = new(StandardCursorType.Arrow);
-        public Cursor WindowCursor
+        [ObservableProperty]
+        private Cursor _windowCursor = new(StandardCursorType.Arrow);
+
+        [ObservableProperty]
+        private double _windowWidth = 1720d;
+
+        [ObservableProperty]
+        private double _windowHeight = 900d;
+
+        [ObservableProperty]
+        private int _emulatorSelectedIndex = -1;
+
+        partial void OnEmulatorSelectedIndexChanged(int value)
         {
-            get => this.windowCursor;
-            set => this.RaiseAndSetIfChanged(ref this.windowCursor, value);
+            Emulator_Selected(value);
         }
 
-        private double windowWidth = 1720d;
-        public double WindowWidth
+        [ObservableProperty]
+        private int _simSelectedIndex = -1;
+
+        partial void OnSimSelectedIndexChanged(int value)
         {
-            get => this.windowWidth;
-            set => this.RaiseAndSetIfChanged(ref this.windowWidth, value);
+            Settings.Instance.SimSelectedIndex = value;
         }
 
-        private double windowHeight = 900d;
-        public double WindowHeight
-        {
-            get => this.windowHeight;
-            set => this.RaiseAndSetIfChanged(ref this.windowHeight, value);
-        }
+        [ObservableProperty]
+        private string _testResult = string.Empty;
 
-        private int emulatorSelectedIndex = 0;
-        public int EmulatorSelectedIndex
+        [ObservableProperty]
+        private string _rect = string.Empty;
+
+        [ObservableProperty]
+        private string _createStr = string.Empty;
+
+        [ObservableProperty]
+        private ObservableCollection<string> _emulatorInfo;
+
+        [ObservableProperty]
+        private int _titleBarWidth;
+
+        [ObservableProperty]
+        private TabItems<TabItem> _tabItems = new();
+
+        [ObservableProperty]
+        private int _tabControlSelectedIndex;
+
+        partial void OnTabControlSelectedIndexChanged(int value)
         {
-            get => this.emulatorSelectedIndex;
-            set
+            if (value != -1)
             {
-                this.RaiseAndSetIfChanged(ref this.emulatorSelectedIndex, value);
-                Emulator_Selected(value);
+                this.Img = this.TabItems[value].Img;
+                var stream = new MemoryStream();
+                this.Img.Save(stream);
+                stream.Position = 0;
+                var sKBitmap = SKBitmap.Decode(stream);
+                GraphicHelper.KeepScreen(sKBitmap);
+                sKBitmap.Dispose();
+                stream.Dispose();
+            }
+            else
+            {
+                var sKBitmap = new SKBitmap(1, 1);
+                GraphicHelper.KeepScreen(sKBitmap);
+                this.Img = new Bitmap(GraphicHelper.PxFormat, AlphaFormat.Opaque, sKBitmap.GetPixels(), new PixelSize(1, 1), new Vector(96, 96), sKBitmap.RowBytes);
+                sKBitmap.Dispose();
             }
         }
 
-        private int simSelectedIndex = 0;
-        public int SimSelectedIndex
+        [ObservableProperty]
+        private Bitmap _img;
+
+        partial void OnImgChanged(Bitmap value)
         {
-            get => this.simSelectedIndex;
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.simSelectedIndex, value);
-                Settings.Instance.SimSelectedIndex = value;
-            }
+            this.ImgWidth = value.Size.Width;
+            this.ImgHeight = value.Size.Height;
         }
 
-        private string testResult = string.Empty;
-        public string TestResult
+        [ObservableProperty]
+        private Thickness _imgMargin = new(220, 50, 280, 20);
+
+        [ObservableProperty]
+        private double _imgWidth;
+
+        partial void OnImgWidthChanged(double value)
         {
-            get => this.testResult;
-            set => this.RaiseAndSetIfChanged(ref this.testResult, value);
+            this.ImgDrawWidth = Math.Floor(value * this.ScaleFactor);
         }
 
-        private string rect = string.Empty;
-        public string Rect
+        [ObservableProperty]
+        private double _imgHeight;
+
+        partial void OnImgHeightChanged(double value)
         {
-            get => this.rect;
-            set => this.RaiseAndSetIfChanged(ref this.rect, value);
+            this.ImgDrawHeight = Math.Floor(value * this.ScaleFactor);
         }
 
-        private string createStr = string.Empty;
-        public string CreateStr
-        {
-            get => this.createStr;
-            set => this.RaiseAndSetIfChanged(ref this.createStr, value);
-        }
+        [ObservableProperty]
+        private double _imgDrawWidth;
 
-        private ObservableCollection<string> emulatorInfo;
-        public ObservableCollection<string> EmulatorInfo
-        {
-            get => this.emulatorInfo;
-            set => this.RaiseAndSetIfChanged(ref this.emulatorInfo, value);
-        }
+        [ObservableProperty]
+        private double _imgDrawHeight;
 
-        private int titleBarWidth;
-        public int TitleBarWidth
-        {
-            get => this.titleBarWidth;
-            set => this.RaiseAndSetIfChanged(ref this.titleBarWidth, value);
-        }
-
-        private TabItems<TabItem> tabItems = new();
-        public TabItems<TabItem> TabItems
-        {
-            get => this.tabItems;
-            set => this.RaiseAndSetIfChanged(ref this.tabItems, value);
-        }
-
-        private int tabControlSelectedIndex;
-        public int TabControlSelectedIndex
-        {
-            get => this.tabControlSelectedIndex;
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.tabControlSelectedIndex, value);
-                if (value != -1)
-                {
-                    this.Img = this.TabItems[value].Img;
-                    var stream = new MemoryStream();
-                    this.Img.Save(stream);
-                    stream.Position = 0;
-                    var sKBitmap = SKBitmap.Decode(stream);
-                    GraphicHelper.KeepScreen(sKBitmap);
-                    sKBitmap.Dispose();
-                    stream.Dispose();
-                }
-                else
-                {
-                    var sKBitmap = new SKBitmap(1, 1);
-                    GraphicHelper.KeepScreen(sKBitmap);
-                    this.Img = new Bitmap(GraphicHelper.PxFormat, AlphaFormat.Opaque, sKBitmap.GetPixels(), new PixelSize(1, 1), new Vector(96, 96), sKBitmap.RowBytes);
-                    sKBitmap.Dispose();
-                }
-            }
-        }
-
-        private Bitmap img;
-        public Bitmap Img
-        {
-            get => this.img;
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.img, value);
-                this.ImgWidth = value.Size.Width;
-                this.ImgHeight = value.Size.Height;
-            }
-        }
-
-        private Thickness imgMargin = new(220, 50, 280, 20);
-        public Thickness ImgMargin
-        {
-            get => this.imgMargin;
-            set => this.RaiseAndSetIfChanged(ref this.imgMargin, value);
-        }
-
-        private double imgWidth = 0;
-        private double ImgWidth
-        {
-            get => this.imgWidth;
-            set
-            {
-                this.imgWidth = value;
-                this.ImgDrawWidth = Math.Floor(value * this.ScaleFactor);
-            }
-        }
-
-        private double imgHeight = 0;
-        private double ImgHeight
-        {
-            get => this.imgHeight;
-            set
-            {
-                this.imgHeight = value;
-                this.ImgDrawHeight = Math.Floor(value * this.ScaleFactor);
-            }
-        }
-
-        private double imgDrawWidth = 0;
-        public double ImgDrawWidth
-        {
-            get => this.imgDrawWidth;
-            set => this.RaiseAndSetIfChanged(ref this.imgDrawWidth, value);
-        }
-
-        private double imgDrawHeight = 0;
-        public double ImgDrawHeight
-        {
-            get => this.imgDrawHeight;
-            set => this.RaiseAndSetIfChanged(ref this.imgDrawHeight, value);
-        }
-
-        private double scaleFactor = 1.0;
         /// <summary>
-        /// 缩放比例
+        /// 主图片缩放系数
         /// </summary>
-        public double ScaleFactor
+        [ObservableProperty]
+        private double _scaleFactor = 1.0;
+
+        partial void OnScaleFactorChanged(double value)
         {
-            get => this.scaleFactor;
-            set
-            {
-                this.ImgDrawWidth = Math.Floor(this.ImgWidth * value);
-                this.ImgDrawHeight = Math.Floor(this.ImgHeight * value);
-                this.RaiseAndSetIfChanged(ref this.scaleFactor, value);
-            }
+            this.ImgDrawWidth = Math.Floor(this.ImgWidth * value);
+            this.ImgDrawHeight = Math.Floor(this.ImgHeight * value);
         }
 
-        private WriteableBitmap loupeWriteBmp;
-        public WriteableBitmap LoupeWriteBmp
-        {
-            get => this.loupeWriteBmp;
-            set => this.RaiseAndSetIfChanged(ref this.loupeWriteBmp, value);
-        }
+        /// <summary>
+        /// 放大镜显示的颜色信息
+        /// </summary>
+        [ObservableProperty]
+        private WriteableBitmap _loupeWriteBmp;
 
-        private bool loupe_IsVisible = false;
-        public bool Loupe_IsVisible
-        {
-            get => this.loupe_IsVisible;
-            set => this.RaiseAndSetIfChanged(ref this.loupe_IsVisible, value);
-        }
+        /// <summary>
+        /// 放大镜刷新间隔 (毫秒)
+        /// </summary>
+        [ObservableProperty]
+        private int _loupeRefreshInterval = 100;
 
-        private Thickness loupeMargin;
-        public Thickness LoupeMargin
-        {
-            get => this.loupeMargin;
-            set => this.RaiseAndSetIfChanged(ref this.loupeMargin, value);
-        }
+        [ObservableProperty]
+        private int _pointX;
 
-        private int pointX = 0;
-        public int PointX
-        {
-            get => this.pointX;
-            set => this.RaiseAndSetIfChanged(ref this.pointX, value);
-        }
+        [ObservableProperty]
+        private int _pointY;
 
-        private int pointY = 0;
-        public int PointY
-        {
-            get => this.pointY;
-            set => this.RaiseAndSetIfChanged(ref this.pointY, value);
-        }
+        [ObservableProperty]
+        private string _pointColor = "#000000";
 
-        private string pointColor;
+        [ObservableProperty]
+        private double _rectWidth;
 
-        public string PointColor
-        {
-            get => this.pointColor;
-            set => this.RaiseAndSetIfChanged(ref this.pointColor, value);
-        }
+        [ObservableProperty]
+        private double _rectHeight;
 
+        [ObservableProperty]
+        private Thickness _rectMargin;
 
-        private double rectWidth = 0;
-        public double RectWidth
-        {
-            get => this.rectWidth;
-            set => this.RaiseAndSetIfChanged(ref this.rectWidth, value);
-        }
+        [ObservableProperty]
+        private bool _rect_IsVisible = false;
 
-        private double rectHeight = 0;
-        public double RectHeight
-        {
-            get => this.rectHeight;
-            set => this.RaiseAndSetIfChanged(ref this.rectHeight, value);
-        }
+        [ObservableProperty]
+        private Thickness _findedPoint_Margin;
 
-        private Thickness rectMargin;
-        public Thickness RectMargin
-        {
-            get => this.rectMargin;
-            set => this.RaiseAndSetIfChanged(ref this.rectMargin, value);
-        }
+        [ObservableProperty]
+        private bool _findedPoint_IsVisible = false;
 
-        private bool rect_IsVisible = false;
-        public bool Rect_IsVisible
-        {
-            get => this.rect_IsVisible;
-            set => this.RaiseAndSetIfChanged(ref this.rect_IsVisible, value);
-        }
+        [ObservableProperty]
+        private ObservableCollection<ColorInfo> _colorInfos;
 
-        private Thickness findedPoint_Margin;
-        public Thickness FindedPoint_Margin
-        {
-            get => this.findedPoint_Margin;
-            set => this.RaiseAndSetIfChanged(ref this.findedPoint_Margin, value);
-        }
+        [ObservableProperty]
+        private int _dataGridSelectedIndex;
 
-        private bool findedPoint_IsVisible = false;
-        public bool FindedPoint_IsVisible
-        {
-            get => this.findedPoint_IsVisible;
-            set => this.RaiseAndSetIfChanged(ref this.findedPoint_IsVisible, value);
-        }
+        [ObservableProperty]
+        private int _dataGridHeight;
 
-        private ObservableCollection<ColorInfo> colorInfos;
-        public ObservableCollection<ColorInfo> ColorInfos
-        {
-            get => this.colorInfos;
-            set => this.RaiseAndSetIfChanged(ref this.colorInfos, value);
-        }
+        [ObservableProperty]
+        private bool _dataGrid_IsVisible = true;
 
-        private int dataGridSelectedIndex;
-        public int DataGridSelectedIndex
-        {
-            get => this.dataGridSelectedIndex;
-            set => this.RaiseAndSetIfChanged(ref this.dataGridSelectedIndex, value);
-        }
+        [ObservableProperty]
+        private List<string> _formatItems;
 
-        private int dataGridHeight;
-        public int DataGridHeight
-        {
-            get => this.dataGridHeight;
-            set
-            {
-                if (value > 1000)
-                {
-                    value = 1000;
-                }
-                this.RaiseAndSetIfChanged(ref this.dataGridHeight, value);
-            }
-        }
+        /// <summary>
+        /// 选择的格式化方案索引
+        /// </summary>
+        [ObservableProperty]
+        private int _formatSelectedIndex = -1;
 
-        private bool dataGrid_IsVisible = true;
-        public bool DataGrid_IsVisible
-        {
-            get => this.dataGrid_IsVisible;
-            set => this.RaiseAndSetIfChanged(ref this.dataGrid_IsVisible, value);
-        }
-
-
-        private List<string> formatItems;
-        public List<string> FormatItems
-        {
-            get => this.formatItems;
-            set => this.formatItems = value;
-        }
-
+        // NOTE:
+        // 由于 Toolkit 生成的代码会先判断不相等才继续触发set函数,
+        // int默认值是0, 所以这里初始值给一个不可能的数,确保首次稳定触发
         private FormatConfig CurrentFormat;
 
-        private int formatSelectedIndex = 0;
-        public int FormatSelectedIndex
+        partial void OnFormatSelectedIndexChanged(int value)
         {
-            get => this.formatSelectedIndex;
-            set
+            Settings.Instance.FormatSelectedIndex = value;
+            this.CurrentFormat = FormatConfig.GetFormat(this.FormatItems[value])!;
+            if (this.CurrentFormat.AnchorIsEnabled is true)
             {
-                this.RaiseAndSetIfChanged(ref this.formatSelectedIndex, value);
-                Settings.Instance.FormatSelectedIndex = value;
-                this.CurrentFormat = FormatConfig.GetFormat(this.FormatItems[value])!;
-                if (this.CurrentFormat.AnchorIsEnabled is true)
-                {
-                    this.DataGrid_IsVisible = false;
-                    this.ImgMargin = new Thickness(220, 50, 340, 20);
-                }
-                else
-                {
-                    this.DataGrid_IsVisible = true;
-                    this.ImgMargin = new Thickness(220, 50, 280, 20);
-                }
+                this.DataGrid_IsVisible = false;
+                this.ImgMargin = new Thickness(220, 50, 340, 20);
+            }
+            else
+            {
+                this.DataGrid_IsVisible = true;
+                this.ImgMargin = new Thickness(220, 50, 280, 20);
             }
         }
-    }
 
+    }
 }

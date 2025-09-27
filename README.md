@@ -12,15 +12,7 @@
 
 ## 说明
 
-运行需要安装 [.NET 6 SDK](https://dotnet.microsoft.com/zh-cn/download/dotnet/6.0) (每次重复打包,太大了)
-
 软件在 Release 中下载
-
-## 源码开发
-
-Visual Studio 2022
-
-.NET 6
 
 ## 原作者
 

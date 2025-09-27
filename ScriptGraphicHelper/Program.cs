@@ -1,5 +1,4 @@
 using Avalonia;
-using Avalonia.ReactiveUI;
 using System;
 
 namespace ScriptGraphicHelper
@@ -12,8 +11,7 @@ namespace ScriptGraphicHelper
         [STAThread]
         public static void Main(string[] args)
         {
-            BuildAvaloniaApp()
-.StartWithClassicDesktopLifetime(args);
+            BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
         }
 
         // Avalonia configuration, don't remove; also used by visual designer.
@@ -21,8 +19,8 @@ namespace ScriptGraphicHelper
         {
             return AppBuilder.Configure<App>()
                            .UsePlatformDetect()
-                           .LogToTrace()
-                           .UseReactiveUI();
+                           .WithInterFont() // 使用旧版本字体
+                           .LogToTrace();
         }
     }
 }

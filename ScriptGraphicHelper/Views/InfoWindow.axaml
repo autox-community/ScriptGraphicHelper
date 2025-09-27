@@ -1,0 +1,32 @@
+﻿<Window
+    x:Class="ScriptGraphicHelper.Views.InfoWindow"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Title="关于"
+    Width="700"
+    Height="400"
+    CanResize="True"
+    Icon="/Assets/img/ico.ico"
+	FontSize="19"
+	WindowStartupLocation="CenterScreen"
+    mc:Ignorable="d">
+	<ScrollViewer>
+		<StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+			<TextBlock Tapped="Address_Tapped" Cursor="Hand">Github 开源地址:</TextBlock>
+			<Border BorderBrush="Blue" BorderThickness="0,0,0,2">
+				<TextBlock Tapped="Address_Tapped"  Cursor="Hand">autox-community/ScriptGraphicHelper</TextBlock>
+			</Border>
+			<TextBlock></TextBlock>
+			<TextBlock FontSize="23">快捷键:</TextBlock>
+			<TextBlock Margin="0,5,0,0">F1 清空列表</TextBlock>
+			<TextBlock Margin="0,5,0,0">F2 更改配置</TextBlock>
+			<TextBlock Margin="0,5,0,0">↑ ↓ ← → 方向键微调鼠标</TextBlock>
+			<TextBlock Margin="0,5,0,0">Tab/＋/- 缩放图片</TextBlock>
+			<TextBlock Margin="0,5,0,0">Ctrl + V 导入图片或数据</TextBlock>
+			<TextBlock Margin="0,5,0,0">右键 "模式配置" 可重置选项</TextBlock>
+			<TextBlock Margin="0,5,0,0">右键 "颜色列表" 或 图片 可清空颜色列表</TextBlock>
+		</StackPanel>
+	</ScrollViewer>
+</Window>

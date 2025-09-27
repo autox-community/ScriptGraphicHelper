@@ -1,0 +1,124 @@
+自定义格式说明请看文本末尾
+
+模拟器模式
+适用于雷电、夜神、逍遥模拟器
+雷电系列模拟器可以自动获取路径(绿色版除外)
+夜神和逍遥模拟器的路径需要手动填写到setting.config(不推荐使用逍遥模拟器, 命令行连接不稳定, 底层可能还是普通adb)
+
+AT模式
+适用于安卓真机或模拟器, 需要在目标设备上安装astator, 并开启调试服务和悬浮窗
+
+AJ模式(autojs.pro 8+, 不支持9)
+适用于安卓真机或模拟器, 需要在目标设备上安装autojs, 并开启调试服务和悬浮窗
+
+导入数据说明
+不支持自定义格式
+不需要额外信息: 多点比色, 触动比色, ec比色, 锚点找色/比色
+需要额外信息(即: 需要在配置里打开生成添加信息开关, 之后生成的字符串才可以重新导入): 大漠找色, 按键找色/比色, 触动找色, autojs找色/比色, ec找色
+
+导入图片或图色数据: Ctrl + V
+缩放: + / -
+选择坐标: 触发鼠标左键 or A
+清空表格: 触发F1 or 表格右键菜单 or 生成字符串为空时点击清空按钮
+重置模拟器选择: 截图按钮右键菜单
+手动范围选择: 在图片框按住鼠标左键后拖动
+
+放大镜(跟随鼠标)
+当中心点相邻 2 格内的所有点的rgb与中心点的rgb差值 ±10 时中心点标记为绿色
+当中心点相邻 1 格内的所有点的rgb与中心点的rgb差值 ±10 时中心点标记为黄色
+
+格式列表说明:
+{
+  "name": "我的自定义比色",
+  "isEnabled": true,
+  "isDiyFormat": true,
+  "isCompareMode":true,
+  "diyFormatName": "diyFormat.json"
+}
+
+name: 格式列表出现的名称, 除了自定义格式, 其他格式的名称均不可修改
+isEnabled: 是否启用该格式, 为false时格式列表不出现该格式
+anchorIsEnabled: 是否启用锚点
+isCompareMode: 是否为比色格式 
+isDiyFormat: 是否为自定义格式
+diyFormatFileName: 自定义格式文件名, 为json文件时是json模式, 为csx文件时是script模式
+
+
+自定义格式参数说明(script模式-->diyformat.csx):
+需要掌握一点点c#, 在./MyFiles/diyformat.csx文件中根据你的需求编写生成代码
+CreateFindColor方法为自定义找色
+CreateCmpColor方法为自定义比色
+
+自定义格式参数说明(json模式-->diyformat.json):
+
+参数说明:
+"ImportInfo": 数据导入的标识(只能是以下标识---> "dm"/"cd"/"ec"),
+"RangeFormat": 范围描述, 只有两种格式--->　"{startX},{startY},{endX},{endY}"　或　"{startX},{startY},{width},{height}",
+FirstColorFormat: 基准色组格式(color = 颜色)
+FollowColorFormat: 偏移色组格式
+FindStrFormat: 多点找色返回格式(range = 查找范围)
+CompareStrFormat: 多点比色返回格式
+
+示例1(大漠字符串格式):
+{
+  "ImportInfo": "dm",
+  "RangeFormat": "{startX},{startY},{endX},{endY}",
+  "FirstColorFormat": "{color}",
+  "FollowColorFormat": "{x}|{y}|{color}",
+  "FindStrFormat": "new array({ImportInfo},\"{range}\",\"{firstColorStr}\",\"{followColorStr}\",0.9,1)",
+  "CompareStrFormat": "new array({ImportInfo},\"{colorStr}\",0.9)"
+}
+
+找色格式返回:
+new array("dm/171/92",121,42,953,430,"425882","190|208|feeeea,732|206|b8d7fc,589|271|16231c,91|288|311b5b",0.9,1)
+
+比色格式返回:
+new array("270|126|3e5b62,471|398|feeeea,976|406|fdced6,298|516|ac8fe9,663|625|e47877",0.9)
+
+示例2(EasyClick字符串格式):
+{
+  "ImportInfo": "ec",
+  "RangeFormat": "{startX},{startY},{endX},{endY}",
+  "FirstColorFormat": "0x{color}",
+  "FollowColorFormat": "{x}|{y}|0x{color}",
+  "FindStrFormat": "new array({ImportInfo},\"{range}\",\"{firstColorStr}\",\"{followColorStr}\",0.9,1)",
+  "CompareStrFormat": "new array({ImportInfo},\"{colorStr}\",0.9)"
+}
+
+找色格式返回:
+new array("ec/171/92","121,42,953,430","0x425882","190|208|0xfeeeea,732|206|0xb8d7fc,589|271|0x16231c,91|288|0x311b5b",0.9,1)
+
+比色格式返回:
+new array("ec","171|92|0x425882,361|300|0xfeeeea,903|298|0xb8d7fc,760|363|0x16231c,262|380|0x311b5b",0.9)
+
+示例3(数组格式(数组格式不支持导入功能)):
+{
+  "RangeFormat": "{startX},{startY},{width},{height}",
+  "FirstColorFormat": "[0x{color}]",
+  "FollowColorFormat": "\n[{x},{y},0x{color}]",
+  "FindStrFormat": "data[data.length] = \n[\n[{range}], \n[\n{firstColorStr},\n[{followColorStr}\n]\n]\n]",
+  "CompareStrFormat": "data[data.length] = \n[{colorStr}\n]"
+}
+
+找色格式返回:
+data[data.length] =
+    [
+        [170, 215, 563, 523],
+        [
+            [0x717171],
+            [
+                [343, -118, 0x343434],
+                [300, 140, 0x4d83c2],
+                [89, 106, 0x1a1a1a]
+            ]
+        ]
+    ];
+
+比色格式返回:
+data[data.length] =
+    [
+        [195, 358, 0x717171],
+        [538, 240, 0x343434],
+        [495, 498, 0x4d83c2],
+        [284, 464, 0x1a1a1a]
+    ];

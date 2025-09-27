@@ -1,140 +1,93 @@
-﻿using Avalonia.Controls;
-using Avalonia.Input;
-using Avalonia.Media;
-using Avalonia.Media.Imaging;
-using ReactiveUI;
-using ScriptGraphicHelper.Models;
-using ScriptGraphicHelper.Models.UnmanagedMethods;
-using ScriptGraphicHelper.ViewModels.Core;
-using ScriptGraphicHelper.Views;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
+using Avalonia.Controls;
+using Avalonia.Input;
+using Avalonia.Media;
+using Avalonia.Media.Imaging;
+using Avalonia.Platform.Storage;
+
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.DependencyInjection;
+
+using ScriptGraphicHelper.Helpers;
+using ScriptGraphicHelper.Models;
+using ScriptGraphicHelper.Utils.ViewModel;
+using ScriptGraphicHelper.Views;
+
 namespace ScriptGraphicHelper.ViewModels
 {
-    public class ImgEditorViewModel : ViewModelBase
+    public partial class ImgEditorViewModel : ViewModelBase
     {
-        private int windowWidth;
-        public int WindowWidth
+        [ObservableProperty]
+        private int _windowWidth;
+
+        [ObservableProperty]
+        private int _windowHeight;
+
+        [ObservableProperty]
+        private WriteableBitmap _drawBitmap;
+
+        [ObservableProperty]
+        private int _imgWidth;
+
+        [ObservableProperty]
+        private int _imgHeight;
+
+        [ObservableProperty]
+        private Color _srcColor = Colors.White;
+
+        [ObservableProperty]
+        private Color _destColor = Colors.Red;
+
+        [ObservableProperty]
+        private bool _pen_IsChecked;
+
+        [ObservableProperty]
+        private int _tolerance = 5;
+        
+        partial void OnToleranceChanged(int value)
         {
-            get => this.windowWidth;
-            set => this.RaiseAndSetIfChanged(ref this.windowWidth, value);
+            this.DrawBitmap = ImgEditorHelper.ResetImg();
+            this.DrawBitmap.SetPixels(this.SrcColor, this.DestColor, this.Tolerance, this.Reverse_IsChecked);
+            this.ImgWidth -= 1;
+            this.ImgWidth += 1;
         }
 
-        private int windowHeight;
-        public int WindowHeight
+        [ObservableProperty]
+        private bool _reverse_IsChecked;
+
+        [ObservableProperty]
+        private bool _getColorInfosBtnState;
+
+        [ObservableProperty]
+        private int _getColorInfosModeSelectedIndex;
+
+        partial void OnGetColorInfosModeSelectedIndexChanged(int value)
         {
-            get => this.windowHeight;
-            set => this.RaiseAndSetIfChanged(ref this.windowHeight, value);
+            Settings.Instance.ImgEditor.ModeSelectedIndex = value;
         }
 
-        private WriteableBitmap drawBitmap;
-        public WriteableBitmap DrawBitmap
+        [ObservableProperty]
+        private int _getColorInfosThreshold;
+
+        partial void OnGetColorInfosThresholdChanged(int value)
         {
-            get => this.drawBitmap;
-            set => this.RaiseAndSetIfChanged(ref this.drawBitmap, value);
+            Settings.Instance.ImgEditor.Threshold = value;
         }
 
-        private int imgWidth;
-        public int ImgWidth
+        [ObservableProperty]
+        private int _getColorInfosSize;
+
+        partial void OnGetColorInfosSizeChanged(int value)
         {
-            get => this.imgWidth;
-            set => this.RaiseAndSetIfChanged(ref this.imgWidth, value);
+            Settings.Instance.ImgEditor.Size = value;
         }
 
-        private int imgHeight;
-        public int ImgHeight
-        {
-            get => this.imgHeight;
-            set => this.RaiseAndSetIfChanged(ref this.imgHeight, value);
-        }
-
-        private Color srcColor = Colors.White;
-        public Color SrcColor
-        {
-            get => this.srcColor;
-            set => this.RaiseAndSetIfChanged(ref this.srcColor, value);
-        }
-
-        private Color destColor = Colors.Red;
-        public Color DestColor
-        {
-            get => this.destColor;
-            set => this.RaiseAndSetIfChanged(ref this.destColor, value);
-        }
-
-        private bool pen_IsChecked;
-        public bool Pen_IsChecked
-        {
-            get => this.pen_IsChecked;
-            set => this.RaiseAndSetIfChanged(ref this.pen_IsChecked, value);
-        }
-
-        private int tolerance = 5;
-        public int Tolerance
-        {
-            get => this.tolerance;
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.tolerance, value);
-                this.DrawBitmap = ImgEditorHelper.ResetImg();
-                this.DrawBitmap.SetPixels(this.SrcColor, this.destColor, this.Tolerance, this.reverse_IsChecked);
-                this.ImgWidth -= 1;
-                this.ImgWidth += 1;
-            }
-        }
-
-        private bool reverse_IsChecked;
-        public bool Reverse_IsChecked
-        {
-            get => this.reverse_IsChecked;
-            set => this.RaiseAndSetIfChanged(ref this.reverse_IsChecked, value);
-        }
-
-        private bool getColorInfosBtnState;
-        public bool GetColorInfosBtnState
-        {
-            get => this.getColorInfosBtnState;
-            set => this.RaiseAndSetIfChanged(ref this.getColorInfosBtnState, value);
-        }
-
-        private int getColorInfosModeSelectedIndex;
-        public int GetColorInfosModeSelectedIndex
-        {
-            get => this.getColorInfosModeSelectedIndex;
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.getColorInfosModeSelectedIndex, value);
-                Settings.Instance.ImgEditor.ModeSelectedIndex = value;
-            }
-        }
-
-        private int getColorInfosThreshold;
-        public int GetColorInfosThreshold
-        {
-            get => this.getColorInfosThreshold;
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.getColorInfosThreshold, value);
-                Settings.Instance.ImgEditor.Threshold = value;
-            }
-        }
-
-        private int getColorInfosSize;
-        public int GetColorInfosSize
-        {
-            get => this.getColorInfosSize;
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.getColorInfosSize, value);
-                Settings.Instance.ImgEditor.Size = value;
-            }
-        }
-
-        public ImgEditorViewModel(Models.Range range, byte[] data)
+        public ImgEditorViewModel(Models.MyRange range, byte[] data)
         {
             this.DrawBitmap = ImgEditorHelper.Init(range, data);
             this.ImgWidth = (int)this.DrawBitmap.Size.Width * 5;
@@ -175,75 +128,39 @@ namespace ScriptGraphicHelper.ViewModels
 
             try
             {
-                var fileName = string.Empty;
-
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                var tl = Ioc.Default.GetService<TopLevel>();
+                var storageFile = await tl.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions()
                 {
-                    OpenFileName ofn = new();
-
-                    ofn.hwnd = MainWindow.Instance.Handle;
-                    ofn.structSize = Marshal.SizeOf(ofn);
-                    ofn.filter = "位图文件 (*.png;*.bmp;*.jpg)\0*.png;*.bmp;*.jpg\0";
-                    ofn.file = new string(new char[256]);
-                    ofn.maxFile = ofn.file.Length;
-                    ofn.fileTitle = new string(new char[64]);
-                    ofn.maxFileTitle = ofn.fileTitle.Length;
-                    ofn.title = "保存文件";
-                    ofn.defExt = ".png";
-                    if (NativeApi.GetSaveFileName(ofn))
+                    SuggestedFileName = "Screen_" + DateTime.Now.ToString("yy-MM-dd-HH-mm-ss"),
+                    Title = "保存文件",
+                    FileTypeChoices = new List<FilePickerFileType>()
                     {
-                        fileName = ofn.file;
-                    }
-                }
-                else
-                {
-                    var dlg = new SaveFileDialog
-                    {
-                        InitialFileName = "Screen_" + DateTime.Now.ToString("yy-MM-dd-HH-mm-ss"),
-                        Title = "保存文件",
-                        Filters = new List<FileDialogFilter>
+                        new FilePickerFileType("位图文件")
                         {
-                            new FileDialogFilter
-                            {
-                                Name = "位图文件",
-                                Extensions = new List<string>()
-                                {
-                                    "png",
-                                    "bmp",
-                                    "jpg"
-                                }
-                            }
+                            Patterns = new List<string>(){"*.png", "*.bmp", "*.jpg"}
                         }
-                    };
-                    fileName = await dlg.ShowAsync(MainWindow.Instance);
-                }
-
-
-                if (fileName != null && fileName != "" && fileName != string.Empty)
-                {
-                    if (fileName.IndexOf("bmp") != -1 && RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                    {
-                        var bitmap = this.DrawBitmap.GetBitmap();
-                        bitmap.Save(fileName, System.Drawing.Imaging.ImageFormat.Bmp);
                     }
-                    else
+                });
+                if (storageFile != null)
+                {
+                    var filePath = storageFile.TryGetLocalPath();
+                    if (!string.IsNullOrWhiteSpace(filePath))
                     {
-                        this.DrawBitmap.Save(fileName);
+                        this.DrawBitmap.Save(filePath);
                     }
                 }
             }
             catch (Exception e)
             {
-                MessageBox.ShowAsync(e.ToString());
+                MessageBoxWindow.ShowAsync(e.ToString());
             }
         }
-
 
         private bool IsDown = false;
         public ICommand Img_PointerPressed => new Command(async (param) =>
         {
             this.IsDown = true;
-            if (this.pen_IsChecked)
+            if (this.Pen_IsChecked)
             {
                 if (param != null)
                 {
@@ -267,6 +184,7 @@ namespace ScriptGraphicHelper.ViewModels
 
                         this.ImgWidth -= 1;
                         this.ImgWidth += 1;
+                        // TODO:
                         //Image控件不会自动刷新, 解决方案是改变一次宽高, 可能是bug https://github.com/AvaloniaUI/Avalonia/issues/1995
                     }
                 }
@@ -276,7 +194,7 @@ namespace ScriptGraphicHelper.ViewModels
 
         public ICommand Img_PointerMoved => new Command(async (param) =>
         {
-            if (this.pen_IsChecked && this.IsDown)
+            if (this.Pen_IsChecked && this.IsDown)
             {
                 if (param != null)
                 {
@@ -311,7 +229,7 @@ namespace ScriptGraphicHelper.ViewModels
                     var x = (int)point.X / 5;
                     var y = (int)point.Y / 5;
                     this.SrcColor = await this.DrawBitmap.GetPixel(x, y);
-                    this.DrawBitmap.SetPixels(this.SrcColor, this.DestColor, this.Tolerance, this.reverse_IsChecked);
+                    this.DrawBitmap.SetPixels(this.SrcColor, this.DestColor, this.Tolerance, this.Reverse_IsChecked);
                     this.ImgWidth -= 1;
                     this.ImgWidth += 1;
                 }
@@ -324,13 +242,13 @@ namespace ScriptGraphicHelper.ViewModels
             this.GetColorInfosBtnState = false;
 
             CutImg_Click();
-            if (this.getColorInfosModeSelectedIndex == 0)
+            if (this.GetColorInfosModeSelectedIndex == 0)
             {
-                ImgEditor.ResultColorInfos = await this.DrawBitmap.GetAllColorInfos(this.GetColorInfosSize);
+                ImgEditorWindow.ResultColorInfos = await this.DrawBitmap.GetAllColorInfos(this.GetColorInfosSize);
             }
             else
             {
-                ImgEditor.ResultColorInfos = await this.DrawBitmap.GetColorInfos(this.GetColorInfosSize, this.GetColorInfosThreshold);
+                ImgEditorWindow.ResultColorInfos = await this.DrawBitmap.GetColorInfos(this.GetColorInfosSize, this.GetColorInfosThreshold);
             }
             this.ImgWidth -= 1;
             this.ImgWidth += 1;

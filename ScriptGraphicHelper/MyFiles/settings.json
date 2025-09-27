@@ -1,0 +1,110 @@
+{
+  "showConsole": false,
+  "loupeRefreshInterval": 100,
+  "width": 1720.0,
+  "height": 900.0,
+  "simSelectedIndex": 0,
+  "formatSelectedIndex": 0,
+  "addRange": true,
+  "addInfo": false,
+  "rangeTolerance": 50,
+  "diySim": 95,
+  "isOffset": false,
+  "dmRegcode": "",
+  "ysPath": "",
+  "xyPath": "",
+  "ldPath3": "",
+  "ldPath4": "",
+  "ldPath64": "",
+  "formats": [
+    {
+      "name": "自定义找色",
+      "isEnabled": true,
+      "isDiyFormat": true,
+      "diyFormatFileName": "diyFormat.json"
+    },
+    {
+      "name": "自定义比色",
+      "isEnabled": true,
+      "isCompareMode": true,
+      "isDiyFormat": true,
+      "diyFormatFileName": "diyFormat.json"
+    },
+    {
+      "name": "AutoJs找色",
+      "isEnabled": true
+    },
+    {
+      "name": "AutoJs比色",
+      "isEnabled": true,
+      "isCompareMode": true
+    },
+    {
+      "name": "大漠找色",
+      "isEnabled": true
+    },
+    {
+      "name": "AT找色",
+      "isEnabled": false
+    },
+    {
+      "name": "AT比色",
+      "isEnabled": false,
+      "isCompareMode": true
+    },
+    {
+      "name": "AT锚点找色",
+      "isEnabled": false,
+      "anchorIsEnabled": true
+    },
+    {
+      "name": "AT锚点比色",
+      "isEnabled": false,
+      "anchorIsEnabled": true,
+      "isCompareMode": true
+    },
+    {
+      "name": "锚点找色",
+      "isEnabled": true,
+      "anchorIsEnabled": true
+    },
+    {
+      "name": "锚点比色",
+      "isEnabled": true,
+      "anchorIsEnabled": true,
+      "isCompareMode": true
+    },
+    {
+      "name": "按键找色",
+      "isEnabled": false
+    },
+    {
+      "name": "按键比色",
+      "isEnabled": false,
+      "isCompareMode": true
+    },
+    {
+      "name": "EC找色",
+      "isEnabled": false
+    },
+    {
+      "name": "EC比色",
+      "isEnabled": false,
+      "isCompareMode": true
+    },
+    {
+      "name": "触动找色",
+      "isEnabled": false
+    },
+    {
+      "name": "触动比色",
+      "isEnabled": false,
+      "isCompareMode": true
+    }
+  ],
+  "imgEditor": {
+    "modeSelectedIndex": 0,
+    "threshold": 12,
+    "size": -1
+  }
+}
