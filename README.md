@@ -5,12 +5,12 @@
 ## 功能
 
 - ⭐ ADB连接模式: 通过 adb 进行截图 (usb/wifi)
-- ⭐ 支持生成各种工具的格式代码 与 自定义的格式代码 (在 Assets/diyFormat.json 的 FindStrFormat 定义)
-- 模拟器模式: 调用模拟器命令行进行截图, 无需手动连接 adb (适用于雷电、夜神、逍遥)
-- AJ连接模式: 调用 aj 的 tcp 调试端口进行截图 (需要安装 autojs.pro 8, 并开启调试服务和悬浮窗)
+- ⭐ 支持生成各种工具的格式代码 与 自定义的格式代码
 - 多分辨率适配的测试和代码生成 (锚点格式)
 
 ## 说明
+
+运行前需要安装 .NET 8 运行时 [(官网下载只需 27 M)](https://dotnet.microsoft.com/zh-cn/download/dotnet/thank-you/runtime-8.0.20-windows-x64-installer)
 
 软件在 Release 中下载
 
