@@ -17,7 +17,7 @@ using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 
 using CommunityToolkit.Mvvm.DependencyInjection;
-
+using CommunityToolkit.Mvvm.Messaging;
 using ExCSS;
 
 using Newtonsoft.Json;
@@ -26,6 +26,7 @@ using ScriptGraphicHelper.Helpers;
 using ScriptGraphicHelper.Models;
 using ScriptGraphicHelper.Tools;
 using ScriptGraphicHelper.Tools.Converters;
+using ScriptGraphicHelper.UserControls;
 using ScriptGraphicHelper.Utils.ViewModel;
 using ScriptGraphicHelper.Views;
 
@@ -51,7 +52,8 @@ namespace ScriptGraphicHelper.ViewModels
             }
 
 #if DEBUG
-            NativeApi.AllocConsole();
+            // Rider 自带控制台, VS 需要开启这个
+            // NativeApi.AllocConsole();
 #endif
 
             // 获取 开启 的生成格式
@@ -191,7 +193,7 @@ namespace ScriptGraphicHelper.ViewModels
             // 放大镜 显示颜色矩阵
             this.LoupeWriteBmp.WriteColor(colors);
             // 刷新图片
-            MainWindow.MyLoupeImg?.InvalidateVisual();
+            WeakReferenceMessenger.Default.Send(new LoupeInvalidateVisualMessage());
         });
 
         private DateTime _addColorInfoTime = DateTime.Now;

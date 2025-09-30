@@ -1,0 +1,26 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+
+             xmlns:vm="using:ScriptGraphicHelper.ViewModels"
+
+             x:Class="ScriptGraphicHelper.UserControls.SelectRect">
+
+    <Design.DataContext>
+        <vm:MainWindowViewModel />
+    </Design.DataContext>
+
+    <Canvas>
+        <Rectangle
+            Width="{Binding RectWidth, Mode=TwoWay}"
+            Height="{Binding RectHeight, Mode=TwoWay}"
+            Margin="{Binding RectMargin, Mode=TwoWay}"
+            Fill="Transparent"
+            Focusable="False"
+            IsVisible="{Binding Rect_IsVisible, Mode=TwoWay}"
+            Stroke="Red"
+            StrokeThickness="2" />
+    </Canvas>
+</UserControl>

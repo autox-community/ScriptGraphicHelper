@@ -1,0 +1,68 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+
+             xmlns:uc="using:ScriptGraphicHelper.UserControls"
+             xmlns:vm="using:ScriptGraphicHelper.ViewModels"
+
+             x:Class="ScriptGraphicHelper.UserControls.RightPart">
+
+    <Design.DataContext>
+        <vm:MainWindowViewModel />
+    </Design.DataContext>
+
+    <Grid RowDefinitions="Auto,*" Margin="10">
+        <!--放大镜-->
+        <StackPanel Grid.Row="0" Spacing="5">
+            <Image
+                Name="LoupeImg"
+                Width="241"
+                Height="241"
+                Source="{Binding LoupeWriteBmp}"
+                Stretch="UniformToFill" />
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <!--x坐标-->
+                <TextBlock FontSize="18" Text="{Binding PointX, Mode=TwoWay}" />
+
+                <TextBlock FontSize="18" Text="," />
+
+                <!--y坐标-->
+                <TextBlock FontSize="18" Text="{Binding PointY, Mode=TwoWay}" />
+
+                <TextBlock FontSize="18" Text="," />
+
+                <!--颜色-->
+                <TextBlock FontSize="18" Text="{Binding PointColor, Mode=TwoWay}" />
+
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" Spacing="10" Margin="0,0,0,5">
+                <TextBlock VerticalAlignment="Center">放大镜刷新间隔:</TextBlock>
+                <TextBox HorizontalContentAlignment="Center"
+                         Text="{Binding LoupeRefreshInterval,Mode=TwoWay}" />
+                <TextBlock VerticalAlignment="Center">毫秒</TextBlock>
+            </StackPanel>
+        </StackPanel>
+
+        <ScrollViewer
+            Grid.Row="1"
+            VerticalScrollBarVisibility="Auto"
+            HorizontalScrollBarVisibility="Auto">
+
+            <!--颜色列表-->
+            <uc:ColorInfos VerticalAlignment="Top">
+                <!--右键菜单-->
+                <uc:ColorInfos.ContextMenu>
+                    <ContextMenu FontSize="25">
+                        <MenuItem Command="{Binding Key_ColorInfo_Clear}" Header="清空颜色列表" />
+                    </ContextMenu>
+                </uc:ColorInfos.ContextMenu>
+            </uc:ColorInfos>
+
+        </ScrollViewer>
+    </Grid>
+
+</UserControl>

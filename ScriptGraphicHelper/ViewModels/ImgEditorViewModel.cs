@@ -185,7 +185,7 @@ namespace ScriptGraphicHelper.ViewModels
 
                         this.ImgWidth -= 1;
                         this.ImgWidth += 1;
-                        // TODO:
+                        // TODO: 原作者
                         //Image控件不会自动刷新, 解决方案是改变一次宽高, 可能是bug https://github.com/AvaloniaUI/Avalonia/issues/1995
                     }
                 }

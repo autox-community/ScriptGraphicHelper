@@ -1,0 +1,74 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+
+             xmlns:i="using:Avalonia.Xaml.Interactivity"
+             xmlns:ic="using:Avalonia.Xaml.Interactions.Core"
+             xmlns:vm="using:ScriptGraphicHelper.ViewModels"
+             xmlns:icc="using:ScriptGraphicHelper.Utils.ViewModel"
+
+             x:Class="ScriptGraphicHelper.UserControls.CenterImage">
+
+    <Design.DataContext>
+        <vm:MainWindowViewModel />
+    </Design.DataContext>
+
+    <!-- 与 滚动条 和 边框 隔开一些距离 -->
+    <Panel Margin="20,20,20,20">
+
+        <!--右键菜单-->
+        <Panel.ContextMenu>
+            <ContextMenu FontSize="25">
+                <MenuItem
+                    Command="{Binding Key_ScaleFactorChanged}"
+                    CommandParameter="Add"
+                    Header="放大图片" />
+                <MenuItem
+                    Command="{Binding Key_ScaleFactorChanged}"
+                    CommandParameter="Subtract"
+                    Header="缩小图片" />
+                <MenuItem Command="{Binding Key_ColorInfo_Clear}" Header="清空颜色列表" />
+            </ContextMenu>
+        </Panel.ContextMenu>
+
+        <!--"测试找图" 成功的标志-->
+        <Image
+            Width="72"
+            Height="72"
+            Margin="{Binding FindedPoint_Margin}"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            IsVisible="{Binding FindedPoint_IsVisible}"
+            ZIndex="1">
+            <Image.Source>
+                <SvgImage Source="/Assets/img/location.svg" />
+            </Image.Source>
+        </Image>
+
+        <!--主图片-->
+        <Image
+            Name="Img"
+            Width="{Binding ImgDrawWidth, Mode=TwoWay}"
+            Height="{Binding ImgDrawHeight, Mode=TwoWay}"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            PointerEntered="Image_PointerEntered_Focus"
+            Source="{Binding Img, Mode=TwoWay}"
+            ZIndex="0">
+            <i:Interaction.Behaviors>
+                <ic:EventTriggerBehavior EventName="PointerMoved">
+                    <icc:InvokeCommandAction Command="{Binding Img_PointerMoved}" />
+                </ic:EventTriggerBehavior>
+                <ic:EventTriggerBehavior EventName="PointerPressed">
+                    <icc:InvokeCommandAction Command="{Binding Img_PointerPressed}" />
+                </ic:EventTriggerBehavior>
+                <ic:EventTriggerBehavior EventName="PointerReleased">
+                    <icc:InvokeCommandAction Command="{Binding Img_PointerReleased}" />
+                </ic:EventTriggerBehavior>
+            </i:Interaction.Behaviors>
+        </Image>
+
+    </Panel>
+</UserControl>

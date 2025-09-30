@@ -37,19 +37,19 @@ d:DataContext="{d:DesignInstance vm:MainWindowViewModel}" // 在子组件中绑�
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-	
-	mc:Ignorable="d"
-	
+
+    mc:Ignorable="d"
+
     x:Class="ScriptGraphicHelper.Views.MainWindow"
-	
+
     xmlns:i="using:Avalonia.Xaml.Interactivity"
-	xmlns:ic="using:Avalonia.Xaml.Interactions.Core"
-	xmlns:uc="using:ScriptGraphicHelper.UserControls"
+    xmlns:ic="using:Avalonia.Xaml.Interactions.Core"
+    xmlns:uc="using:ScriptGraphicHelper.UserControls"
     xmlns:vm="using:ScriptGraphicHelper.ViewModels"
     xmlns:cv="using:ScriptGraphicHelper.Tools.Converters"
     xmlns:icc="using:ScriptGraphicHelper.Utils.ViewModel"
 
-	Title="综合图色助手"
+    Title="综合图色助手"
     Width="{Binding WindowWidth, Mode=TwoWay}"
     Height="{Binding WindowHeight, Mode=TwoWay}"
     Cursor="{Binding WindowCursor, Mode=TwoWay}"
@@ -57,21 +57,19 @@ d:DataContext="{d:DesignInstance vm:MainWindowViewModel}" // 在子组件中绑�
     DragDrop.AllowDrop="True"
     FontSize="14"
     FontStyle="Normal"
-	FontWeight="Medium"
-	Icon="/Assets/img/ico.ico"
-	Background="#F0F8FF"
-	WindowStartupLocation="CenterScreen"
-	
-	ExtendClientAreaToDecorationsHint="True"
-	ExtendClientAreaTitleBarHeightHint="-1"
-	ExtendClientAreaChromeHints="NoChrome"
-	
-    KeyDown="Window_KeyDown"
-	Opened="Window_Opened"
-    Closing="Window_Closing"
+    FontWeight="Medium"
+    Icon="/Assets/img/ico.ico"
+    Background="#F0F8FF"
+    WindowStartupLocation="CenterScreen"
 
-    >
-	<!--
+    ExtendClientAreaToDecorationsHint="True"
+    ExtendClientAreaTitleBarHeightHint="-1"
+    ExtendClientAreaChromeHints="NoChrome"
+
+    KeyDown="Window_KeyDown"
+    Opened="Window_Opened"
+    Closing="Window_Closing">
+    <!--
 	    告诉 IDE 这个 xaml 绑定的 ViewModel 是哪个,可以让 IDE 更智能的分析代码 和 预览界面,
 		不参与运行时, 也可以写到根标签中 d:DataContext="{d:DesignInstance vm:MainWindowViewModel}"
 		
@@ -79,827 +77,311 @@ d:DataContext="{d:DesignInstance vm:MainWindowViewModel}" // 在子组件中绑�
 		比如 这个 xaml 是在 App.xaml.cs 实例化, MainWindow 中指定的 ViewModel
 		desktop.MainWindow = new MainWindow{ DataContext = new MainWindowViewModel() };
 	-->
-	<Design.DataContext>
-		<vm:MainWindowViewModel />
-	</Design.DataContext>
+    <Design.DataContext>
+        <vm:MainWindowViewModel />
+    </Design.DataContext>
 
-	<Window.Resources>
-		<cv:ScaleFactorConverter x:Key="ScaleFactor" />
-	</Window.Resources>
+    <Window.Resources>
+        <cv:ScaleFactorConverter x:Key="ScaleFactor" />
+    </Window.Resources>
 
-	<!--窗口边框-->
-	<Border BorderBrush="Black"	BorderThickness="1,1,1,1">
-		<Panel>
-			<!-- 主网格布局：两行（标题栏+内容区） -->
-			<!-- NOTE: 第一行自适应内容,第二行填补窗口剩余空间,可以框住无限延伸的容器, 使滚动条正常工作-->
-			<Grid RowDefinitions="Auto, *">
+    <!--窗口边框-->
+    <Border BorderBrush="Black" BorderThickness="1,1,1,1">
+        <Panel>
+            <!-- 主网格布局：两行（标题栏+内容区） -->
+            <!-- NOTE: 第一行自适应内容,第二行填补窗口剩余空间,可以框住无限延伸的容器, 使滚动条正常工作-->
+            <Grid RowDefinitions="Auto, *">
 
-				<!-- 顶部 标题栏 -->
-				<Panel Grid.Row="0" Background="#2C3E50">
-					<!--左上角 标题栏-->
-					<uc:TitleBar VerticalAlignment="Top" PointerPressed="TitleBar_DragMove" DoubleTapped="WindowStateChange_Tapped">
-						<!--右键菜单-->
-						<uc:TitleBar.ContextMenu>
-							<ContextMenu FontSize="25">
-								<MenuItem Header="最小化" Tapped="Minsize_Tapped" />
-								<MenuItem Header="全屏/还原" Tapped="WindowStateChange_Tapped" />
-								<MenuItem Header="关闭" Tapped="Close_Tapped" />
-							</ContextMenu>
-						</uc:TitleBar.ContextMenu>
-					</uc:TitleBar>
+                <!-- 顶部 标题栏 -->
+                <Panel Grid.Row="0" Background="#2C3E50">
+                    <!--左上角 标题栏-->
+                    <uc:TitleBar VerticalAlignment="Top" PointerPressed="TitleBar_DragMove"
+                                 DoubleTapped="WindowStateChange_Tapped">
+                        <!--右键菜单-->
+                        <uc:TitleBar.ContextMenu>
+                            <ContextMenu FontSize="25">
+                                <MenuItem Header="最小化" Tapped="Minsize_Tapped" />
+                                <MenuItem Header="全屏/还原" Tapped="WindowStateChange_Tapped" />
+                                <MenuItem Header="关闭" Tapped="Close_Tapped" />
+                            </ContextMenu>
+                        </uc:TitleBar.ContextMenu>
+                    </uc:TitleBar>
 
-					<!--右上角 按钮-->
-					<StackPanel
-						HorizontalAlignment="Right"
-						VerticalAlignment="Top"
-						Orientation="Horizontal">
+                    <!--右上角 按钮-->
+                    <StackPanel
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Top"
+                        Orientation="Horizontal">
 
-						<!--设置_按钮-->
-						<Button
-							Width="46"
-							Height="30"
-							Padding="15,0,15,0"
-							VerticalAlignment="Center"
-							Background="Transparent"
-							Command="{Binding Key_SetConfig}">
-							<Image
-								Width="16"
-								Height="16"
-								VerticalAlignment="Center">
-								<Image.Source>
-									<SvgImage Source="/Assets/img/settings.svg" />
-								</Image.Source>
-							</Image>
-							<Button.Styles>
-								<Style Selector="Button /template/ ContentPresenter">
-									<Setter Property="CornerRadius" Value="0" />
-								</Style>
-								<Style Selector="Button:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-									<Setter Property="Background" Value="#ffffff" />
-								</Style>
-							</Button.Styles>
-						</Button>
+                        <!--设置_按钮-->
+                        <Button
+                            Width="46"
+                            Height="30"
+                            Padding="15,0,15,0"
+                            VerticalAlignment="Center"
+                            Background="Transparent"
+                            Command="{Binding Key_SetConfig}">
+                            <Image
+                                Width="16"
+                                Height="16"
+                                VerticalAlignment="Center">
+                                <Image.Source>
+                                    <SvgImage Source="/Assets/img/settings.svg" />
+                                </Image.Source>
+                            </Image>
+                            <Button.Styles>
+                                <Style Selector="Button /template/ ContentPresenter">
+                                    <Setter Property="CornerRadius" Value="0" />
+                                </Style>
+                                <Style Selector="Button:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+                                    <Setter Property="Background" Value="#ffffff" />
+                                </Style>
+                            </Button.Styles>
+                        </Button>
 
-						<!--关于_按钮-->
-						<Button
-							Width="46"
-							Height="30"
-							Padding="15,0,15,0"
-							VerticalAlignment="Center"
-							Background="Transparent"
-							Tapped="Info_Tapped">
-							<Image
-								Width="16"
-								Height="16"
-								VerticalAlignment="Center">
-								<Image.Source>
-									<SvgImage Source="/Assets/img/info.svg" />
-								</Image.Source>
-							</Image>
-							<Button.Styles>
-								<Style Selector="Button /template/ ContentPresenter">
-									<Setter Property="CornerRadius" Value="0" />
-								</Style>
-								<Style Selector="Button:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-									<Setter Property="Background" Value="#ffffff" />
-								</Style>
-							</Button.Styles>
-						</Button>
+                        <!--关于_按钮-->
+                        <Button
+                            Width="46"
+                            Height="30"
+                            Padding="15,0,15,0"
+                            VerticalAlignment="Center"
+                            Background="Transparent"
+                            Tapped="Info_Tapped">
+                            <Image
+                                Width="16"
+                                Height="16"
+                                VerticalAlignment="Center">
+                                <Image.Source>
+                                    <SvgImage Source="/Assets/img/info.svg" />
+                                </Image.Source>
+                            </Image>
+                            <Button.Styles>
+                                <Style Selector="Button /template/ ContentPresenter">
+                                    <Setter Property="CornerRadius" Value="0" />
+                                </Style>
+                                <Style Selector="Button:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+                                    <Setter Property="Background" Value="#ffffff" />
+                                </Style>
+                            </Button.Styles>
+                        </Button>
 
-						<!--最小化_按钮-->
-						<Button
-							Width="46"
-							Height="30"
-							Padding="15,0,15,0"
-							VerticalAlignment="Center"
-							Background="Transparent"
-							Tapped="Minsize_Tapped">
-							<Image
-								Width="16"
-								Height="16"
-								VerticalAlignment="Center">
-								<Image.Source>
-									<SvgImage Source="/Assets/img/minsize.svg" />
-								</Image.Source>
-							</Image>
-							<Button.Styles>
-								<Style Selector="Button /template/ ContentPresenter">
-									<Setter Property="CornerRadius" Value="0" />
-								</Style>
-								<Style Selector="Button:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-									<Setter Property="Background" Value="#ffffff" />
-								</Style>
-							</Button.Styles>
-						</Button>
+                        <!--最小化_按钮-->
+                        <Button
+                            Width="46"
+                            Height="30"
+                            Padding="15,0,15,0"
+                            VerticalAlignment="Center"
+                            Background="Transparent"
+                            Tapped="Minsize_Tapped">
+                            <Image
+                                Width="16"
+                                Height="16"
+                                VerticalAlignment="Center">
+                                <Image.Source>
+                                    <SvgImage Source="/Assets/img/minsize.svg" />
+                                </Image.Source>
+                            </Image>
+                            <Button.Styles>
+                                <Style Selector="Button /template/ ContentPresenter">
+                                    <Setter Property="CornerRadius" Value="0" />
+                                </Style>
+                                <Style Selector="Button:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+                                    <Setter Property="Background" Value="#ffffff" />
+                                </Style>
+                            </Button.Styles>
+                        </Button>
 
-						<!--还原_按钮-->
-						<Button
-							x:Name="Default_btn"
-							Width="46"
-							Height="30"
-							Padding="15,0,15,0"
-							VerticalAlignment="Center"
-							Background="Transparent"
-							IsVisible="False"
-							Tapped="WindowStateChange_Tapped">
-							<Image
-								Width="16"
-								Height="16"
-								VerticalAlignment="Center">
-								<Image.Source>
-									<SvgImage Source="/Assets/img/default.svg" />
-								</Image.Source>
-							</Image>
-							<Button.Styles>
-								<Style Selector="Button /template/ ContentPresenter">
-									<Setter Property="CornerRadius" Value="0" />
-								</Style>
-								<Style Selector="Button:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-									<Setter Property="Background" Value="#ffffff" />
-								</Style>
-							</Button.Styles>
-						</Button>
+                        <!--还原_按钮-->
+                        <Button
+                            x:Name="Default_btn"
+                            Width="46"
+                            Height="30"
+                            Padding="15,0,15,0"
+                            VerticalAlignment="Center"
+                            Background="Transparent"
+                            IsVisible="False"
+                            Tapped="WindowStateChange_Tapped">
+                            <Image
+                                Width="16"
+                                Height="16"
+                                VerticalAlignment="Center">
+                                <Image.Source>
+                                    <SvgImage Source="/Assets/img/default.svg" />
+                                </Image.Source>
+                            </Image>
+                            <Button.Styles>
+                                <Style Selector="Button /template/ ContentPresenter">
+                                    <Setter Property="CornerRadius" Value="0" />
+                                </Style>
+                                <Style Selector="Button:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+                                    <Setter Property="Background" Value="#ffffff" />
+                                </Style>
+                            </Button.Styles>
+                        </Button>
 
-						<!--全屏_按钮-->
-						<Button
-							x:Name="FullScreen_btn"
-							Width="46"
-							Height="30"
-							Padding="15,0,15,0"
-							VerticalAlignment="Center"
-							Background="Transparent"
-							Tapped="WindowStateChange_Tapped">
-							<Image
-								Width="16"
-								Height="16"
-								VerticalAlignment="Center">
-								<Image.Source>
-									<SvgImage Source="/Assets/img/fullscreen.svg" />
-								</Image.Source>
-							</Image>
-							<Button.Styles>
-								<Style Selector="Button /template/ ContentPresenter">
-									<Setter Property="CornerRadius" Value="0" />
-								</Style>
-								<Style Selector="Button:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-									<Setter Property="Background" Value="#ffffff" />
-								</Style>
-							</Button.Styles>
-						</Button>
+                        <!--全屏_按钮-->
+                        <Button
+                            x:Name="FullScreen_btn"
+                            Width="46"
+                            Height="30"
+                            Padding="15,0,15,0"
+                            VerticalAlignment="Center"
+                            Background="Transparent"
+                            Tapped="WindowStateChange_Tapped">
+                            <Image
+                                Width="16"
+                                Height="16"
+                                VerticalAlignment="Center">
+                                <Image.Source>
+                                    <SvgImage Source="/Assets/img/fullscreen.svg" />
+                                </Image.Source>
+                            </Image>
+                            <Button.Styles>
+                                <Style Selector="Button /template/ ContentPresenter">
+                                    <Setter Property="CornerRadius" Value="0" />
+                                </Style>
+                                <Style Selector="Button:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+                                    <Setter Property="Background" Value="#ffffff" />
+                                </Style>
+                            </Button.Styles>
+                        </Button>
 
-						<!--关闭_按钮-->
-						<Button
-							Width="46"
-							Height="30"
-							Padding="15,0,15,0"
-							VerticalAlignment="Center"
-							Background="Transparent"
-							CornerRadius="0"
-							Tapped="Close_Tapped">
-							<Image
-								Width="16"
-								Height="16"
-								VerticalAlignment="Center">
-								<Image.Source>
-									<SvgImage Source="/Assets/img/close.svg" />
-								</Image.Source>
-							</Image>
-							<Button.Styles>
-								<Style Selector="Button /template/ ContentPresenter">
-									<Setter Property="CornerRadius" Value="0" />
-								</Style>
-								<Style Selector="Button:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-									<Setter Property="Background" Value="#bfe81123" />
-								</Style>
-							</Button.Styles>
-						</Button>
-					</StackPanel>
+                        <!--关闭_按钮-->
+                        <Button
+                            Width="46"
+                            Height="30"
+                            Padding="15,0,15,0"
+                            VerticalAlignment="Center"
+                            Background="Transparent"
+                            CornerRadius="0"
+                            Tapped="Close_Tapped">
+                            <Image
+                                Width="16"
+                                Height="16"
+                                VerticalAlignment="Center">
+                                <Image.Source>
+                                    <SvgImage Source="/Assets/img/close.svg" />
+                                </Image.Source>
+                            </Image>
+                            <Button.Styles>
+                                <Style Selector="Button /template/ ContentPresenter">
+                                    <Setter Property="CornerRadius" Value="0" />
+                                </Style>
+                                <Style Selector="Button:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+                                    <Setter Property="Background" Value="#bfe81123" />
+                                </Style>
+                            </Button.Styles>
+                        </Button>
+                    </StackPanel>
 
-				</Panel>
+                </Panel>
 
-				<!-- 内容区：三栏布局 -->
-				<!-- NOTE: 中间图片区域填补剩余控件, 其他区域自适应内容 -->
-				<Grid Grid.Row="1" ColumnDefinitions="Auto, Auto,*, Auto, Auto">
+                <!-- 内容区：三栏布局 -->
+                <!-- NOTE: 中间图片区域填补剩余控件, 其他区域自适应内容 -->
+                <Grid Grid.Row="1" ColumnDefinitions="Auto, Auto,*, Auto, Auto">
 
-					<!-- 左侧 内容区域 -->
-					<ScrollViewer Grid.Column="0"
-								  VerticalScrollBarVisibility="Auto"
-								  HorizontalScrollBarVisibility="Auto">
-						<StackPanel Margin="5">
-							<!--左侧工具栏-->
+                    <!-- 左侧 内容区域 -->
+                    <ScrollViewer Grid.Column="0"
+                                  VerticalScrollBarVisibility="Auto"
+                                  HorizontalScrollBarVisibility="Auto">
 
-							<!--模式配置_下拉框-->
-							<StackPanel
-								Margin="0,0,0,10"
-								Orientation="Horizontal"
-								ToolTip.Tip="模式配置 (右键菜单可重置)">
-								<Image Width="15" Height="15">
-									<Image.Source>
-										<SvgImage Source="/Assets/img/mode.svg" />
-									</Image.Source>
-								</Image>
-								<Border
-									Margin="9,0"
-									BorderBrush="#666666"
-									BorderThickness="0,0,0,1"
-									CornerRadius="0">
-									<ComboBox
-										Name="EmulatorOptions"
-										Width="160"
-										HorizontalAlignment="Right"
-										VerticalAlignment="Center"
-										HorizontalContentAlignment="Center"
-										VerticalContentAlignment="Center"
-										Background="Transparent"
-										BorderBrush="#666666"
-										BorderThickness="0"
-										FontSize="15"
-										PlaceholderForeground="Gray"
-										PlaceholderText="选择连接模式"
-										ItemsSource="{Binding EmulatorInfo, Mode=TwoWay}"
-										SelectedIndex="{Binding EmulatorSelectedIndex, Mode=TwoWay}">
-										<i:Interaction.Behaviors>
-											<!--点击事件-->
-											<ic:EventTriggerBehavior EventName="Tapped">
-												<icc:InvokeCommandAction Command="{Binding GetList}" />
-											</ic:EventTriggerBehavior>
-										</i:Interaction.Behaviors>
-									</ComboBox>
-								</Border>
-								<!--右键菜单-->
-								<StackPanel.ContextMenu>
-									<ContextMenu FontSize="25">
-										<MenuItem Command="{Binding ResetEmulatorOptions_Click}" Header="重置模式选择" />
-									</ContextMenu>
-								</StackPanel.ContextMenu>
-							</StackPanel>
+                        <!-- 左侧按钮组 -->
+                        <uc:LeftPart />
 
-							<!--截图_按钮-->
-							<Button
-								Name="ScreenShot"
-								Width="185"
-								FontSize="19"
-								Margin="0,6"
-								HorizontalContentAlignment="Center"
-								
-								Command="{Binding ScreenShot_Click}">
-								<StackPanel Orientation="Horizontal" Spacing="6">
-									<Image Width="25" Height="25">
-										<Image.Source>
-											<SvgImage Source="/Assets/img/jie_ping.svg" />
-										</Image.Source>
-									</Image>
-									<TextBlock>截图</TextBlock>
-								</StackPanel>
-							</Button>
+                    </ScrollViewer>
 
-							<!--加载_按钮-->
-							<Button
-								Name="Load"
-								Width="185"
-								FontSize="19"
-								Margin="0,6"
-								HorizontalContentAlignment="Center"
-								Command="{Binding Load_Click}">
-								<StackPanel Orientation="Horizontal" Spacing="6">
-									<Image Width="25" Height="25">
-										<Image.Source>
-											<SvgImage Source="/Assets/img/da_kai_wen_jian.svg" />
-										</Image.Source>
-									</Image>
-									<TextBlock>加载</TextBlock>
-								</StackPanel>
-							</Button>
+                    <!-- 第 1 个分隔条 -->
+                    <GridSplitter Grid.Column="1"
+                                  Background="#BDC3C7"
+                                  Width="2"
+                                  VerticalAlignment="Stretch"
+                                  HorizontalAlignment="Center"
+                                  ResizeDirection="Columns"
+                                  ShowsPreview="True" />
 
-							<!--保存图片_按钮-->
-							<Button
-								Name="Save"
-								Width="185"
-								FontSize="19"
-								Margin="0,6"
-								HorizontalContentAlignment="Center"
-								Command="{Binding Save_Click}">
-								<StackPanel Orientation="Horizontal" Spacing="6">
-									<Image Width="25" Height="25">
-										<Image.Source>
-											<SvgImage Source="/Assets/img/save.svg" />
-										</Image.Source>
-									</Image>
-									<TextBlock>保存</TextBlock>
-								</StackPanel>
-							</Button>
+                    <!-- 中间 内容区域 -->
+                    <ScrollViewer
+                        Grid.Column="2"
+                        VerticalScrollBarVisibility="Auto"
+                        HorizontalScrollBarVisibility="Auto"
+                        AllowAutoHide="False">
 
-							<!--右转_按钮-->
-							<Button
-								Name="TurnRight"
-								Width="185"
-								FontSize="19"
-								Margin="0,6"
-								HorizontalContentAlignment="Center"
-								Command="{Binding TurnRight_Click}">
-								<StackPanel Orientation="Horizontal" Spacing="6">
-									<Image Width="25" Height="25">
-										<Image.Source>
-											<SvgImage Source="/Assets/img/you_zhuan.svg" />
-										</Image.Source>
-									</Image>
-									<TextBlock>旋转</TextBlock>
-								</StackPanel>
-							</Button>
+                        <!--中间图片-->
+                        <uc:CenterImage />
 
-							<!--测试_按钮-->
-							<Button
-								Name="Test"
-								Width="185"
-								FontSize="19"
-								Margin="0,6"
-								HorizontalContentAlignment="Center"
-								Command="{Binding Test_Click}">
-								<StackPanel Orientation="Horizontal" Spacing="6">
-									<Image Width="25" Height="25">
-										<Image.Source>
-											<SvgImage Source="/Assets/img/ce_shi.svg" />
-										</Image.Source>
-									</Image>
-									<TextBlock>测试</TextBlock>
-								</StackPanel>
-							</Button>
+                    </ScrollViewer>
 
-							<!--相似度_下拉框-->
-							<StackPanel
-								Margin="0,6"
-								Orientation="Horizontal"
-								ToolTip.Tip="相似度">
-								<Image Width="15" Height="15">
-									<Image.Source>
-										<SvgImage Source="/Assets/img/sim.svg" />
-									</Image.Source>
-								</Image>
-								<Border
-									Margin="9,0"
-									BorderBrush="#666666"
-									BorderThickness="0,0,0,1"
-									CornerRadius="0">
-									<ComboBox
-										Name="Sim"
-										Width="160"
-										HorizontalAlignment="Right"
-										VerticalAlignment="Center"
-										HorizontalContentAlignment="Center"
-										VerticalContentAlignment="Center"
-										Background="Transparent"
-										BorderBrush="#666666"
-										BorderThickness="0"
-										FontSize="15"
-										SelectedIndex="{Binding SimSelectedIndex, Mode=TwoWay}">
-										<ComboBoxItem>100%</ComboBoxItem>
-										<ComboBoxItem>95%</ComboBoxItem>
-										<ComboBoxItem>90%</ComboBoxItem>
-										<ComboBoxItem>85%</ComboBoxItem>
-										<ComboBoxItem>80%</ComboBoxItem>
-										<ComboBoxItem>自定义</ComboBoxItem>
-									</ComboBox>
-								</Border>
-							</StackPanel>
+                    <!-- 第 2 个分隔条 -->
+                    <GridSplitter Grid.Column="3"
+                                  Background="#BDC3C7"
+                                  Width="2"
+                                  VerticalAlignment="Stretch"
+                                  HorizontalAlignment="Center"
+                                  ResizeDirection="Columns"
+                                  ShowsPreview="True" />
 
-							<!--测试结果_文本框-->
-							<StackPanel
-								Margin="0,6"
-								Orientation="Horizontal"
-								ToolTip.Tip="测试结果">
-								<Image Width="15" Height="15">
-									<Image.Source>
-										<SvgImage Source="/Assets/img/test.svg" />
-									</Image.Source>
-								</Image>
-								<Border
-									Margin="9,0"
-									BorderBrush="#666666"
-									BorderThickness="0,0,0,1"
-									CornerRadius="0">
-									<TextBox
-										Name="TestResult"
-										Width="160"
-										Background="Transparent"
-										BorderBrush="#666666"
-										BorderThickness="0"
-										FontSize="15"
-										IsReadOnly="True"
-										Watermark="测试结果"
-										HorizontalContentAlignment="Center"
-										VerticalContentAlignment="Center"
-										Text="{Binding TestResult, Mode=TwoWay}" />
-								</Border>
-							</StackPanel>
+                    <!-- 右侧 内容区域 -->
+                    <Panel Grid.Column="4">
+                        <uc:RightPart />
+                    </Panel>
 
-							<!--生成格式_下拉框-->
-							<StackPanel
-								Margin="0,6"
-								Orientation="Horizontal"
-								ToolTip.Tip="生成格式">
-								<Image Width="15" Height="15">
-									<Image.Source>
-										<SvgImage Source="/Assets/img/format.svg" />
-									</Image.Source>
-								</Image>
-								<Border
-									Margin="9,0"
-									BorderBrush="#666666"
-									BorderThickness="0,0,0,1"
-									CornerRadius="0">
-									<ComboBox
-										x:Name="Format"
-										Width="160"
-										HorizontalAlignment="Right"
-										VerticalAlignment="Center"
-										HorizontalContentAlignment="Center"
-										VerticalContentAlignment="Center"
-										Background="Transparent"
-										BorderBrush="#666666"
-										BorderThickness="0"
-										FontSize="15"
-										ItemsSource="{Binding FormatItems}"
-										SelectedIndex="{Binding FormatSelectedIndex, Mode=TwoWay}" />
-								</Border>
-							</StackPanel>
+                </Grid>
+            </Grid>
 
-							<!--缩放系数_下拉框-->
-							<StackPanel
-								Margin="0,6"
-								Orientation="Horizontal"
-								ToolTip.Tip="缩放系数">
-								<Image Width="15" Height="15">
-									<Image.Source>
-										<SvgImage Source="/Assets/img/microscope.svg" />
-									</Image.Source>
-								</Image>
-								<Border
-									Margin="9,0"
-									BorderBrush="#666666"
-									BorderThickness="0,0,0,1"
-									CornerRadius="0">
-									<ComboBox
-										Width="160"
-										HorizontalAlignment="Right"
-										VerticalAlignment="Center"
-										HorizontalContentAlignment="Center"
-										VerticalContentAlignment="Center"
-										Background="Transparent"
-										BorderBrush="#666666"
-										BorderThickness="0"
-										FontSize="15"
-										SelectedIndex="{Binding ScaleFactor, Mode=TwoWay, Converter={StaticResource ScaleFactor}}">
-										<ComboBoxItem>30%</ComboBoxItem>
-										<ComboBoxItem>40%</ComboBoxItem>
-										<ComboBoxItem>50%</ComboBoxItem>
-										<ComboBoxItem>60%</ComboBoxItem>
-										<ComboBoxItem>70%</ComboBoxItem>
-										<ComboBoxItem>80%</ComboBoxItem>
-										<ComboBoxItem>90%</ComboBoxItem>
-										<ComboBoxItem>100%</ComboBoxItem>
-										<ComboBoxItem>120%</ComboBoxItem>
-										<ComboBoxItem>140%</ComboBoxItem>
-										<ComboBoxItem>160%</ComboBoxItem>
-										<ComboBoxItem>180%</ComboBoxItem>
-										<ComboBoxItem>200%</ComboBoxItem>
-									</ComboBox>
-								</Border>
-							</StackPanel>
+            <!--鼠标画矩形-->
+            <uc:SelectRect />
 
-							<!--框选范围_文本框-->
-							<StackPanel
-								Margin="0,6"
-								Orientation="Horizontal"
-								ToolTip.Tip="框选范围 (右键菜单)">
-								<Image Width="15" Height="15">
-									<Image.Source>
-										<SvgImage Source="/Assets/img/rect.svg" />
-									</Image.Source>
-								</Image>
-								<Border
-									Margin="9,0"
-									BorderBrush="#666666"
-									BorderThickness="0,0,0,1"
-									CornerRadius="0">
-									<TextBox
-										Name="Rect"
-										Width="160"
-										Background="Transparent"
-										BorderBrush="#666666"
-										BorderThickness="0"
-										FontSize="14"
-										Watermark="框选范围 (右键菜单)"
-										HorizontalContentAlignment="Center"
-										VerticalContentAlignment="Center"
-										Text="{Binding Rect, Mode=TwoWay}">
-										<TextBox.ContextMenu>
-											<ContextMenu FontSize="25">
-												<MenuItem Command="{Binding Rect_Copy_Click}" Header="复制" />
-												<MenuItem Command="{Binding Rect_Clear_Click}" Header="清空" />
-											</ContextMenu>
-										</TextBox.ContextMenu>
-									</TextBox>
-								</Border>
-							</StackPanel>
+        </Panel>
+    </Border>
 
-							<!--裁剪_按钮-->
-							<Button
-								Width="185"
-								FontSize="19"
-								Margin="0,10,0,7"
-								HorizontalContentAlignment="Center"
-								Command="{Binding CutImg_Click}">
-								<StackPanel Orientation="Horizontal" Spacing="6">
-									<Image Width="25" Height="25">
-										<Image.Source>
-											<SvgImage Source="/Assets/img/cai_jian.svg" />
-										</Image.Source>
-									</Image>
-									<TextBlock>区域裁剪</TextBlock>
-								</StackPanel>
-							</Button>
+    <!--快捷键-->
+    <Window.KeyBindings>
 
-							<!--生成_按钮-->
-							<Button
-								Name="Create"
-								Width="185"
-								FontSize="19"
-								Margin="0,10,0,7"
-								HorizontalContentAlignment="Center"
-								Command="{Binding Create_Click}">
-								<StackPanel Orientation="Horizontal" Spacing="6">
-									<Image Width="25" Height="25">
-										<Image.Source>
-											<SvgImage Source="/Assets/img/code.svg" />
-										</Image.Source>
-									</Image>
-									<TextBlock>生成代码</TextBlock>
-								</StackPanel>
-							</Button>
+        <!--A键 列表添加颜色-->
+        <KeyBinding
+            Command="{Binding Key_AddColorInfo}"
+            CommandParameter="A"
+            Gesture="A" />
 
-							<!--生成的字符串_文本框-->
-							<TextBox
-								Name="CreateStr"
-								Width="185"
-								Height="80"
-								Margin="0,10,0,10"
-								HorizontalAlignment="Left"
-								VerticalAlignment="Top"
-								HorizontalContentAlignment="Left"
-								VerticalContentAlignment="Top"
-								AcceptsReturn="True"
-								Background="Transparent"
-								BorderBrush="#666666"
-								IsReadOnly="True"
-								Text="{Binding CreateStr, Mode=TwoWay}"
-								TextWrapping="Wrap"
-								Watermark="生成代码"
-								ToolTip.Tip="生成字符串" />
+        <!--S键 列表添加颜色-->
+        <KeyBinding
+            Command="{Binding Key_AddColorInfo}"
+            CommandParameter="S"
+            Gesture="S" />
 
-							<!--复制_按钮-->
-							<Button
-								Name="CreateStrCopy"
-								Width="185"
-								FontSize="19"
-								Margin="0,6"
-								HorizontalContentAlignment="Center"
-								Command="{Binding CreateStr_Copy_Click}">
-								<StackPanel Orientation="Horizontal" Spacing="6">
-									<Image Width="25" Height="25">
-										<Image.Source>
-											<SvgImage Source="/Assets/img/copy.svg" />
-										</Image.Source>
-									</Image>
-									<TextBlock>复制</TextBlock>
-								</StackPanel>
-							</Button>
+        <!--D键 列表添加颜色-->
+        <KeyBinding
+            Command="{Binding Key_AddColorInfo}"
+            CommandParameter="D"
+            Gesture="D" />
 
-							<!--清空_按钮-->
-							<Button
-								Name="CreateStrClear"
-								Width="185"
-								FontSize="19"
-								Margin="0,6"
-								HorizontalContentAlignment="Center"
-								Command="{Binding Clear_Click}">
-								<StackPanel Orientation="Horizontal" Spacing="6">
-									<Image Width="25" Height="25">
-										<Image.Source>
-											<SvgImage Source="/Assets/img/qing_kong.svg" />
-										</Image.Source>
-									</Image>
-									<TextBlock>清空</TextBlock>
-								</StackPanel>
-							</Button>
+        <!--F1键 清空颜色列表-->
+        <KeyBinding Command="{Binding Key_ColorInfo_Clear}" Gesture="F1" />
 
-						</StackPanel>
-					</ScrollViewer>
+        <!--F2键 打开设置界面-->
+        <KeyBinding Command="{Binding Key_SetConfig}" Gesture="F2" />
 
-					<!-- 第 1 个分隔条 -->
-					<GridSplitter Grid.Column="1"
-								  Background="#BDC3C7"
-								  Width="2"
-								  VerticalAlignment="Stretch"
-								  HorizontalAlignment="Center"
-								  ResizeDirection="Columns"
-								  ShowsPreview="True"/>
+        <!--"+" 加号 放大图片-->
+        <KeyBinding
+            Command="{Binding Key_ScaleFactorChanged}"
+            CommandParameter="Add"
+            Gesture="Add" />
 
-					<!-- 中间 内容区域 -->
-					<ScrollViewer
-						Grid.Column="2"
-						VerticalScrollBarVisibility="Auto"
-						HorizontalScrollBarVisibility="Auto"
-						AllowAutoHide="False">
+        <!--"-" 减号 缩小图片-->
+        <KeyBinding
+            Command="{Binding Key_ScaleFactorChanged}"
+            CommandParameter="Subtract"
+            Gesture="Subtract" />
 
-						<!--中间图片-->
-						<Panel Margin="20,20,20,20">
-							
-							<!--右键菜单-->
-							<Panel.ContextMenu>
-								<ContextMenu FontSize="25">
-									<MenuItem
-									Command="{Binding Key_ScaleFactorChanged}"
-									CommandParameter="Add"
-									Header="放大图片" />
-									<MenuItem
-									Command="{Binding Key_ScaleFactorChanged}"
-									CommandParameter="Subtract"
-									Header="缩小图片" />
-									<MenuItem Command="{Binding Key_ColorInfo_Clear}" Header="清空颜色列表" />
-								</ContextMenu>
-							</Panel.ContextMenu>
-							
-							<!--"测试找图" 成功的标志-->
-							<Image
-								Width="72"
-								Height="72"
-								Margin="{Binding FindedPoint_Margin}"
-								HorizontalAlignment="Left"
-								VerticalAlignment="Top"
-								IsVisible="{Binding FindedPoint_IsVisible}"
-								ZIndex="1">
-								<Image.Source>
-									<SvgImage Source="/Assets/img/location.svg" />
-								</Image.Source>
-							</Image>
-							
-							<!--主图片-->
-							<Image
-								Name="Img"
-								Width="{Binding ImgDrawWidth, Mode=TwoWay}"
-								Height="{Binding ImgDrawHeight, Mode=TwoWay}"
-								HorizontalAlignment="Left"
-								VerticalAlignment="Top"
-								PointerEntered="Image_PointerEntered_Focus"
-								Source="{Binding Img, Mode=TwoWay}"
-								ZIndex="0">
-								<i:Interaction.Behaviors>
-									<ic:EventTriggerBehavior EventName="PointerMoved">
-										<icc:InvokeCommandAction Command="{Binding Img_PointerMoved}" />
-									</ic:EventTriggerBehavior>
-									<ic:EventTriggerBehavior EventName="PointerPressed">
-										<icc:InvokeCommandAction Command="{Binding Img_PointerPressed}" />
-									</ic:EventTriggerBehavior>
-									<ic:EventTriggerBehavior EventName="PointerReleased">
-										<icc:InvokeCommandAction Command="{Binding Img_PointerReleased}" />
-									</ic:EventTriggerBehavior>
-								</i:Interaction.Behaviors>
-							</Image>
-							
-						</Panel>
-						
-					</ScrollViewer>
+        <!--tab 键 缩小图片-->
+        <KeyBinding
+            Command="{Binding Key_ScaleFactorChanged}"
+            CommandParameter="Tab"
+            Gesture="Tab" />
 
-					<!-- 第 2 个分隔条 -->
-					<GridSplitter Grid.Column="3"
-								  Background="#BDC3C7"
-								  Width="2"
-								  VerticalAlignment="Stretch"
-								  HorizontalAlignment="Center"
-								  ResizeDirection="Columns"
-								  ShowsPreview="True"/>
+        <!--ctrl + v 获取剪贴板数据 (文件/文字)-->
+        <KeyBinding Command="{Binding Key_GetClipboardData}" Gesture="Ctrl+V" />
 
-					<!-- 右侧 内容区域 -->
-					<Grid Grid.Column="4" RowDefinitions="Auto,*" Margin="10">
-						<!--放大镜-->
-						<StackPanel Grid.Row="0" Spacing="5">
-							<Image
-								Name="LoupeImg"
-								Width="241"
-								Height="241"
-								Source="{Binding LoupeWriteBmp}"
-								Stretch="UniformToFill" />
+    </Window.KeyBindings>
 
-							<StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-								<!--x坐标-->
-								<TextBlock FontSize="18" Text="{Binding PointX, Mode=TwoWay}" />
-
-								<TextBlock FontSize="18" Text=","/>
-
-								<!--y坐标-->
-								<TextBlock FontSize="18" Text="{Binding PointY, Mode=TwoWay}" />
-
-								<TextBlock FontSize="18" Text=","/>
-
-								<!--颜色-->
-								<TextBlock FontSize="18" Text="{Binding PointColor, Mode=TwoWay}" />
-
-							</StackPanel>
-
-							<StackPanel Orientation="Horizontal" Spacing="10" Margin="0,0,0,5">
-								<TextBlock VerticalAlignment="Center">放大镜刷新间隔:</TextBlock>
-								<TextBox HorizontalContentAlignment="Center" Text="{Binding LoupeRefreshInterval,Mode=TwoWay}"/>
-								<TextBlock VerticalAlignment="Center">毫秒</TextBlock>
-							</StackPanel>
-						</StackPanel>
-
-						<ScrollViewer
-							Grid.Row="1"
-							VerticalScrollBarVisibility="Auto"
-							HorizontalScrollBarVisibility="Auto">
-
-							<!--颜色列表-->
-							<uc:ColorInfos VerticalAlignment="Top">
-								<!--右键菜单-->
-								<uc:ColorInfos.ContextMenu>
-									<ContextMenu FontSize="25">
-										<MenuItem Command="{Binding Key_ColorInfo_Clear}" Header="清空颜色列表" />
-									</ContextMenu>
-								</uc:ColorInfos.ContextMenu>
-							</uc:ColorInfos>
-
-						</ScrollViewer>
-					</Grid>
-
-				</Grid>
-			</Grid>
-			
-			<!--鼠标画矩形-->
-			<Canvas>
-				<Rectangle
-					Name="SelectRect"
-					Width="{Binding RectWidth, Mode=TwoWay}"
-					Height="{Binding RectHeight, Mode=TwoWay}"
-					Margin="{Binding RectMargin, Mode=TwoWay}"
-					Fill="Transparent"
-					Focusable="False"
-					IsVisible="{Binding Rect_IsVisible, Mode=TwoWay}"
-					Stroke="Red"
-					StrokeThickness="2" />
-			</Canvas>
-
-		</Panel>
-	</Border>
-	
-	<!--快捷键-->
-	<Window.KeyBindings>
-
-		<!--A键 列表添加颜色-->
-		<KeyBinding
-			Command="{Binding Key_AddColorInfo}"
-			CommandParameter="A"
-			Gesture="A" />
-
-		<!--S键 列表添加颜色-->
-		<KeyBinding
-			Command="{Binding Key_AddColorInfo}"
-			CommandParameter="S"
-			Gesture="S" />
-
-		<!--D键 列表添加颜色-->
-		<KeyBinding
-			Command="{Binding Key_AddColorInfo}"
-			CommandParameter="D"
-			Gesture="D" />
-
-		<!--F1键 清空颜色列表-->
-		<KeyBinding Command="{Binding Key_ColorInfo_Clear}" Gesture="F1" />
-
-		<!--F2键 打开设置界面-->
-		<KeyBinding Command="{Binding Key_SetConfig}" Gesture="F2" />
-
-		<!--"+" 加号 放大图片-->
-		<KeyBinding
-			Command="{Binding Key_ScaleFactorChanged}"
-			CommandParameter="Add"
-			Gesture="Add" />
-
-		<!--"-" 减号 缩小图片-->
-		<KeyBinding
-			Command="{Binding Key_ScaleFactorChanged}"
-			CommandParameter="Subtract"
-			Gesture="Subtract" />
-
-		<!--tab 键 缩小图片-->
-		<KeyBinding
-			Command="{Binding Key_ScaleFactorChanged}"
-			CommandParameter="Tab"
-			Gesture="Tab" />
-
-		<!--ctrl + v 获取剪贴板数据 (文件/文字)-->
-		<KeyBinding Command="{Binding Key_GetClipboardData}" Gesture="Ctrl+V" />
-
-	</Window.KeyBindings>
-	
 </Window>
-
