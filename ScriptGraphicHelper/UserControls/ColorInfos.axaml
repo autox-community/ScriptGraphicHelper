@@ -2,11 +2,18 @@
     x:Class="ScriptGraphicHelper.UserControls.ColorInfos"
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:cv="using:ScriptGraphicHelper.Tools.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    
+    xmlns:cv="using:ScriptGraphicHelper.Tools.Converters"
+    xmlns:vm="clr-namespace:ScriptGraphicHelper.ViewModels"
+    
     mc:Ignorable="d">
 
+	<Design.DataContext>
+		<vm:MainWindowViewModel />
+	</Design.DataContext>
+	
 	<UserControl.Resources>
 		<cv:Color2HexConverter x:Key="color2Hex" />
 		<cv:Color2BrushConverter x:Key="color2Brush" />

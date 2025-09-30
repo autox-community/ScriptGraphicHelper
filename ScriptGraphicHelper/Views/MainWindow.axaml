@@ -27,7 +27,9 @@ xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 mc:Ignorable="d"
 d:DesignHeight="300"
 d:DesignWidth="500"
-这个值指示 XAML 解析器（无论是在设计时还是运行时），可以安全地​​忽略​​所有以 d:前缀开头的属性或元素。
+xmlns:vm="clr-namespace:ScriptGraphicHelper.ViewModels"
+d:DataContext="{d:DesignInstance vm:MainWindowViewModel}" // 在子组件中绑定设计时 DataContext
+这个值指示 XAML 解析器（无论是在设计时还是运行时），可以安全地忽略所有以 d:前缀开头的属性或元素。
 如果解析器无法理解或处理这些带 d:前缀的内容，它不会抛出错误
 -->
 <Window
@@ -71,13 +73,11 @@ d:DesignWidth="500"
     >
 	<!--
 	    告诉 IDE 这个 xaml 绑定的 ViewModel 是哪个,可以让 IDE 更智能的分析代码 和 预览界面,
-		不参与运行时,
+		不参与运行时, 也可以写到根标签中 d:DataContext="{d:DesignInstance vm:MainWindowViewModel}"
+		
 	    运行时 ViewModel 需要在 c# 代码中 new(), 
-		比如 这个 xaml 是在 App.xaml.cs 实例化  MainWindow 后指定的 ViewModel
-		desktop.MainWindow = new MainWindow
-        {
-            DataContext = new MainWindowViewModel(),
-        };
+		比如 这个 xaml 是在 App.xaml.cs 实例化, MainWindow 中指定的 ViewModel
+		desktop.MainWindow = new MainWindow{ DataContext = new MainWindowViewModel() };
 	-->
 	<Design.DataContext>
 		<vm:MainWindowViewModel />
@@ -86,56 +86,6 @@ d:DesignWidth="500"
 	<Window.Resources>
 		<cv:ScaleFactorConverter x:Key="ScaleFactor" />
 	</Window.Resources>
-
-	<!--快捷键-->
-	<Window.KeyBindings>
-
-		<!--A键 列表添加颜色-->
-		<KeyBinding
-            Command="{Binding Key_AddColorInfo}"
-            CommandParameter="A"
-            Gesture="A" />
-
-		<!--S键 列表添加颜色-->
-		<KeyBinding
-            Command="{Binding Key_AddColorInfo}"
-            CommandParameter="S"
-            Gesture="S" />
-
-		<!--D键 列表添加颜色-->
-		<KeyBinding
-            Command="{Binding Key_AddColorInfo}"
-            CommandParameter="D"
-            Gesture="D" />
-
-		<!--F1键 清空颜色列表-->
-		<KeyBinding Command="{Binding Key_ColorInfo_Clear}" Gesture="F1" />
-
-		<!--F2键 打开设置界面-->
-		<KeyBinding Command="{Binding Key_SetConfig}" Gesture="F2" />
-
-		<!--"+" 加号 放大图片-->
-		<KeyBinding
-            Command="{Binding Key_ScaleFactorChanged}"
-            CommandParameter="Add"
-            Gesture="Add" />
-
-		<!--"-" 减号 缩小图片-->
-		<KeyBinding
-            Command="{Binding Key_ScaleFactorChanged}"
-            CommandParameter="Subtract"
-            Gesture="Subtract" />
-
-		<!--tab 键 缩小图片-->
-		<KeyBinding
-            Command="{Binding Key_ScaleFactorChanged}"
-            CommandParameter="Tab"
-            Gesture="Tab" />
-
-		<!--ctrl + v 获取剪贴板数据 (文件/文字)-->
-		<KeyBinding Command="{Binding Key_GetClipboardData}" Gesture="Ctrl+V" />
-
-	</Window.KeyBindings>
 
 	<!--窗口边框-->
 	<Border BorderBrush="Black"	BorderThickness="1,1,1,1">
@@ -900,6 +850,56 @@ d:DesignWidth="500"
 
 		</Panel>
 	</Border>
+	
+	<!--快捷键-->
+	<Window.KeyBindings>
 
+		<!--A键 列表添加颜色-->
+		<KeyBinding
+			Command="{Binding Key_AddColorInfo}"
+			CommandParameter="A"
+			Gesture="A" />
+
+		<!--S键 列表添加颜色-->
+		<KeyBinding
+			Command="{Binding Key_AddColorInfo}"
+			CommandParameter="S"
+			Gesture="S" />
+
+		<!--D键 列表添加颜色-->
+		<KeyBinding
+			Command="{Binding Key_AddColorInfo}"
+			CommandParameter="D"
+			Gesture="D" />
+
+		<!--F1键 清空颜色列表-->
+		<KeyBinding Command="{Binding Key_ColorInfo_Clear}" Gesture="F1" />
+
+		<!--F2键 打开设置界面-->
+		<KeyBinding Command="{Binding Key_SetConfig}" Gesture="F2" />
+
+		<!--"+" 加号 放大图片-->
+		<KeyBinding
+			Command="{Binding Key_ScaleFactorChanged}"
+			CommandParameter="Add"
+			Gesture="Add" />
+
+		<!--"-" 减号 缩小图片-->
+		<KeyBinding
+			Command="{Binding Key_ScaleFactorChanged}"
+			CommandParameter="Subtract"
+			Gesture="Subtract" />
+
+		<!--tab 键 缩小图片-->
+		<KeyBinding
+			Command="{Binding Key_ScaleFactorChanged}"
+			CommandParameter="Tab"
+			Gesture="Tab" />
+
+		<!--ctrl + v 获取剪贴板数据 (文件/文字)-->
+		<KeyBinding Command="{Binding Key_GetClipboardData}" Gesture="Ctrl+V" />
+
+	</Window.KeyBindings>
+	
 </Window>
 

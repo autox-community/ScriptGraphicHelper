@@ -2,12 +2,15 @@
     x:Class="ScriptGraphicHelper.Views.ImgEditorWindow"
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:cv="using:ScriptGraphicHelper.Tools.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    
+    xmlns:cv="using:ScriptGraphicHelper.Tools.Converters"
     xmlns:i="using:Avalonia.Xaml.Interactivity"
     xmlns:ic="using:Avalonia.Xaml.Interactions.Core"
     xmlns:icc="using:ScriptGraphicHelper.Utils.ViewModel"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="using:ScriptGraphicHelper.ViewModels"
+    
     Title="图像编辑"
     Width="{Binding WindowWidth, Mode=TwoWay}"
     Height="{Binding WindowHeight, Mode=TwoWay}"
@@ -19,6 +22,10 @@
     WindowStartupLocation="CenterScreen"
     mc:Ignorable="d">
 
+	<Design.DataContext>
+		<vm:ImgEditorViewModel  />
+	</Design.DataContext>
+	
 	<Window.Resources>
 		<cv:_Color2HexConverter x:Key="_color2Hex" />
 		<cv:_Color2BrushConverter x:Key="_color2Brush" />
