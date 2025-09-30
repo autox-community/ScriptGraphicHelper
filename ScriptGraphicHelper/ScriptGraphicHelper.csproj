@@ -4,7 +4,7 @@
 		<TargetFramework>net8.0-windows</TargetFramework>
 		<LangVersion>latest</LangVersion>
 		<Nullable>enable</Nullable>
-		<Platforms>x64;x86</Platforms>
+		<Platforms>x64</Platforms>
 		<ApplicationIcon>Assets\img\ico.ico</ApplicationIcon>
 		<Configurations>Debug;Release</Configurations>
 		<ApplicationManifest>app.manifest</ApplicationManifest>
