@@ -16,6 +16,7 @@ using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
+using ScriptGraphicHelper.Tools;
 
 namespace ScriptGraphicHelper.Helpers.Screenshot
 {
@@ -33,7 +34,7 @@ namespace ScriptGraphicHelper.Helpers.Screenshot
         public override async Task<List<KeyValuePair<int, string>>> Initialize()
         {
             var config = new ATConfigWindow();
-            var remoteIP = await config.ShowDialog<string?>(MainWindow.Instance);
+            var remoteIP = await config.ShowDialog<string?>(IocTools.GetMainWindow());
 
             if (!string.IsNullOrEmpty(remoteIP))
             {

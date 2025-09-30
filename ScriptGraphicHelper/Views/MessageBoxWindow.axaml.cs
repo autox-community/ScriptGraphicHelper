@@ -8,6 +8,7 @@ using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
 
 using CommunityToolkit.Mvvm.DependencyInjection;
+using ScriptGraphicHelper.Tools;
 
 namespace ScriptGraphicHelper.Views
 {
@@ -17,7 +18,7 @@ namespace ScriptGraphicHelper.Views
         {
             await Dispatcher.UIThread.InvokeAsync(async () =>
             {
-                await new MessageBoxWindow(msg).ShowDialog(MainWindow.Instance);
+                await new MessageBoxWindow(msg).ShowDialog(IocTools.GetMainWindow());
             });
         }
 
@@ -25,7 +26,7 @@ namespace ScriptGraphicHelper.Views
         {
             await Dispatcher.UIThread.InvokeAsync(async () =>
             {
-                await new MessageBoxWindow(title, msg).ShowDialog(MainWindow.Instance);
+                await new MessageBoxWindow(title, msg).ShowDialog(IocTools.GetMainWindow());
             });
         }
 
@@ -65,8 +66,8 @@ namespace ScriptGraphicHelper.Views
 
         private async void Close_Tapped(object sender, RoutedEventArgs e)
         {
-            var tl = Ioc.Default.GetService<TopLevel>();
-            await tl.Clipboard.SetTextAsync(this.Message);
+            var clipboard = IocTools.GetClipboard();
+            await clipboard.SetTextAsync(this.Message);
             Close();
         }
 
@@ -74,8 +75,8 @@ namespace ScriptGraphicHelper.Views
         {
             if (e.Key == Key.Enter)
             {
-                var tl = Ioc.Default.GetService<TopLevel>();
-                await tl.Clipboard.SetTextAsync(this.Message);
+                var clipboard = IocTools.GetClipboard();
+                await clipboard.SetTextAsync(this.Message);
                 Close();
             }
         }

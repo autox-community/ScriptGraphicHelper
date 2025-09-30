@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+using ScriptGraphicHelper.Tools;
 
 namespace ScriptGraphicHelper.Helpers.Screenshot
 {
@@ -46,7 +47,7 @@ namespace ScriptGraphicHelper.Helpers.Screenshot
             Dm = Dmsoft.Instance;
             Dm.Hwnd = -1;
             HwndConfigWindow config = new();
-            await config.ShowDialog(MainWindow.Instance);
+            await config.ShowDialog(IocTools.GetMainWindow());
             return await GetList();
         }
 

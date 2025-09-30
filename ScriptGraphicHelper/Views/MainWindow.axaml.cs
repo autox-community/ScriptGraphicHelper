@@ -22,8 +22,6 @@ namespace ScriptGraphicHelper.Views
 {
     public partial class MainWindow : Window
     {
-        public static MainWindow Instance { get; private set; }
-
         public IntPtr Handle { get; private set; }
 
         /// <summary>
@@ -36,7 +34,6 @@ namespace ScriptGraphicHelper.Views
 
         public MainWindow()
         {
-            Instance = this;
             this.InitializeComponent();
 
             MyLoupeImg = this.LoupeImg;

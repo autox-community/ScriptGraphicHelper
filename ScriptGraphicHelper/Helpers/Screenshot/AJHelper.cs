@@ -18,6 +18,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using ScriptGraphicHelper.Tools;
 
 namespace ScriptGraphicHelper.Helpers.Screenshot
 {
@@ -96,8 +97,8 @@ namespace ScriptGraphicHelper.Helpers.Screenshot
         public override async Task<List<KeyValuePair<int, string>>> Initialize()
         {
             var config = new AJConfigWindow(Util.GetLocalAddress());
-
-            var result = await config.ShowDialog<(string, string)?>(MainWindow.Instance);
+            
+            var result = await config.ShowDialog<(string, string)?>(IocTools.GetMainWindow());
 
             if (result != null)
             {

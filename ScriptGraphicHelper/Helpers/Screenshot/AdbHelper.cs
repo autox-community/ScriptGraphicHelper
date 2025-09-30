@@ -10,6 +10,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using ScriptGraphicHelper.Tools;
 
 namespace ScriptGraphicHelper.Helpers.Screenshot
 {
@@ -60,7 +61,7 @@ namespace ScriptGraphicHelper.Helpers.Screenshot
             DeviceInfos.Clear();
 
             // 弹窗, 让用户填写 ip 地址 端口
-            var res = await new AdbConfigWindow().ShowDialog<string?>(MainWindow.Instance);
+            var res = await new AdbConfigWindow().ShowDialog<string?>(IocTools.GetMainWindow());
 
             // 填写了 ip 与 端口, "跳过" 则不进行这一步
             if (res != null)

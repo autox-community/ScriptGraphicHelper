@@ -6,6 +6,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows.Input;
+using ScriptGraphicHelper.Tools;
 
 namespace ScriptGraphicHelper.Helpers
 {
@@ -18,8 +19,10 @@ namespace ScriptGraphicHelper.Helpers
                 RemoveAt(0);
             }
             base.Add(item);
-
-            var width = (int)((MainWindow.Instance.Width - 450) / (Count < 8 ? Count : 8));
+            
+            var mainWindow = IocTools.GetMainWindow();
+            
+            var width = (int)((mainWindow.Width - 450) / (Count < 8 ? Count : 8));
             for (var i = 0; i < Count; i++)
             {
                 this[i].Width = width < 160 ? width : 160;

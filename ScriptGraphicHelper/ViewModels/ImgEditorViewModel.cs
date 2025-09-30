@@ -15,6 +15,7 @@ using CommunityToolkit.Mvvm.DependencyInjection;
 
 using ScriptGraphicHelper.Helpers;
 using ScriptGraphicHelper.Models;
+using ScriptGraphicHelper.Tools;
 using ScriptGraphicHelper.Utils.ViewModel;
 using ScriptGraphicHelper.Views;
 
@@ -128,7 +129,7 @@ namespace ScriptGraphicHelper.ViewModels
 
             try
             {
-                var tl = Ioc.Default.GetService<TopLevel>();
+                var tl = IocTools.GetTopLevel();
                 var storageFile = await tl.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions()
                 {
                     SuggestedFileName = "Screen_" + DateTime.Now.ToString("yy-MM-dd-HH-mm-ss"),

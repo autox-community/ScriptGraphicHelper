@@ -489,7 +489,7 @@ namespace ScriptGraphicHelper.ViewModels
         {
             try
             {
-                var tl = Ioc.Default.GetService<TopLevel>();
+                var tl = IocTools.GetTopLevel();
                 var fileList = await tl.StorageProvider.OpenFilePickerAsync(new Avalonia.Platform.Storage.FilePickerOpenOptions()
                 {
                     Title = "请选择文件",
@@ -550,7 +550,7 @@ namespace ScriptGraphicHelper.ViewModels
 
             try
             {
-                var tl = Ioc.Default.GetService<TopLevel>();
+                var tl = IocTools.GetTopLevel();
                 var storageFile = await tl.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions()
                 {
                     SuggestedFileName = "Screen_" + DateTime.Now.ToString("yy-MM-dd-HH-mm-ss"),
@@ -689,8 +689,8 @@ namespace ScriptGraphicHelper.ViewModels
         {
             try
             {
-                var tl = Ioc.Default.GetService<TopLevel>();
-                await tl.Clipboard.SetTextAsync(this.CreateStr);
+                var clipboard = IocTools.GetClipboard();
+                await clipboard.SetTextAsync(this.CreateStr);
             }
             catch (Exception ex)
             {
@@ -818,14 +818,14 @@ namespace ScriptGraphicHelper.ViewModels
         {
             try
             {
-                var tl = Ioc.Default.GetService<TopLevel>();
-                var formats = await tl.Clipboard.GetFormatsAsync();
+                var clipboard = IocTools.GetClipboard();
+                var formats = await clipboard.GetFormatsAsync();
 
                 var fileName = string.Empty;
 
                 if (Array.IndexOf(formats, "FileNames") != -1)
                 {
-                    var fileNames = (List<string>)await tl.Clipboard.GetDataAsync(DataFormats.FileNames);
+                    var fileNames = (List<string>)await clipboard.GetDataAsync(DataFormats.FileNames);
                     if (fileNames.Count != 0)
                     {
                         fileName = fileNames[0];
@@ -852,7 +852,7 @@ namespace ScriptGraphicHelper.ViewModels
                 }
                 else
                 {
-                    var text = await tl.Clipboard.GetTextAsync();
+                    var text = await clipboard.GetTextAsync();
                     if (!string.IsNullOrWhiteSpace(text))
                     {
                         this.ColorInfos.Clear();
@@ -903,7 +903,7 @@ namespace ScriptGraphicHelper.ViewModels
             var ldpath4 = setting.LdPath4;
             var ldpath64 = setting.LdPath64;
 
-            await config.ShowDialog(MainWindow.Instance);
+            await config.ShowDialog(IocTools.GetMainWindow());
 
             if (ldpath3 != setting.LdPath3 || ldpath4 != setting.LdPath4 || ldpath64 != setting.LdPath64)
             {
@@ -918,8 +918,8 @@ namespace ScriptGraphicHelper.ViewModels
         {
             try
             {
-                var tl = Ioc.Default.GetService<TopLevel>();
-                await tl.Clipboard.SetTextAsync(this.Rect);
+                var clipboard = IocTools.GetClipboard();
+                await clipboard.SetTextAsync(this.Rect);
             }
             catch (Exception ex)
             {
@@ -949,8 +949,8 @@ namespace ScriptGraphicHelper.ViewModels
                 var point = this.ColorInfos[this.DataGridSelectedIndex].Point;
                 var pointStr = string.Format("{0},{1}", point.X, point.Y);
 
-                var tl = Ioc.Default.GetService<TopLevel>();
-                await tl.Clipboard.SetTextAsync(pointStr);
+                var clipboard = IocTools.GetClipboard();
+                await clipboard.SetTextAsync(pointStr);
             }
             catch (Exception ex)
             {
@@ -972,8 +972,8 @@ namespace ScriptGraphicHelper.ViewModels
                 var color = this.ColorInfos[this.DataGridSelectedIndex].Color;
                 var hexColor = string.Format("#{0}{1}{2}", color.R.ToString("X2"), color.G.ToString("X2"), color.B.ToString("X2"));
 
-                var tl = Ioc.Default.GetService<TopLevel>();
-                await tl.Clipboard.SetTextAsync(hexColor);
+                var clipboard = IocTools.GetClipboard();
+                await clipboard.SetTextAsync(hexColor);
             }
             catch (Exception ex)
             {
@@ -1025,7 +1025,7 @@ namespace ScriptGraphicHelper.ViewModels
         {
             var range = GetRange();
             var imgEditor = new ImgEditorWindow(range, GraphicHelper.GetRectData(range));
-            await imgEditor.ShowDialog(MainWindow.Instance);
+            await imgEditor.ShowDialog(IocTools.GetMainWindow());
             if (ImgEditorWindow.Result_ACK && ImgEditorWindow.ResultColorInfos != null && ImgEditorWindow.ResultColorInfos.Count != 0)
             {
                 this.ColorInfos = new ObservableCollection<ColorInfo>(ImgEditorWindow.ResultColorInfos);

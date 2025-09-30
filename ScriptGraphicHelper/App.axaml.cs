@@ -1,16 +1,12 @@
 using System.Linq;
-
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core.Plugins;
 using Avalonia.Input.Platform;
 using Avalonia.Markup.Xaml;
-
 using CommunityToolkit.Mvvm.DependencyInjection;
-
 using Microsoft.Extensions.DependencyInjection;
-
 using ScriptGraphicHelper.ViewModels;
 using ScriptGraphicHelper.Views;
 
@@ -27,23 +23,30 @@ namespace ScriptGraphicHelper
         {
             if (this.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
-
                 DisableAvaloniaDataAnnotationValidation();
-
-                desktop.MainWindow = new MainWindow
+                
+                var mainWindow = new MainWindow
                 {
                     DataContext = new MainWindowViewModel(),
                 };
+                desktop.MainWindow = mainWindow;
 
                 // IOC
                 var serviceCollection = new ServiceCollection();
+                
                 var topLevel = TopLevel.GetTopLevel(desktop.MainWindow);
+                
                 if (topLevel != null)
                 {
                     // 将 toplevel 设置为单例,可以在 mvvm 中获取
                     serviceCollection.AddSingleton(topLevel);
+
+                    serviceCollection.AddSingleton(mainWindow);
                 }
+
                 var serviceProvider = serviceCollection.BuildServiceProvider();
+                
+                // 将 ioc容器 交给 Toolkit, 使用示例 : var o = Ioc.Default.GetService<MyClass>()
                 Ioc.Default.ConfigureServices(serviceProvider);
             }
 
