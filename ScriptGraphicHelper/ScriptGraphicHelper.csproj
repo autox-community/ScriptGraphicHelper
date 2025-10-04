@@ -39,6 +39,8 @@
 		<PackageReference Include="Svg.Controls.Skia.Avalonia" Version="11.3.6.2" />
 		<PackageReference Include="System.Drawing.Common" Version="9.0.9" />
 		<PackageReference Include="Xaml.Behaviors.Avalonia" Version="11.3.6.2" />
+		<!--开发时热重载,对发布后无影响-->
+		<PackageReference Include="HotAvalonia" Version="3.0.0" PrivateAssets="All" />
 	</ItemGroup>
 	
 	<!--编译时把 MyFiles 文件夹复制到输出目录-->
