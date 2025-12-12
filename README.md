@@ -10,8 +10,6 @@
 
 ## 说明
 
-运行前需要安装 .NET 8 运行时 [(官网下载只需 27 M)](https://dotnet.microsoft.com/zh-cn/download/dotnet/thank-you/runtime-8.0.20-windows-x64-installer)
-
 软件在 Release 中下载
 
 ## 原作者
