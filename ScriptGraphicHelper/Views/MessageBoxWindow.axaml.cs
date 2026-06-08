@@ -57,9 +57,12 @@ namespace ScriptGraphicHelper.Views
             var tb = this.FindControl<TextBlock>("MessageTextBlock");
             tb.Text = this.Message;
 
+            // 高 DPI: WorkingArea 是物理像素，需除以 Scaling 转为 DIP
+            var scaling = this.Screens.Primary.Scaling;
+            var workingArea = this.Screens.Primary.WorkingArea;
 
-            this.MaxWidth = this.Screens.Primary.WorkingArea.Width * 0.9;
-            this.MaxHeight = this.Screens.Primary.WorkingArea.Height * 0.8;
+            this.MaxWidth = workingArea.Width / scaling * 0.9;
+            this.MaxHeight = workingArea.Height / scaling * 0.8;
 
             tb.MaxWidth = this.MaxWidth - 100;
         }
@@ -85,10 +88,14 @@ namespace ScriptGraphicHelper.Views
         {
             if (e.Property.Name == "Width" || e.Property.Name == "Height")
             {
+                var scaling = this.Screens.Primary.Scaling;
+                var workingArea = this.Screens.Primary.WorkingArea;
+                var physicalW = this.Width * scaling;
+                var physicalH = this.Height * scaling;
+
                 this.Position = new PixelPoint(
-                    (int)(this.Screens.Primary.WorkingArea.Width / 2 - this.Width / 2),
-                    (int)(this.Screens.Primary.WorkingArea.Height / 2 - this.Height / 2)
-                    );
+                    workingArea.X + (int)((workingArea.Width - physicalW) / 2),
+                    workingArea.Y + (int)((workingArea.Height - physicalH) / 2));
             }
         }
     }
