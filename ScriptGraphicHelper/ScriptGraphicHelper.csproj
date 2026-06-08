@@ -13,6 +13,8 @@
 		<EmitCompilerGeneratedFiles>false</EmitCompilerGeneratedFiles>
 		<!--允许 unsafe 代码块-->
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<RuntimeIdentifier>win-x64</RuntimeIdentifier>
+		<AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
 	</PropertyGroup>
 
 	<ItemGroup>
