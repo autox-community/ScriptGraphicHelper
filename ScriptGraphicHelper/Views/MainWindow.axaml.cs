@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 
@@ -121,6 +122,14 @@ namespace ScriptGraphicHelper.Views
                 case Key.Up: NativeApi.Move2Top(); break;
                 case Key.Right: NativeApi.Move2Right(); break;
                 case Key.Down: NativeApi.Move2Bottom(); break;
+                case Key.Escape:
+                    if (ShortcutOverlay.IsVisible)
+                    {
+                        ShortcutOverlay.IsVisible = false;
+                        e.Handled = true;
+                        return;
+                    }
+                    break;
                 default: return;
             }
             e.Handled = true;
@@ -144,6 +153,29 @@ namespace ScriptGraphicHelper.Views
         private void Minsize_Tapped(object sender, RoutedEventArgs e)
         {
             this.WindowState = WindowState.Minimized;
+        }
+
+        /// <summary>
+        private void ToggleShortcutPanel(object sender, RoutedEventArgs e)
+        {
+            ShortcutOverlay.IsVisible = !ShortcutOverlay.IsVisible;
+        }
+
+        private void ShortcutOverlay_Close(object sender, RoutedEventArgs e)
+        {
+            ShortcutOverlay.IsVisible = false;
+        }
+
+        private void Address_Tapped(object sender, RoutedEventArgs e)
+        {
+            var url = "https://github.com/autox-community/ScriptGraphicHelper";
+            using var process = Process.Start(new ProcessStartInfo
+            {
+                FileName = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? url : "open",
+                Arguments = RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ? $"{url}" : "",
+                CreateNoWindow = true,
+                UseShellExecute = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+            });
         }
 
         /// <summary>
