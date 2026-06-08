@@ -78,8 +78,6 @@ namespace ScriptGraphicHelper.Helpers.Screenshot
                 }
                 // 获取 adb 中的设备列表
                 ret = await GetList();
-
-                MessageBoxWindow.ShowAsync("adb 获取到的设备数量:" + ret.Count);
             }
             return ret;
         }
