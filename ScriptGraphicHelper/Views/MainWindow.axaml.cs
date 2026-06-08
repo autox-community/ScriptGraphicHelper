@@ -50,16 +50,7 @@ namespace ScriptGraphicHelper.Views
 
         private void EnsureWindowPositionInScreen(PixelRect workingArea, Size dipSize, double scaling)
         {
-            var physicalW = dipSize.Width * scaling;
-            var physicalH = dipSize.Height * scaling;
-
-            var targetX = workingArea.X + (workingArea.Width - physicalW) / 2;
-            var targetY = workingArea.Y + (workingArea.Height - physicalH) / 2;
-
-            targetX = Math.Max(workingArea.X, targetX);
-            targetY = Math.Max(workingArea.Y, targetY);
-
-            this.Position = new PixelPoint((int)targetX, (int)targetY);
+            DpiHelper.CenterWindow(this, dipSize.Width, dipSize.Height);
         }
 
         /// <summary>
@@ -214,13 +205,7 @@ namespace ScriptGraphicHelper.Views
                 this.Width = this.defaultWidth;
                 this.Height = this.defaultHeight;
 
-                var scaling = this.Screens.Primary.Scaling;
-                var workingArea = this.Screens.Primary.WorkingArea;
-                var physicalW = this.Width * scaling;
-                var physicalH = this.Height * scaling;
-                this.Position = new PixelPoint(
-                    workingArea.X + (int)((workingArea.Width - physicalW) / 2),
-                    workingArea.Y + (int)((workingArea.Height - physicalH) / 2));
+                DpiHelper.CenterWindow(this);
             }
             else
             {

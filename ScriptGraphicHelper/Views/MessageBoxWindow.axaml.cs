@@ -88,14 +88,7 @@ namespace ScriptGraphicHelper.Views
         {
             if (e.Property.Name == "Width" || e.Property.Name == "Height")
             {
-                var scaling = this.Screens.Primary.Scaling;
-                var workingArea = this.Screens.Primary.WorkingArea;
-                var physicalW = this.Width * scaling;
-                var physicalH = this.Height * scaling;
-
-                this.Position = new PixelPoint(
-                    workingArea.X + (int)((workingArea.Width - physicalW) / 2),
-                    workingArea.Y + (int)((workingArea.Height - physicalH) / 2));
+                DpiHelper.CenterWindow(this);
             }
         }
     }
