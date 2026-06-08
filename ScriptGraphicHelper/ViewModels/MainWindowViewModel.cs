@@ -146,30 +146,55 @@ namespace ScriptGraphicHelper.ViewModels
 
             // 操作放大镜
 
-            // 降低放大镜的刷新频率, 提高软件性能 (刷新过快也没啥用)
-            var now = DateTime.UtcNow;
-            if ((now - _lastPixelTime).TotalMilliseconds < this.LoupeRefreshInterval) // 间隔
-                return;
-
-            _lastPixelTime = now;
-
+            // 1. 始终更新坐标和颜色文本 (轻量, 不受节流限制)
             var position = eventArgs.GetPosition((Image)parameters.Sender);
-
             var imgPoint = new Point(
                 Math.Floor(position.X / this.ScaleFactor),
                 Math.Floor(position.Y / this.ScaleFactor));
-
             this.PointX = (int)imgPoint.X;
             this.PointY = (int)imgPoint.Y;
+            var pixelColor = GraphicHelper.GetPixel(this.PointX, this.PointY);
+            this.PointColor = "#" + pixelColor[0].ToString("X2") + pixelColor[1].ToString("X2") + pixelColor[2].ToString("X2");
 
-            // 获取当前点的颜色
-            var color = GraphicHelper.GetPixel(this.PointX, this.PointY);
-            this.PointColor = "#" + color[0].ToString("X2") + color[1].ToString("X2") + color[2].ToString("X2");
+            // 2. 节流只控制放大镜位图 (昂贵的 15x15 矩阵 + WriteColor + InvalidateVisual)
+            var now = DateTime.UtcNow;
+            var elapsed = (now - _lastPixelTime).TotalMilliseconds;
+            var throttled = elapsed < this.LoupeRefreshInterval;
 
-            var sx = this.PointX - 7;
-            var sy = this.PointY - 7;
+            if (throttled)
+            {
+                // 节流跳过时: 调度一个延迟位图刷新, 连续移动时自动 debounce
+                // 确保鼠标停下后位图最终刷新到正确位置
+                _loupeDeferredTag++;
+                var tag = _loupeDeferredTag;
+                var px = this.PointX;
+                var py = this.PointY;
+                _ = Task.Delay(this.LoupeRefreshInterval + 20).ContinueWith(_ =>
+                {
+                    // 只有最新一次调度才执行 (debounce)
+                    if (tag == _loupeDeferredTag)
+                    {
+                        Dispatcher.UIThread.InvokeAsync(() => UpdateLoupeBitmap(px, py),
+                            DispatcherPriority.Background);
+                    }
+                });
+                return;
+            }
 
-            // 获取 15x15 大小的矩阵颜色
+            _lastPixelTime = now;
+            UpdateLoupeBitmap(this.PointX, this.PointY);
+        });
+
+        private int _loupeDeferredTag;
+
+        /// <summary>
+        /// 更新放大镜位图 (15x15 矩阵采集 + WriteColor + 通知 UI 刷新)
+        /// </summary>
+        private void UpdateLoupeBitmap(int px, int py)
+        {
+            var sx = px - 7;
+            var sy = py - 7;
+
             var colors = new List<byte[]>();
             for (var j = 0; j < 15; j++)
             {
@@ -177,24 +202,15 @@ namespace ScriptGraphicHelper.ViewModels
                 {
                     var x = sx + i;
                     var y = sy + j;
-
                     if (x >= 0 && y >= 0 && x < this.ImgWidth && y < this.ImgHeight)
-                    {
-                        // 获取颜色
                         colors.Add(GraphicHelper.GetPixel(x, y));
-                    }
                     else
-                    {
-                        // 出界则为黑色
                         colors.Add(new byte[] { 255, 250, 250 });
-                    }
                 }
             }
-            // 放大镜 显示颜色矩阵
             this.LoupeWriteBmp.WriteColor(colors);
-            // 刷新图片
             WeakReferenceMessenger.Default.Send(new LoupeInvalidateVisualMessage());
-        });
+        }
 
         private DateTime _addColorInfoTime = DateTime.Now;
 
@@ -236,11 +252,23 @@ namespace ScriptGraphicHelper.ViewModels
                     // 两次添加颜色信息的间隔大于 200 毫秒,则本次正常添加
                     if ((DateTime.Now - this._addColorInfoTime).TotalMilliseconds > 200)
                     {
+                        // 取色点: 使用 endPoint (放大镜十字准星对准的位置)
+                        var pickX = (int)endPoint.X;
+                        var pickY = (int)endPoint.Y;
+
+                        // 强制同步放大镜到位图位置 (消除节流导致的滞后)
+                        this.PointX = pickX;
+                        this.PointY = pickY;
+                        UpdateLoupeBitmap(pickX, pickY);
+
                         // 记录本次添加颜色的时间
                         this._addColorInfoTime = DateTime.Now;
 
                         // 获取颜色
-                        var color = GraphicHelper.GetPixel(startX, startY);
+                        var color = GraphicHelper.GetPixel(pickX, pickY);
+
+                        // 同步放大镜颜色显示
+                        this.PointColor = "#" + color[0].ToString("X2") + color[1].ToString("X2") + color[2].ToString("X2");
 
                         if (this.ColorInfos.Count == 0)
                         {
@@ -252,11 +280,11 @@ namespace ScriptGraphicHelper.ViewModels
 
                         var quarterWidth = this.ImgWidth / 4;
 
-                        if (startX > quarterWidth * 3)
+                        if (pickX > quarterWidth * 3)
                         {
                             anchor = AnchorMode.Right;
                         }
-                        else if (startX > quarterWidth)
+                        else if (pickX > quarterWidth)
                         {
                             anchor = AnchorMode.Center;
                         }
@@ -266,7 +294,7 @@ namespace ScriptGraphicHelper.ViewModels
                         }
 
                         // 添加 颜色信息
-                        this.ColorInfos.Add(new ColorInfo(this.ColorInfos.Count, anchor, startX, startY, color));
+                        this.ColorInfos.Add(new ColorInfo(this.ColorInfos.Count, anchor, pickX, pickY, color));
 
                         // 增加 表格的高度
                         this.DataGridHeight = (this.ColorInfos.Count + 1) * 40;
