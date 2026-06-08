@@ -13,24 +13,25 @@
         <vm:MainWindowViewModel />
     </Design.DataContext>
 
-    <Grid RowDefinitions="Auto,*" Margin="10">
+    <Grid RowDefinitions="Auto,*" Margin="10" MinWidth="260">
         <!--放大镜-->
         <StackPanel Grid.Row="0" Spacing="5">
             <Image
                 Name="LoupeImg"
                 Width="241"
                 Height="241"
+                HorizontalAlignment="Center"
                 Source="{Binding LoupeWriteBmp}"
                 Stretch="UniformToFill" />
 
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                 <!--x坐标-->
-                <TextBlock FontSize="18" Text="{Binding PointX, Mode=TwoWay}" />
+                <TextBlock FontSize="18" MinWidth="45" Text="{Binding PointX, Mode=TwoWay}" />
 
                 <TextBlock FontSize="18" Text="," />
 
                 <!--y坐标-->
-                <TextBlock FontSize="18" Text="{Binding PointY, Mode=TwoWay}" />
+                <TextBlock FontSize="18" MinWidth="45" Text="{Binding PointY, Mode=TwoWay}" />
 
                 <TextBlock FontSize="18" Text="," />
 
@@ -39,7 +40,7 @@
 
             </StackPanel>
 
-            <StackPanel Orientation="Horizontal" Spacing="10" Margin="0,0,0,5">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="10" Margin="0,0,0,5">
                 <TextBlock VerticalAlignment="Center">放大镜刷新间隔:</TextBlock>
                 <TextBox HorizontalContentAlignment="Center"
                          Text="{Binding LoupeRefreshInterval,Mode=TwoWay}" />
@@ -47,13 +48,8 @@
             </StackPanel>
         </StackPanel>
 
-        <ScrollViewer
-            Grid.Row="1"
-            VerticalScrollBarVisibility="Auto"
-            HorizontalScrollBarVisibility="Auto">
-
             <!--颜色列表-->
-            <uc:ColorInfos VerticalAlignment="Top">
+            <uc:ColorInfos Grid.Row="1" VerticalAlignment="Stretch">
                 <!--右键菜单-->
                 <uc:ColorInfos.ContextMenu>
                     <ContextMenu FontSize="25">
@@ -61,8 +57,6 @@
                     </ContextMenu>
                 </uc:ColorInfos.ContextMenu>
             </uc:ColorInfos>
-
-        </ScrollViewer>
     </Grid>
 
 </UserControl>
