@@ -9,6 +9,7 @@ using Avalonia.Threading;
 
 using CommunityToolkit.Mvvm.DependencyInjection;
 using ScriptGraphicHelper.Tools;
+using ScriptGraphicHelper.Utils;
 
 namespace ScriptGraphicHelper.Views
 {
@@ -16,6 +17,7 @@ namespace ScriptGraphicHelper.Views
     {
         public static async void ShowAsync(string msg)
         {
+            Logger.Error(msg);
             await Dispatcher.UIThread.InvokeAsync(async () =>
             {
                 await new MessageBoxWindow(msg).ShowDialog(IocTools.GetMainWindow());
@@ -24,6 +26,12 @@ namespace ScriptGraphicHelper.Views
 
         public static async void ShowAsync(string title, string msg)
         {
+            var isError = title.Contains("错误") || title.Contains("error") || title.Contains("异常");
+            if (isError)
+                Logger.Error($"[{title}] {msg}");
+            else
+                Logger.Warn($"[{title}] {msg}");
+
             await Dispatcher.UIThread.InvokeAsync(async () =>
             {
                 await new MessageBoxWindow(title, msg).ShowDialog(IocTools.GetMainWindow());
