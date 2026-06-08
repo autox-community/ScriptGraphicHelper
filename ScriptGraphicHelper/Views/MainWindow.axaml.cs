@@ -29,6 +29,38 @@ namespace ScriptGraphicHelper.Views
             this.InitializeComponent();
         }
 
+        private Size ClampToScreen(double desiredWidth, double desiredHeight, PixelRect workingArea, double scaling)
+        {
+            var effectiveWidth = workingArea.Width / scaling;
+            var effectiveHeight = workingArea.Height / scaling;
+
+            const double margin = 40;
+            var maxWidth = Math.Max(800, effectiveWidth - margin);
+            var maxHeight = Math.Max(500, effectiveHeight - margin);
+
+            const double minWidth = 1024;
+            const double minHeight = 600;
+
+            var clampedWidth = Math.Max(minWidth, Math.Min(desiredWidth, maxWidth));
+            var clampedHeight = Math.Max(minHeight, Math.Min(desiredHeight, maxHeight));
+
+            return new Size(clampedWidth, clampedHeight);
+        }
+
+        private void EnsureWindowPositionInScreen(PixelRect workingArea, Size dipSize, double scaling)
+        {
+            var physicalW = dipSize.Width * scaling;
+            var physicalH = dipSize.Height * scaling;
+
+            var targetX = workingArea.X + (workingArea.Width - physicalW) / 2;
+            var targetY = workingArea.Y + (workingArea.Height - physicalH) / 2;
+
+            targetX = Math.Max(workingArea.X, targetX);
+            targetY = Math.Max(workingArea.Y, targetY);
+
+            this.Position = new PixelPoint((int)targetX, (int)targetY);
+        }
+
         /// <summary>
         /// 窗口打开事件
         /// </summary>
@@ -41,8 +73,21 @@ namespace ScriptGraphicHelper.Views
 
             this.Handle = this.TryGetPlatformHandle()?.Handle ?? -1;
 
-            // 设置窗口大小
-            this.ClientSize = new Size(Settings.Instance.Width, Settings.Instance.Height);
+            var scaling = this.Screens.Primary.Scaling;
+            var workingArea = this.Screens.Primary.WorkingArea;
+            var clampedSize = ClampToScreen(Settings.Instance.Width, Settings.Instance.Height, workingArea, scaling);
+            this.ClientSize = clampedSize;
+
+            var vm = this.DataContext as MainWindowViewModel;
+            if (vm != null)
+            {
+                vm.WindowWidth = clampedSize.Width;
+                vm.WindowHeight = clampedSize.Height;
+            }
+            Settings.Instance.Width = clampedSize.Width;
+            Settings.Instance.Height = clampedSize.Height;
+
+            EnsureWindowPositionInScreen(workingArea, clampedSize, scaling);
         }
 
         /// <summary>
@@ -136,8 +181,14 @@ namespace ScriptGraphicHelper.Views
 
                 this.Width = this.defaultWidth;
                 this.Height = this.defaultHeight;
-                var workingAreaSize = this.Screens.Primary.WorkingArea.Size;
-                this.Position = new PixelPoint((int)((workingAreaSize.Width - this.Width) / 2), (int)((workingAreaSize.Height - this.Height) / 2));
+
+                var scaling = this.Screens.Primary.Scaling;
+                var workingArea = this.Screens.Primary.WorkingArea;
+                var physicalW = this.Width * scaling;
+                var physicalH = this.Height * scaling;
+                this.Position = new PixelPoint(
+                    workingArea.X + (int)((workingArea.Width - physicalW) / 2),
+                    workingArea.Y + (int)((workingArea.Height - physicalH) / 2));
             }
             else
             {
