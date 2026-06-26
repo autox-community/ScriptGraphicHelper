@@ -29,7 +29,7 @@ namespace ScriptGraphicHelper.Helpers.Screenshot
 
         private IMqttClient? client;
 
-        private string deviceName = "null";
+        private string deviceName = "";
 
         public override async Task<List<KeyValuePair<int, string>>> Initialize()
         {
@@ -77,10 +77,7 @@ namespace ScriptGraphicHelper.Helpers.Screenshot
                 }
             }
 
-            var list = new List<KeyValuePair<int, string>>
-            {
-                    new KeyValuePair<int, string>(key: 0, value: "null")
-            };
+            var list = new List<KeyValuePair<int, string>>();
 
             return list;
         }

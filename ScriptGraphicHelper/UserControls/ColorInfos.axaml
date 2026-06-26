@@ -25,12 +25,10 @@
         BorderThickness="2"
         CornerRadius="3">
 
-		<ScrollViewer HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden">
 			<Grid>
 
 				<!--颜色列表-->
 				<DataGrid
-                    Height="{Binding DataGridHeight, Mode=TwoWay}"
                     AutoGenerateColumns="False"
                     CanUserResizeColumns="False"
                     CanUserSortColumns="False"
@@ -44,8 +42,7 @@
                     SelectionMode="Single">
 					<DataGrid.Columns>
 						<DataGridTemplateColumn
-                            Width="Auto"
-							MinWidth="40"
+                            Width="40"
                             Header="序号"
                             IsReadOnly="True">
 							<DataGridTemplateColumn.CellTemplate>
@@ -60,8 +57,7 @@
 							</DataGridTemplateColumn.CellTemplate>
 						</DataGridTemplateColumn>
 						<DataGridTemplateColumn
-                            Width="Auto"
-							MinWidth="80"
+                            Width="90"
                             Header="坐标"
                             IsReadOnly="True">
 							<DataGridTemplateColumn.CellTemplate>
@@ -77,8 +73,7 @@
 							</DataGridTemplateColumn.CellTemplate>
 						</DataGridTemplateColumn>
 						<DataGridTemplateColumn
-							MinWidth="80"
-                            Width="Auto"
+							Width="100"
                             Header="颜色"
                             IsReadOnly="True">
 							<DataGridTemplateColumn.CellTemplate>
@@ -100,7 +95,7 @@
 								</DataTemplate>
 							</DataGridTemplateColumn.CellTemplate>
 						</DataGridTemplateColumn>
-						<DataGridTemplateColumn Width="Auto" MinWidth="40" Header="状态">
+						<DataGridTemplateColumn Width="50" Header="状态">
 							<DataGridTemplateColumn.CellTemplate>
 								<DataTemplate>
 									<!--底部边框 (所有列共同组成 行下面的横线)-->
@@ -120,7 +115,6 @@
 
 				<!--锚点比色 (多了个 锚点 字段)-->
 				<DataGrid
-                    Height="{Binding DataGridHeight, Mode=TwoWay}"
                     AutoGenerateColumns="False"
                     CanUserResizeColumns="False"
                     CanUserSortColumns="False"
@@ -241,7 +235,6 @@
 					</ContextMenu>
 				</Grid.ContextMenu>
 			</Grid>
-		</ScrollViewer>
 
 	</Border>
 

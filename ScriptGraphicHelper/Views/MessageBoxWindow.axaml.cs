@@ -9,6 +9,7 @@ using Avalonia.Threading;
 
 using CommunityToolkit.Mvvm.DependencyInjection;
 using ScriptGraphicHelper.Tools;
+using ScriptGraphicHelper.Utils;
 
 namespace ScriptGraphicHelper.Views
 {
@@ -16,6 +17,7 @@ namespace ScriptGraphicHelper.Views
     {
         public static async void ShowAsync(string msg)
         {
+            Logger.Error(msg);
             await Dispatcher.UIThread.InvokeAsync(async () =>
             {
                 await new MessageBoxWindow(msg).ShowDialog(IocTools.GetMainWindow());
@@ -24,6 +26,12 @@ namespace ScriptGraphicHelper.Views
 
         public static async void ShowAsync(string title, string msg)
         {
+            var isError = title.Contains("错误") || title.Contains("error") || title.Contains("异常");
+            if (isError)
+                Logger.Error($"[{title}] {msg}");
+            else
+                Logger.Warn($"[{title}] {msg}");
+
             await Dispatcher.UIThread.InvokeAsync(async () =>
             {
                 await new MessageBoxWindow(title, msg).ShowDialog(IocTools.GetMainWindow());
@@ -57,9 +65,12 @@ namespace ScriptGraphicHelper.Views
             var tb = this.FindControl<TextBlock>("MessageTextBlock");
             tb.Text = this.Message;
 
+            // 高 DPI: WorkingArea 是物理像素，需除以 Scaling 转为 DIP
+            var scaling = this.Screens.Primary.Scaling;
+            var workingArea = this.Screens.Primary.WorkingArea;
 
-            this.MaxWidth = this.Screens.Primary.WorkingArea.Width * 0.9;
-            this.MaxHeight = this.Screens.Primary.WorkingArea.Height * 0.8;
+            this.MaxWidth = workingArea.Width / scaling * 0.9;
+            this.MaxHeight = workingArea.Height / scaling * 0.8;
 
             tb.MaxWidth = this.MaxWidth - 100;
         }
@@ -85,10 +96,7 @@ namespace ScriptGraphicHelper.Views
         {
             if (e.Property.Name == "Width" || e.Property.Name == "Height")
             {
-                this.Position = new PixelPoint(
-                    (int)(this.Screens.Primary.WorkingArea.Width / 2 - this.Width / 2),
-                    (int)(this.Screens.Primary.WorkingArea.Height / 2 - this.Height / 2)
-                    );
+                DpiHelper.CenterWindow(this);
             }
         }
     }

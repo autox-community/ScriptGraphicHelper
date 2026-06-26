@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 
@@ -29,6 +30,29 @@ namespace ScriptGraphicHelper.Views
             this.InitializeComponent();
         }
 
+        private Size ClampToScreen(double desiredWidth, double desiredHeight, PixelRect workingArea, double scaling)
+        {
+            var effectiveWidth = workingArea.Width / scaling;
+            var effectiveHeight = workingArea.Height / scaling;
+
+            const double margin = 40;
+            var maxWidth = Math.Max(800, effectiveWidth - margin);
+            var maxHeight = Math.Max(500, effectiveHeight - margin);
+
+            const double minWidth = 1024;
+            const double minHeight = 600;
+
+            var clampedWidth = Math.Max(minWidth, Math.Min(desiredWidth, maxWidth));
+            var clampedHeight = Math.Max(minHeight, Math.Min(desiredHeight, maxHeight));
+
+            return new Size(clampedWidth, clampedHeight);
+        }
+
+        private void EnsureWindowPositionInScreen(PixelRect workingArea, Size dipSize, double scaling)
+        {
+            DpiHelper.CenterWindow(this, dipSize.Width, dipSize.Height);
+        }
+
         /// <summary>
         /// 窗口打开事件
         /// </summary>
@@ -41,8 +65,21 @@ namespace ScriptGraphicHelper.Views
 
             this.Handle = this.TryGetPlatformHandle()?.Handle ?? -1;
 
-            // 设置窗口大小
-            this.ClientSize = new Size(Settings.Instance.Width, Settings.Instance.Height);
+            var scaling = this.Screens.Primary.Scaling;
+            var workingArea = this.Screens.Primary.WorkingArea;
+            var clampedSize = ClampToScreen(Settings.Instance.Width, Settings.Instance.Height, workingArea, scaling);
+            this.ClientSize = clampedSize;
+
+            var vm = this.DataContext as MainWindowViewModel;
+            if (vm != null)
+            {
+                vm.WindowWidth = clampedSize.Width;
+                vm.WindowHeight = clampedSize.Height;
+            }
+            Settings.Instance.Width = clampedSize.Width;
+            Settings.Instance.Height = clampedSize.Height;
+
+            EnsureWindowPositionInScreen(workingArea, clampedSize, scaling);
         }
 
         /// <summary>
@@ -76,6 +113,14 @@ namespace ScriptGraphicHelper.Views
                 case Key.Up: NativeApi.Move2Top(); break;
                 case Key.Right: NativeApi.Move2Right(); break;
                 case Key.Down: NativeApi.Move2Bottom(); break;
+                case Key.Escape:
+                    if (ShortcutOverlay.IsVisible)
+                    {
+                        ShortcutOverlay.IsVisible = false;
+                        e.Handled = true;
+                        return;
+                    }
+                    break;
                 default: return;
             }
             e.Handled = true;
@@ -99,6 +144,29 @@ namespace ScriptGraphicHelper.Views
         private void Minsize_Tapped(object sender, RoutedEventArgs e)
         {
             this.WindowState = WindowState.Minimized;
+        }
+
+        /// <summary>
+        private void ToggleShortcutPanel(object sender, RoutedEventArgs e)
+        {
+            ShortcutOverlay.IsVisible = !ShortcutOverlay.IsVisible;
+        }
+
+        private void ShortcutOverlay_Close(object sender, RoutedEventArgs e)
+        {
+            ShortcutOverlay.IsVisible = false;
+        }
+
+        private void Address_Tapped(object sender, RoutedEventArgs e)
+        {
+            var url = "https://github.com/autox-community/ScriptGraphicHelper";
+            using var process = Process.Start(new ProcessStartInfo
+            {
+                FileName = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? url : "open",
+                Arguments = RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ? $"{url}" : "",
+                CreateNoWindow = true,
+                UseShellExecute = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+            });
         }
 
         /// <summary>
@@ -136,8 +204,8 @@ namespace ScriptGraphicHelper.Views
 
                 this.Width = this.defaultWidth;
                 this.Height = this.defaultHeight;
-                var workingAreaSize = this.Screens.Primary.WorkingArea.Size;
-                this.Position = new PixelPoint((int)((workingAreaSize.Width - this.Width) / 2), (int)((workingAreaSize.Height - this.Height) / 2));
+
+                DpiHelper.CenterWindow(this);
             }
             else
             {

@@ -146,7 +146,7 @@ d:DataContext="{d:DesignInstance vm:MainWindowViewModel}" // 在子组件中绑�
                             Padding="15,0,15,0"
                             VerticalAlignment="Center"
                             Background="Transparent"
-                            Tapped="Info_Tapped">
+                            Tapped="ToggleShortcutPanel">
                             <Image
                                 Width="16"
                                 Height="16"
@@ -330,6 +330,125 @@ d:DataContext="{d:DesignInstance vm:MainWindowViewModel}" // 在子组件中绑�
 
             <!--鼠标画矩形-->
             <uc:SelectRect />
+
+            <!-- 快捷键弹出面板 -->
+            <Panel x:Name="ShortcutOverlay" IsVisible="False" ZIndex="1000">
+                <Border x:Name="ShortcutOverlayBg" Background="#22000000" Tapped="ShortcutOverlay_Close" />
+                <Border
+                    Width="360"
+                    Margin="0,32,10,0"
+                    Padding="20,16"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Top"
+                    Background="#F0F8FF"
+                    CornerRadius="8"
+                    BorderBrush="#D0D0D0"
+                    BorderThickness="1">
+                    <StackPanel Spacing="0">
+                        <TextBlock
+                            Margin="0,0,0,10"
+                            FontSize="15"
+                            FontWeight="Medium"
+                            Foreground="#303030"
+                            Text="快捷操作" />
+                        <Grid
+                            ColumnDefinitions="*,*"
+                            RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto">
+
+                            <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal" Spacing="6" Margin="0,10,0,4">
+                                <Border Background="#E8F0FE" CornerRadius="3" Padding="5,2" MinWidth="22" HorizontalAlignment="Center">
+                                    <TextBlock FontSize="12" Foreground="#1A73E8" FontWeight="Medium" Text="A" HorizontalAlignment="Center" />
+                                </Border>
+                                <TextBlock FontSize="12" Foreground="#555" VerticalAlignment="Center" Text="添加颜色点" />
+                            </StackPanel>
+                            <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" Spacing="6" Margin="0,10,0,4">
+                                <Border Background="#E8F0FE" CornerRadius="3" Padding="5,2" MinWidth="22" HorizontalAlignment="Center">
+                                    <TextBlock FontSize="12" Foreground="#1A73E8" FontWeight="Medium" Text="S" HorizontalAlignment="Center" />
+                                </Border>
+                                <TextBlock FontSize="12" Foreground="#555" VerticalAlignment="Center" Text="添加偏色点" />
+                            </StackPanel>
+
+                            <StackPanel Grid.Row="1" Grid.Column="0" Orientation="Horizontal" Spacing="6" Margin="0,0,0,4">
+                                <Border Background="#E8F0FE" CornerRadius="3" Padding="5,2" MinWidth="22" HorizontalAlignment="Center">
+                                    <TextBlock FontSize="12" Foreground="#1A73E8" FontWeight="Medium" Text="D" HorizontalAlignment="Center" />
+                                </Border>
+                                <TextBlock FontSize="12" Foreground="#555" VerticalAlignment="Center" Text="添加多点色" />
+                            </StackPanel>
+
+                            <StackPanel Grid.Row="2" Grid.Column="0" Orientation="Horizontal" Spacing="6" Margin="0,0,0,4">
+                                <Border Background="#E8F0FE" CornerRadius="3" Padding="5,2" HorizontalAlignment="Center">
+                                    <TextBlock FontSize="12" Foreground="#1A73E8" FontWeight="Medium" Text="←↑↓→" HorizontalAlignment="Center" />
+                                </Border>
+                                <TextBlock FontSize="12" Foreground="#555" VerticalAlignment="Center" Text="微调鼠标" />
+                            </StackPanel>
+                            <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal" Spacing="6" Margin="0,0,0,4">
+                                <Border Background="#E8F0FE" CornerRadius="3" Padding="5,2" MinWidth="22" HorizontalAlignment="Center">
+                                    <TextBlock FontSize="12" Foreground="#1A73E8" FontWeight="Medium" Text="+" HorizontalAlignment="Center" />
+                                </Border>
+                                <TextBlock FontSize="12" Foreground="#555" VerticalAlignment="Center" Text="放大图片" />
+                            </StackPanel>
+
+                            <StackPanel Grid.Row="3" Grid.Column="0" Orientation="Horizontal" Spacing="6" Margin="0,0,0,4">
+                                <Border Background="#E8F0FE" CornerRadius="3" Padding="5,2" MinWidth="22" HorizontalAlignment="Center">
+                                    <TextBlock FontSize="12" Foreground="#1A73E8" FontWeight="Medium" Text="-" HorizontalAlignment="Center" />
+                                </Border>
+                                <TextBlock FontSize="12" Foreground="#555" VerticalAlignment="Center" Text="缩小图片" />
+                            </StackPanel>
+                            <StackPanel Grid.Row="3" Grid.Column="1" Orientation="Horizontal" Spacing="6" Margin="0,0,0,4">
+                                <Border Background="#E8F0FE" CornerRadius="3" Padding="5,2" MinWidth="22" HorizontalAlignment="Center">
+                                    <TextBlock FontSize="12" Foreground="#1A73E8" FontWeight="Medium" Text="Tab" HorizontalAlignment="Center" />
+                                </Border>
+                                <TextBlock FontSize="12" Foreground="#555" VerticalAlignment="Center" Text="缩放图片" />
+                            </StackPanel>
+
+                            <StackPanel Grid.Row="4" Grid.Column="0" Orientation="Horizontal" Spacing="6" Margin="0,0,0,4">
+                                <Border Background="#E8F0FE" CornerRadius="3" Padding="5,2" MinWidth="22" HorizontalAlignment="Center">
+                                    <TextBlock FontSize="12" Foreground="#1A73E8" FontWeight="Medium" Text="F1" HorizontalAlignment="Center" />
+                                </Border>
+                                <TextBlock FontSize="12" Foreground="#555" VerticalAlignment="Center" Text="清空列表" />
+                            </StackPanel>
+                            <StackPanel Grid.Row="4" Grid.Column="1" Orientation="Horizontal" Spacing="6" Margin="0,0,0,4">
+                                <Border Background="#E8F0FE" CornerRadius="3" Padding="5,2" MinWidth="22" HorizontalAlignment="Center">
+                                    <TextBlock FontSize="12" Foreground="#1A73E8" FontWeight="Medium" Text="F2" HorizontalAlignment="Center" />
+                                </Border>
+                                <TextBlock FontSize="12" Foreground="#555" VerticalAlignment="Center" Text="快捷设置" />
+                            </StackPanel>
+
+                            <StackPanel Grid.Row="5" Grid.Column="0" Orientation="Horizontal" Spacing="6">
+                                <Border Background="#E8F0FE" CornerRadius="3" Padding="5,2" HorizontalAlignment="Center">
+                                    <TextBlock FontSize="12" Foreground="#1A73E8" FontWeight="Medium" Text="Ctrl+V" HorizontalAlignment="Center" />
+                                </Border>
+                                <TextBlock FontSize="12" Foreground="#555" VerticalAlignment="Center" Text="导入剪贴板数据" />
+                            </StackPanel>
+                        </Grid>
+                        <Separator
+                            Margin="0,14,0,0"
+                            Background="#E0E0E0"
+                            Height="1" />
+                        <Border
+                            Margin="0,12,0,0"
+                            Padding="16,7"
+                            HorizontalAlignment="Center"
+                            Background="#E8F0FE"
+                            BorderBrush="#B5D4F4"
+                            BorderThickness="0.5"
+                            CornerRadius="19"
+                            Cursor="Hand"
+                            Tapped="Address_Tapped">
+                            <TextBlock
+                                FontSize="12"
+                                Foreground="#1A73E8"
+                                Text="autox-community / ScriptGraphicHelper" />
+                        </Border>
+                        <TextBlock
+                            Margin="0,12,0,0"
+                            FontSize="11"
+                            Foreground="#999"
+                            HorizontalAlignment="Center"
+                            Text="点击任意位置或按 Esc 关闭" />
+                    </StackPanel>
+                </Border>
+            </Panel>
 
         </Panel>
     </Border>

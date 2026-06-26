@@ -10,7 +10,7 @@ using System.Windows.Input;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
-using Avalonia.Logging;
+using Avalonia.Input.Platform;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform.Storage;
@@ -146,30 +146,55 @@ namespace ScriptGraphicHelper.ViewModels
 
             // 操作放大镜
 
-            // 降低放大镜的刷新频率, 提高软件性能 (刷新过快也没啥用)
-            var now = DateTime.UtcNow;
-            if ((now - _lastPixelTime).TotalMilliseconds < this.LoupeRefreshInterval) // 间隔
-                return;
-
-            _lastPixelTime = now;
-
+            // 1. 始终更新坐标和颜色文本 (轻量, 不受节流限制)
             var position = eventArgs.GetPosition((Image)parameters.Sender);
-
             var imgPoint = new Point(
                 Math.Floor(position.X / this.ScaleFactor),
                 Math.Floor(position.Y / this.ScaleFactor));
-
             this.PointX = (int)imgPoint.X;
             this.PointY = (int)imgPoint.Y;
+            var pixelColor = GraphicHelper.GetPixel(this.PointX, this.PointY);
+            this.PointColor = "#" + pixelColor[0].ToString("X2") + pixelColor[1].ToString("X2") + pixelColor[2].ToString("X2");
 
-            // 获取当前点的颜色
-            var color = GraphicHelper.GetPixel(this.PointX, this.PointY);
-            this.PointColor = "#" + color[0].ToString("X2") + color[1].ToString("X2") + color[2].ToString("X2");
+            // 2. 节流只控制放大镜位图 (昂贵的 15x15 矩阵 + WriteColor + InvalidateVisual)
+            var now = DateTime.UtcNow;
+            var elapsed = (now - _lastPixelTime).TotalMilliseconds;
+            var throttled = elapsed < this.LoupeRefreshInterval;
 
-            var sx = this.PointX - 7;
-            var sy = this.PointY - 7;
+            if (throttled)
+            {
+                // 节流跳过时: 调度一个延迟位图刷新, 连续移动时自动 debounce
+                // 确保鼠标停下后位图最终刷新到正确位置
+                _loupeDeferredTag++;
+                var tag = _loupeDeferredTag;
+                var px = this.PointX;
+                var py = this.PointY;
+                _ = Task.Delay(this.LoupeRefreshInterval + 20).ContinueWith(_ =>
+                {
+                    // 只有最新一次调度才执行 (debounce)
+                    if (tag == _loupeDeferredTag)
+                    {
+                        Dispatcher.UIThread.InvokeAsync(() => UpdateLoupeBitmap(px, py),
+                            DispatcherPriority.Background);
+                    }
+                });
+                return;
+            }
 
-            // 获取 15x15 大小的矩阵颜色
+            _lastPixelTime = now;
+            UpdateLoupeBitmap(this.PointX, this.PointY);
+        });
+
+        private int _loupeDeferredTag;
+
+        /// <summary>
+        /// 更新放大镜位图 (15x15 矩阵采集 + WriteColor + 通知 UI 刷新)
+        /// </summary>
+        private void UpdateLoupeBitmap(int px, int py)
+        {
+            var sx = px - 7;
+            var sy = py - 7;
+
             var colors = new List<byte[]>();
             for (var j = 0; j < 15; j++)
             {
@@ -177,24 +202,15 @@ namespace ScriptGraphicHelper.ViewModels
                 {
                     var x = sx + i;
                     var y = sy + j;
-
                     if (x >= 0 && y >= 0 && x < this.ImgWidth && y < this.ImgHeight)
-                    {
-                        // 获取颜色
                         colors.Add(GraphicHelper.GetPixel(x, y));
-                    }
                     else
-                    {
-                        // 出界则为黑色
                         colors.Add(new byte[] { 255, 250, 250 });
-                    }
                 }
             }
-            // 放大镜 显示颜色矩阵
             this.LoupeWriteBmp.WriteColor(colors);
-            // 刷新图片
             WeakReferenceMessenger.Default.Send(new LoupeInvalidateVisualMessage());
-        });
+        }
 
         private DateTime _addColorInfoTime = DateTime.Now;
 
@@ -236,11 +252,23 @@ namespace ScriptGraphicHelper.ViewModels
                     // 两次添加颜色信息的间隔大于 200 毫秒,则本次正常添加
                     if ((DateTime.Now - this._addColorInfoTime).TotalMilliseconds > 200)
                     {
+                        // 取色点: 使用 endPoint (放大镜十字准星对准的位置)
+                        var pickX = (int)endPoint.X;
+                        var pickY = (int)endPoint.Y;
+
+                        // 强制同步放大镜到位图位置 (消除节流导致的滞后)
+                        this.PointX = pickX;
+                        this.PointY = pickY;
+                        UpdateLoupeBitmap(pickX, pickY);
+
                         // 记录本次添加颜色的时间
                         this._addColorInfoTime = DateTime.Now;
 
                         // 获取颜色
-                        var color = GraphicHelper.GetPixel(startX, startY);
+                        var color = GraphicHelper.GetPixel(pickX, pickY);
+
+                        // 同步放大镜颜色显示
+                        this.PointColor = "#" + color[0].ToString("X2") + color[1].ToString("X2") + color[2].ToString("X2");
 
                         if (this.ColorInfos.Count == 0)
                         {
@@ -252,11 +280,11 @@ namespace ScriptGraphicHelper.ViewModels
 
                         var quarterWidth = this.ImgWidth / 4;
 
-                        if (startX > quarterWidth * 3)
+                        if (pickX > quarterWidth * 3)
                         {
                             anchor = AnchorMode.Right;
                         }
-                        else if (startX > quarterWidth)
+                        else if (pickX > quarterWidth)
                         {
                             anchor = AnchorMode.Center;
                         }
@@ -266,7 +294,7 @@ namespace ScriptGraphicHelper.ViewModels
                         }
 
                         // 添加 颜色信息
-                        this.ColorInfos.Add(new ColorInfo(this.ColorInfos.Count, anchor, startX, startY, color));
+                        this.ColorInfos.Add(new ColorInfo(this.ColorInfos.Count, anchor, pickX, pickY, color));
 
                         // 增加 表格的高度
                         this.DataGridHeight = (this.ColorInfos.Count + 1) * 40;
@@ -296,6 +324,15 @@ namespace ScriptGraphicHelper.ViewModels
                 }
                 ScreenshotHelperBridge.Info = list;
                 this.EmulatorInfo = temp;
+
+                if (temp.Count > 0)
+                {
+                    this.EmulatorSelectedIndex = 0;
+                }
+                else
+                {
+                    this.EmulatorSelectedIndex = -1;
+                }
             }
         });
 
@@ -329,6 +366,11 @@ namespace ScriptGraphicHelper.ViewModels
                     this.EmulatorInfo = await ScreenshotHelperBridge.Initialize();
 
                     this.EmulatorSelectedIndex = -1;
+
+                    if (this.EmulatorInfo != null && this.EmulatorInfo.Count > 0)
+                    {
+                        this.EmulatorSelectedIndex = 0;
+                    }
 
                     // 目标模式 截屏成功回调
                     ScreenshotHelperBridge.Helpers[ScreenshotHelperBridge.Select].OnSuccessed = new Action<Bitmap>((bitmap) =>
@@ -397,7 +439,7 @@ namespace ScriptGraphicHelper.ViewModels
                 this.WindowCursor = new Cursor(StandardCursorType.Wait);
                 if (ScreenshotHelperBridge.Select == -1
                     || ScreenshotHelperBridge.Index == -1 ||
-                    ScreenshotHelperBridge.Info[ScreenshotHelperBridge.Index].Value == "null")
+                    ScreenshotHelperBridge.Info.Count == 0)
                 {
                     MessageBoxWindow.ShowAsync("请先配置 -> (模拟器/tcp/句柄)");
                     this.WindowCursor = new Cursor(StandardCursorType.Arrow);
@@ -814,75 +856,118 @@ namespace ScriptGraphicHelper.ViewModels
         });
 
         /// <summary>
-        /// 快捷键_导入剪贴板数据 (文件/文字)
+        /// 快捷键_导入剪贴板数据 (文件/截图/文字)
         /// </summary>
         public async void Key_GetClipboardData()
         {
             try
             {
                 var clipboard = IocTools.GetClipboard();
-                var formats = await clipboard.GetFormatsAsync();
 
-                var fileName = string.Empty;
-
-                if (Array.IndexOf(formats, "FileNames") != -1)
+                // 文件粘贴: 资源管理器复制的文件
+                var files = await clipboard.TryGetFilesAsync();
+                if (files is { Length: > 0 })
                 {
-                    var fileNames = (List<string>)await clipboard.GetDataAsync(DataFormats.FileNames);
-                    if (fileNames.Count != 0)
+                    foreach (var item in files)
                     {
-                        fileName = fileNames[0];
+                        if (item is IStorageFile file
+                            && (file.Name.EndsWith(".bmp", StringComparison.OrdinalIgnoreCase)
+                                || file.Name.EndsWith(".png", StringComparison.OrdinalIgnoreCase)
+                                || file.Name.EndsWith(".jpg", StringComparison.OrdinalIgnoreCase)
+                                || file.Name.EndsWith(".jpeg", StringComparison.OrdinalIgnoreCase)))
+                        {
+                            await PasteFromStorageFile(file);
+                            return;
+                        }
                     }
                 }
 
-                if (fileName.IndexOf(".bmp") != -1 || fileName.IndexOf(".png") != -1 || fileName.IndexOf(".jpg") != -1)
+                // 截图粘贴: Shift+Win+S / 截图工具 (PNG 格式)
+                var pngFormat = DataFormat.CreateBytesPlatformFormat("PNG");
+                var pngBytes = await clipboard.TryGetValueAsync(pngFormat);
+                if (pngBytes is { Length: > 0 })
                 {
-                    var stream = new FileStream(fileName, FileMode.Open, FileAccess.Read);
-                    this.Img = new Bitmap(stream);
-                    stream.Position = 0;
-                    var sKBitmap = SKBitmap.Decode(stream);
-                    GraphicHelper.KeepScreen(sKBitmap);
-                    sKBitmap.Dispose();
-                    stream.Dispose();
-
-                    var item = new TabItem(this.Img);
-                    item.Command = new Command((param) =>
-                    {
-                        this.TabItems.Remove(item);
-                    });
-                    this.TabItems.Add(item);
-                    this.TabControlSelectedIndex = this.TabItems.Count - 1;
+                    PasteFromBytes(pngBytes);
+                    return;
                 }
-                else
-                {
-                    var text = await clipboard.GetTextAsync();
-                    if (!string.IsNullOrWhiteSpace(text))
-                    {
-                        this.ColorInfos.Clear();
-                        var sims = new int[] { 100, 95, 90, 85, 80, 0 };
-                        var sim = sims[this.SimSelectedIndex];
-                        if (sim == 0)
-                        {
-                            sim = Settings.Instance.DiySim;
-                        }
-                        var result = DataImportHelper.Import(text);
 
-                        var similarity = (255 - 255 * (sim / 100.0)) / 2;
-                        for (var i = 0; i < result.Count; i++)
-                        {
-                            if (GraphicHelper.CompareColor(new byte[] { result[i].Color.R, result[i].Color.G, result[i].Color.B }, similarity, (int)result[i].Point.X, (int)result[i].Point.Y, 0))
-                            {
-                                result[i].IsChecked = true;
-                            }
-                            this.ColorInfos.Add(result[i]);
-                        }
-                        this.DataGridHeight = (this.ColorInfos.Count + 1) * 40;
+                // 文本粘贴: 颜色列表数据
+                var text = await clipboard.TryGetTextAsync();
+                if (!string.IsNullOrWhiteSpace(text))
+                {
+                    this.ColorInfos.Clear();
+                    var sims = new int[] { 100, 95, 90, 85, 80, 0 };
+                    var sim = sims[this.SimSelectedIndex];
+                    if (sim == 0)
+                    {
+                        sim = Settings.Instance.DiySim;
                     }
+                    var result = DataImportHelper.Import(text);
+
+                    var similarity = (255 - 255 * (sim / 100.0)) / 2;
+                    for (var i = 0; i < result.Count; i++)
+                    {
+                        if (GraphicHelper.CompareColor(new byte[] { result[i].Color.R, result[i].Color.G, result[i].Color.B }, similarity, (int)result[i].Point.X, (int)result[i].Point.Y, 0))
+                        {
+                            result[i].IsChecked = true;
+                        }
+                        this.ColorInfos.Add(result[i]);
+                    }
+                    this.DataGridHeight = (this.ColorInfos.Count + 1) * 40;
                 }
             }
             catch (Exception ex)
             {
                 MessageBoxWindow.ShowAsync(ex.ToString());
             }
+        }
+
+        /// <summary>
+        /// 从 IStorageFile 读取图片并添加到标签页
+        /// </summary>
+        private async Task PasteFromStorageFile(IStorageFile file)
+        {
+            await using var stream = await file.OpenReadAsync();
+            PasteFromStream(stream);
+        }
+
+        /// <summary>
+        /// 从 PNG 字节数组加载图片并添加到标签页
+        /// </summary>
+        private void PasteFromBytes(byte[] bytes)
+        {
+            using var ms1 = new MemoryStream(bytes);
+            this.Img = new Bitmap(ms1);
+
+            using var ms2 = new MemoryStream(bytes);
+            using var sKBitmap = SKBitmap.Decode(ms2);
+            GraphicHelper.KeepScreen(sKBitmap);
+
+            AddImageTab();
+        }
+
+        /// <summary>
+        /// 从 Stream 加载图片（先读为 byte[] 避免 SKBitmap.Decode 关闭流影响 Avalonia）
+        /// </summary>
+        private void PasteFromStream(Stream stream)
+        {
+            using var ms = new MemoryStream();
+            stream.CopyTo(ms);
+            PasteFromBytes(ms.ToArray());
+        }
+
+        /// <summary>
+        /// 为当前 Img 创建 TabItem 并切到新标签
+        /// </summary>
+        private void AddImageTab()
+        {
+            var item = new TabItem(this.Img);
+            item.Command = new Command((param) =>
+            {
+                this.TabItems.Remove(item);
+            });
+            this.TabItems.Add(item);
+            this.TabControlSelectedIndex = this.TabItems.Count - 1;
         }
 
         /// <summary>

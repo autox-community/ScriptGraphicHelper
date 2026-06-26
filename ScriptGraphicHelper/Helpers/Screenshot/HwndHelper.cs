@@ -58,7 +58,6 @@ namespace ScriptGraphicHelper.Helpers.Screenshot
                 List<KeyValuePair<int, string>> result = new();
                 if (Dm.Hwnd == -1)
                 {
-                    result.Add(new KeyValuePair<int, string>(key: 0, value: "null"));
                     return result;
                 }
                 if (Dm.BindWindowEx() == 1)
@@ -67,7 +66,6 @@ namespace ScriptGraphicHelper.Helpers.Screenshot
                     result.Add(new KeyValuePair<int, string>(key: 0, value: Dm.Hwnd.ToString() + "-" + Dm.Display));
                     return result;
                 }
-                result.Add(new KeyValuePair<int, string>(key: 0, value: "null"));
                 return result;
 
             });
