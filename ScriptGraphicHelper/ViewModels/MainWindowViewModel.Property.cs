@@ -10,8 +10,6 @@ using Avalonia.Platform;
 
 using CommunityToolkit.Mvvm.ComponentModel;
 
-using Newtonsoft.Json.Linq;
-
 using ScriptGraphicHelper.Helpers;
 using ScriptGraphicHelper.Models;
 using ScriptGraphicHelper.Utils.ViewModel;

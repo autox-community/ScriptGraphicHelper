@@ -1,15 +1,10 @@
-using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
-using Avalonia.Markup.Xaml;
-
-using Newtonsoft.Json;
 
 using ScriptGraphicHelper.Models;
 using ScriptGraphicHelper.Tools;
 
 using System;
-using System.IO;
 
 namespace ScriptGraphicHelper.Views
 {

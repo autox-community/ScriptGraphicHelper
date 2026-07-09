@@ -1,11 +1,10 @@
 ﻿using Avalonia.Media.Imaging;
 
-using ScriptGraphicHelper.Views;
-
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows.Input;
+
 using ScriptGraphicHelper.Tools;
 
 namespace ScriptGraphicHelper.Helpers

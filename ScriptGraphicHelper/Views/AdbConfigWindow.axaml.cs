@@ -3,9 +3,6 @@
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
-using Avalonia.Markup.Xaml;
-
-using Tmds.DBus.Protocol;
 
 namespace ScriptGraphicHelper.Views
 {

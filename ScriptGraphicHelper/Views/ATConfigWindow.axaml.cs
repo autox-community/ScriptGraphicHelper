@@ -1,9 +1,6 @@
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
-using Avalonia.Markup.Xaml;
-using System;
-using System.Collections.Generic;
 
 namespace ScriptGraphicHelper.Views
 {

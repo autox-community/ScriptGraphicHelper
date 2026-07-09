@@ -1,19 +1,11 @@
 using System;
-using System.ComponentModel;
 using System.Diagnostics;
-using System.IO;
 using System.Runtime.InteropServices;
 
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
-using Avalonia.Markup.Xaml;
-using Avalonia.Threading;
-
-using CommunityToolkit.Mvvm.DependencyInjection;
-
-using Newtonsoft.Json;
 
 using ScriptGraphicHelper.Models;
 using ScriptGraphicHelper.Tools;

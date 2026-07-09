@@ -2,25 +2,17 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
 using Avalonia;
-using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Input.Platform;
-using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 
-using CommunityToolkit.Mvvm.DependencyInjection;
 using CommunityToolkit.Mvvm.Messaging;
-using ExCSS;
-
-using Newtonsoft.Json;
 
 using ScriptGraphicHelper.Helpers;
 using ScriptGraphicHelper.Models;

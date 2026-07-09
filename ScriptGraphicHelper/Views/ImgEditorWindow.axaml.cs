@@ -1,10 +1,11 @@
-using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
-using Avalonia.Markup.Xaml;
+
 using ScriptGraphicHelper.Models;
 using ScriptGraphicHelper.ViewModels;
+
 using System.Collections.Generic;
+
 using MyRange = ScriptGraphicHelper.Models.MyRange;
 
 namespace ScriptGraphicHelper.Views

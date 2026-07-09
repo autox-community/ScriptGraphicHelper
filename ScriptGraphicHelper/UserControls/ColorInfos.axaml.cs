@@ -1,8 +1,5 @@
 using Avalonia.Controls;
 using Avalonia.Input;
-using Avalonia.Markup.Xaml;
-
-using ScriptGraphicHelper.Views;
 
 namespace ScriptGraphicHelper.UserControls
 {

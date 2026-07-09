@@ -1,6 +1,4 @@
-﻿using Avalonia;
-using Avalonia.Input;
-using Avalonia.Platform;
+﻿using Avalonia.Input;
 
 using CommunityToolkit.Mvvm.ComponentModel;
 

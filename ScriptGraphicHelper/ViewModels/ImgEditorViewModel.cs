@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
@@ -11,7 +10,6 @@ using Avalonia.Media.Imaging;
 using Avalonia.Platform.Storage;
 
 using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.DependencyInjection;
 
 using ScriptGraphicHelper.Helpers;
 using ScriptGraphicHelper.Models;

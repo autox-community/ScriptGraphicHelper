@@ -1,12 +1,12 @@
-using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.Data.Core.Plugins;
-using Avalonia.Input.Platform;
 using Avalonia.Markup.Xaml;
+
 using CommunityToolkit.Mvvm.DependencyInjection;
+
 using Microsoft.Extensions.DependencyInjection;
+
 using ScriptGraphicHelper.Utils;
 using ScriptGraphicHelper.ViewModels;
 using ScriptGraphicHelper.Views;

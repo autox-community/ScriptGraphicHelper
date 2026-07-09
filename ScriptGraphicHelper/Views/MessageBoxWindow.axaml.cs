@@ -5,10 +5,8 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Input.Platform;
 using Avalonia.Interactivity;
-using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
 
-using CommunityToolkit.Mvvm.DependencyInjection;
 using ScriptGraphicHelper.Tools;
 using ScriptGraphicHelper.Utils;
 

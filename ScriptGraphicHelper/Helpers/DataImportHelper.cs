@@ -5,7 +5,6 @@ using ScriptGraphicHelper.Models;
 using ScriptGraphicHelper.Tools.Converters;
 
 using System.Collections.ObjectModel;
-using System.Linq;
 
 namespace ScriptGraphicHelper.Helpers
 {
