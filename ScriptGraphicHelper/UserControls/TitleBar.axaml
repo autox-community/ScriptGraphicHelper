@@ -35,7 +35,7 @@
                 FontSize="13"
                 FontWeight="Bold"
                 Foreground="#000000">
-				综合图色助手 v2.0.0
+				综合图色助手 v2.1.0
 			</TextBlock>
 
 			<TabControl
