@@ -6,7 +6,7 @@
 
              xmlns:uc="using:ScriptGraphicHelper.UserControls"
              xmlns:vm="using:ScriptGraphicHelper.ViewModels"
-
+             x:DataType="vm:MainWindowViewModel"
              x:Class="ScriptGraphicHelper.UserControls.RightPart">
 
     <Design.DataContext>

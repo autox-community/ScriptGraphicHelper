@@ -3,6 +3,7 @@ using System;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Input.Platform;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
@@ -52,7 +53,8 @@ namespace ScriptGraphicHelper.Views
 
             this.ExtendClientAreaToDecorationsHint = true;
             this.ExtendClientAreaTitleBarHeightHint = -1;
-            this.ExtendClientAreaChromeHints = Avalonia.Platform.ExtendClientAreaChromeHints.NoChrome;
+            this.WindowDecorations = WindowDecorations.None;
+            this.ExtendClientAreaToDecorationsHint = true;
         }
 
         public MessageBoxWindow(string msg) : this("提示", msg) { }

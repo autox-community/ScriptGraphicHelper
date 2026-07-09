@@ -8,6 +8,9 @@
     xmlns:icc="using:ScriptGraphicHelper.Utils.ViewModel"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:vm="using:ScriptGraphicHelper.ViewModels"
+	xmlns:model="using:ScriptGraphicHelper.Models"
+	x:DataType="vm:HwndConfigViewModel"
+
     Title="句柄配置"
     Width="700"
     Height="500"
@@ -30,7 +33,7 @@
             ItemsSource="{Binding HwndInfos, Mode=TwoWay}"
             SelectedItem="{Binding SelectedItem}">
             <TreeView.DataTemplates>
-                <TreeDataTemplate ItemsSource="{Binding Moves}">
+                <TreeDataTemplate x:DataType="model:MoveCategory" ItemsSource="{Binding Moves}">
                     <TextBlock Text="{Binding Info}" />
                 </TreeDataTemplate>
             </TreeView.DataTemplates>

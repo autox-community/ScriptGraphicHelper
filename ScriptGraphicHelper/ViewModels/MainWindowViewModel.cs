@@ -493,7 +493,7 @@ namespace ScriptGraphicHelper.ViewModels
         {
             try
             {
-                foreach (var item in e.Data.GetFiles())
+                foreach (var item in e.DataTransfer.TryGetFiles() ?? [])
                 {
                     var filePath = item.TryGetLocalPath();
 

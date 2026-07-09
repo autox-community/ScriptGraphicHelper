@@ -7,7 +7,8 @@
     
     xmlns:cv="using:ScriptGraphicHelper.Tools.Converters"
     xmlns:vm="clr-namespace:ScriptGraphicHelper.ViewModels"
-    
+    x:DataType="vm:MainWindowViewModel"
+	
     mc:Ignorable="d">
 
 	<Design.DataContext>

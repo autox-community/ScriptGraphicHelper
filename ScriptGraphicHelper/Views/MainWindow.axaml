@@ -31,6 +31,11 @@ xmlns:vm="clr-namespace:ScriptGraphicHelper.ViewModels"
 d:DataContext="{d:DesignInstance vm:MainWindowViewModel}" // 在子组件中绑定设计时 DataContext
 这个值指示 XAML 解析器（无论是在设计时还是运行时），可以安全地忽略所有以 d:前缀开头的属性或元素。
 如果解析器无法理解或处理这些带 d:前缀的内容，它不会抛出错误
+
+WindowDecorations="BorderOnly"
+ExtendClientAreaToDecorationsHint="True"
+隐藏标题栏，保留窗口边框用于调整窗口大小
+
 -->
 <Window
     xmlns="https://github.com/avaloniaui"
@@ -41,6 +46,7 @@ d:DataContext="{d:DesignInstance vm:MainWindowViewModel}" // 在子组件中绑�
     mc:Ignorable="d"
 
     x:Class="ScriptGraphicHelper.Views.MainWindow"
+	x:DataType="vm:MainWindowViewModel"
 
     xmlns:i="using:Avalonia.Xaml.Interactivity"
     xmlns:ic="using:Avalonia.Xaml.Interactions.Core"
@@ -62,14 +68,14 @@ d:DataContext="{d:DesignInstance vm:MainWindowViewModel}" // 在子组件中绑�
     Background="#F0F8FF"
     WindowStartupLocation="CenterScreen"
 
+	WindowDecorations="BorderOnly"
     ExtendClientAreaToDecorationsHint="True"
     ExtendClientAreaTitleBarHeightHint="-1"
-    ExtendClientAreaChromeHints="NoChrome"
-
+	
     KeyDown="Window_KeyDown"
     Opened="Window_Opened"
     Closing="Window_Closing">
-    <!--
+	<!--
 	    告诉 IDE 这个 xaml 绑定的 ViewModel 是哪个,可以让 IDE 更智能的分析代码 和 预览界面,
 		不参与运行时, 也可以写到根标签中 d:DataContext="{d:DesignInstance vm:MainWindowViewModel}"
 		
@@ -77,122 +83,122 @@ d:DataContext="{d:DesignInstance vm:MainWindowViewModel}" // 在子组件中绑�
 		比如 这个 xaml 是在 App.xaml.cs 实例化, MainWindow 中指定的 ViewModel
 		desktop.MainWindow = new MainWindow{ DataContext = new MainWindowViewModel() };
 	-->
-    <Design.DataContext>
-        <vm:MainWindowViewModel />
-    </Design.DataContext>
+	<Design.DataContext>
+		<vm:MainWindowViewModel />
+	</Design.DataContext>
 
-    <Window.Resources>
-        <cv:ScaleFactorConverter x:Key="ScaleFactor" />
-    </Window.Resources>
+	<Window.Resources>
+		<cv:ScaleFactorConverter x:Key="ScaleFactor" />
+	</Window.Resources>
 
-    <!--窗口边框-->
-    <Border BorderBrush="Black" BorderThickness="1,1,1,1">
-        <Panel>
-            <!-- 主网格布局：两行（标题栏+内容区） -->
-            <!-- NOTE: 第一行自适应内容,第二行填补窗口剩余空间,可以框住无限延伸的容器, 使滚动条正常工作-->
-            <Grid RowDefinitions="Auto, *">
+	<!--窗口边框-->
+	<Border BorderBrush="Black" BorderThickness="1,1,1,1">
+		<Panel>
+			<!-- 主网格布局：两行（标题栏+内容区） -->
+			<!-- NOTE: 第一行自适应内容,第二行填补窗口剩余空间,可以框住无限延伸的容器, 使滚动条正常工作-->
+			<Grid RowDefinitions="Auto, *">
 
-                <!-- 顶部 标题栏 -->
-                <Panel Grid.Row="0" Background="#2C3E50">
-                    <!--左上角 标题栏-->
-                    <uc:TitleBar VerticalAlignment="Top" PointerPressed="TitleBar_DragMove"
+				<!-- 顶部 标题栏 -->
+				<Panel Grid.Row="0" Background="#2C3E50">
+					<!--左上角 标题栏-->
+					<uc:TitleBar VerticalAlignment="Top" PointerPressed="TitleBar_DragMove"
                                  DoubleTapped="WindowStateChange_Tapped">
-                        <!--右键菜单-->
-                        <uc:TitleBar.ContextMenu>
-                            <ContextMenu FontSize="25">
-                                <MenuItem Header="最小化" Tapped="Minsize_Tapped" />
-                                <MenuItem Header="全屏/还原" Tapped="WindowStateChange_Tapped" />
-                                <MenuItem Header="关闭" Tapped="Close_Tapped" />
-                            </ContextMenu>
-                        </uc:TitleBar.ContextMenu>
-                    </uc:TitleBar>
+						<!--右键菜单-->
+						<uc:TitleBar.ContextMenu>
+							<ContextMenu FontSize="25">
+								<MenuItem Header="最小化" Tapped="Minsize_Tapped" />
+								<MenuItem Header="全屏/还原" Tapped="WindowStateChange_Tapped" />
+								<MenuItem Header="关闭" Tapped="Close_Tapped" />
+							</ContextMenu>
+						</uc:TitleBar.ContextMenu>
+					</uc:TitleBar>
 
-                    <!--右上角 按钮-->
-                    <StackPanel
+					<!--右上角 按钮-->
+					<StackPanel
                         HorizontalAlignment="Right"
                         VerticalAlignment="Top"
                         Orientation="Horizontal">
 
-                        <!--设置_按钮-->
-                        <Button
+						<!--设置_按钮-->
+						<Button
                             Width="46"
                             Height="30"
                             Padding="15,0,15,0"
                             VerticalAlignment="Center"
                             Background="Transparent"
                             Command="{Binding Key_SetConfig}">
-                            <Image
+							<Image
                                 Width="16"
                                 Height="16"
                                 VerticalAlignment="Center">
-                                <Image.Source>
-                                    <SvgImage Source="/Assets/img/settings.svg" />
-                                </Image.Source>
-                            </Image>
-                            <Button.Styles>
-                                <Style Selector="Button /template/ ContentPresenter">
-                                    <Setter Property="CornerRadius" Value="0" />
-                                </Style>
-                                <Style Selector="Button:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-                                    <Setter Property="Background" Value="#ffffff" />
-                                </Style>
-                            </Button.Styles>
-                        </Button>
+								<Image.Source>
+									<SvgImage Source="/Assets/img/settings.svg" />
+								</Image.Source>
+							</Image>
+							<Button.Styles>
+								<Style Selector="Button /template/ ContentPresenter">
+									<Setter Property="CornerRadius" Value="0" />
+								</Style>
+								<Style Selector="Button:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+									<Setter Property="Background" Value="#ffffff" />
+								</Style>
+							</Button.Styles>
+						</Button>
 
-                        <!--关于_按钮-->
-                        <Button
+						<!--关于_按钮-->
+						<Button
                             Width="46"
                             Height="30"
                             Padding="15,0,15,0"
                             VerticalAlignment="Center"
                             Background="Transparent"
                             Tapped="ToggleShortcutPanel">
-                            <Image
+							<Image
                                 Width="16"
                                 Height="16"
                                 VerticalAlignment="Center">
-                                <Image.Source>
-                                    <SvgImage Source="/Assets/img/info.svg" />
-                                </Image.Source>
-                            </Image>
-                            <Button.Styles>
-                                <Style Selector="Button /template/ ContentPresenter">
-                                    <Setter Property="CornerRadius" Value="0" />
-                                </Style>
-                                <Style Selector="Button:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-                                    <Setter Property="Background" Value="#ffffff" />
-                                </Style>
-                            </Button.Styles>
-                        </Button>
+								<Image.Source>
+									<SvgImage Source="/Assets/img/info.svg" />
+								</Image.Source>
+							</Image>
+							<Button.Styles>
+								<Style Selector="Button /template/ ContentPresenter">
+									<Setter Property="CornerRadius" Value="0" />
+								</Style>
+								<Style Selector="Button:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+									<Setter Property="Background" Value="#ffffff" />
+								</Style>
+							</Button.Styles>
+						</Button>
 
-                        <!--最小化_按钮-->
-                        <Button
+						<!--最小化_按钮-->
+						<Button
                             Width="46"
                             Height="30"
                             Padding="15,0,15,0"
                             VerticalAlignment="Center"
                             Background="Transparent"
                             Tapped="Minsize_Tapped">
-                            <Image
+							<Image
                                 Width="16"
                                 Height="16"
                                 VerticalAlignment="Center">
-                                <Image.Source>
-                                    <SvgImage Source="/Assets/img/minsize.svg" />
-                                </Image.Source>
-                            </Image>
-                            <Button.Styles>
-                                <Style Selector="Button /template/ ContentPresenter">
-                                    <Setter Property="CornerRadius" Value="0" />
-                                </Style>
-                                <Style Selector="Button:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-                                    <Setter Property="Background" Value="#ffffff" />
-                                </Style>
-                            </Button.Styles>
-                        </Button>
+								<Image.Source>
+									<SvgImage Source="/Assets/img/minsize.svg" />
+								</Image.Source>
+							</Image>
+							<Button.Styles>
+								<Style Selector="Button /template/ ContentPresenter">
+									<Setter Property="CornerRadius" Value="0" />
+								</Style>
+								<Style Selector="Button:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+									<Setter Property="Background" Value="#ffffff" />
+								</Style>
+							</Button.Styles>
+						</Button>
 
-                        <!--还原_按钮-->
-                        <Button
+						<!--还原_按钮-->
+						<Button
                             x:Name="Default_btn"
                             Width="46"
                             Height="30"
@@ -201,26 +207,26 @@ d:DataContext="{d:DesignInstance vm:MainWindowViewModel}" // 在子组件中绑�
                             Background="Transparent"
                             IsVisible="False"
                             Tapped="WindowStateChange_Tapped">
-                            <Image
+							<Image
                                 Width="16"
                                 Height="16"
                                 VerticalAlignment="Center">
-                                <Image.Source>
-                                    <SvgImage Source="/Assets/img/default.svg" />
-                                </Image.Source>
-                            </Image>
-                            <Button.Styles>
-                                <Style Selector="Button /template/ ContentPresenter">
-                                    <Setter Property="CornerRadius" Value="0" />
-                                </Style>
-                                <Style Selector="Button:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-                                    <Setter Property="Background" Value="#ffffff" />
-                                </Style>
-                            </Button.Styles>
-                        </Button>
+								<Image.Source>
+									<SvgImage Source="/Assets/img/default.svg" />
+								</Image.Source>
+							</Image>
+							<Button.Styles>
+								<Style Selector="Button /template/ ContentPresenter">
+									<Setter Property="CornerRadius" Value="0" />
+								</Style>
+								<Style Selector="Button:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+									<Setter Property="Background" Value="#ffffff" />
+								</Style>
+							</Button.Styles>
+						</Button>
 
-                        <!--全屏_按钮-->
-                        <Button
+						<!--全屏_按钮-->
+						<Button
                             x:Name="FullScreen_btn"
                             Width="46"
                             Height="30"
@@ -228,26 +234,26 @@ d:DataContext="{d:DesignInstance vm:MainWindowViewModel}" // 在子组件中绑�
                             VerticalAlignment="Center"
                             Background="Transparent"
                             Tapped="WindowStateChange_Tapped">
-                            <Image
+							<Image
                                 Width="16"
                                 Height="16"
                                 VerticalAlignment="Center">
-                                <Image.Source>
-                                    <SvgImage Source="/Assets/img/fullscreen.svg" />
-                                </Image.Source>
-                            </Image>
-                            <Button.Styles>
-                                <Style Selector="Button /template/ ContentPresenter">
-                                    <Setter Property="CornerRadius" Value="0" />
-                                </Style>
-                                <Style Selector="Button:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-                                    <Setter Property="Background" Value="#ffffff" />
-                                </Style>
-                            </Button.Styles>
-                        </Button>
+								<Image.Source>
+									<SvgImage Source="/Assets/img/fullscreen.svg" />
+								</Image.Source>
+							</Image>
+							<Button.Styles>
+								<Style Selector="Button /template/ ContentPresenter">
+									<Setter Property="CornerRadius" Value="0" />
+								</Style>
+								<Style Selector="Button:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+									<Setter Property="Background" Value="#ffffff" />
+								</Style>
+							</Button.Styles>
+						</Button>
 
-                        <!--关闭_按钮-->
-                        <Button
+						<!--关闭_按钮-->
+						<Button
                             Width="46"
                             Height="30"
                             Padding="15,0,15,0"
@@ -255,43 +261,43 @@ d:DataContext="{d:DesignInstance vm:MainWindowViewModel}" // 在子组件中绑�
                             Background="Transparent"
                             CornerRadius="0"
                             Tapped="Close_Tapped">
-                            <Image
+							<Image
                                 Width="16"
                                 Height="16"
                                 VerticalAlignment="Center">
-                                <Image.Source>
-                                    <SvgImage Source="/Assets/img/close.svg" />
-                                </Image.Source>
-                            </Image>
-                            <Button.Styles>
-                                <Style Selector="Button /template/ ContentPresenter">
-                                    <Setter Property="CornerRadius" Value="0" />
-                                </Style>
-                                <Style Selector="Button:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-                                    <Setter Property="Background" Value="#bfe81123" />
-                                </Style>
-                            </Button.Styles>
-                        </Button>
-                    </StackPanel>
+								<Image.Source>
+									<SvgImage Source="/Assets/img/close.svg" />
+								</Image.Source>
+							</Image>
+							<Button.Styles>
+								<Style Selector="Button /template/ ContentPresenter">
+									<Setter Property="CornerRadius" Value="0" />
+								</Style>
+								<Style Selector="Button:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+									<Setter Property="Background" Value="#bfe81123" />
+								</Style>
+							</Button.Styles>
+						</Button>
+					</StackPanel>
 
-                </Panel>
+				</Panel>
 
-                <!-- 内容区：三栏布局 -->
-                <!-- NOTE: 中间图片区域填补剩余控件, 其他区域自适应内容 -->
-                <Grid Grid.Row="1" ColumnDefinitions="Auto, Auto,*, Auto, Auto">
+				<!-- 内容区：三栏布局 -->
+				<!-- NOTE: 中间图片区域填补剩余控件, 其他区域自适应内容 -->
+				<Grid Grid.Row="1" ColumnDefinitions="Auto, Auto,*, Auto, Auto">
 
-                    <!-- 左侧 内容区域 -->
-                    <ScrollViewer Grid.Column="0"
+					<!-- 左侧 内容区域 -->
+					<ScrollViewer Grid.Column="0"
                                   VerticalScrollBarVisibility="Auto"
                                   HorizontalScrollBarVisibility="Auto">
 
-                        <!-- 左侧按钮组 -->
-                        <uc:LeftPart />
+						<!-- 左侧按钮组 -->
+						<uc:LeftPart />
 
-                    </ScrollViewer>
+					</ScrollViewer>
 
-                    <!-- 第 1 个分隔条 -->
-                    <GridSplitter Grid.Column="1"
+					<!-- 第 1 个分隔条 -->
+					<GridSplitter Grid.Column="1"
                                   Background="#BDC3C7"
                                   Width="2"
                                   VerticalAlignment="Stretch"
@@ -299,20 +305,20 @@ d:DataContext="{d:DesignInstance vm:MainWindowViewModel}" // 在子组件中绑�
                                   ResizeDirection="Columns"
                                   ShowsPreview="True" />
 
-                    <!-- 中间 内容区域 -->
-                    <ScrollViewer
+					<!-- 中间 内容区域 -->
+					<ScrollViewer
                         Grid.Column="2"
                         VerticalScrollBarVisibility="Auto"
                         HorizontalScrollBarVisibility="Auto"
                         AllowAutoHide="False">
 
-                        <!--中间图片-->
-                        <uc:CenterImage />
+						<!--中间图片-->
+						<uc:CenterImage />
 
-                    </ScrollViewer>
+					</ScrollViewer>
 
-                    <!-- 第 2 个分隔条 -->
-                    <GridSplitter Grid.Column="3"
+					<!-- 第 2 个分隔条 -->
+					<GridSplitter Grid.Column="3"
                                   Background="#BDC3C7"
                                   Width="2"
                                   VerticalAlignment="Stretch"
@@ -320,21 +326,21 @@ d:DataContext="{d:DesignInstance vm:MainWindowViewModel}" // 在子组件中绑�
                                   ResizeDirection="Columns"
                                   ShowsPreview="True" />
 
-                    <!-- 右侧 内容区域 -->
-                    <Panel Grid.Column="4">
-                        <uc:RightPart />
-                    </Panel>
+					<!-- 右侧 内容区域 -->
+					<Panel Grid.Column="4">
+						<uc:RightPart />
+					</Panel>
 
-                </Grid>
-            </Grid>
+				</Grid>
+			</Grid>
 
-            <!--鼠标画矩形-->
-            <uc:SelectRect />
+			<!--鼠标画矩形-->
+			<uc:SelectRect />
 
-            <!-- 快捷键弹出面板 -->
-            <Panel x:Name="ShortcutOverlay" IsVisible="False" ZIndex="1000">
-                <Border x:Name="ShortcutOverlayBg" Background="#22000000" Tapped="ShortcutOverlay_Close" />
-                <Border
+			<!-- 快捷键弹出面板 -->
+			<Panel x:Name="ShortcutOverlay" IsVisible="False" ZIndex="1000">
+				<Border x:Name="ShortcutOverlayBg" Background="#22000000" Tapped="ShortcutOverlay_Close" />
+				<Border
                     Width="360"
                     Margin="0,32,10,0"
                     Padding="20,16"
@@ -344,88 +350,88 @@ d:DataContext="{d:DesignInstance vm:MainWindowViewModel}" // 在子组件中绑�
                     CornerRadius="8"
                     BorderBrush="#D0D0D0"
                     BorderThickness="1">
-                    <StackPanel Spacing="0">
-                        <TextBlock
+					<StackPanel Spacing="0">
+						<TextBlock
                             Margin="0,0,0,10"
                             FontSize="15"
                             FontWeight="Medium"
                             Foreground="#303030"
                             Text="快捷操作" />
-                        <Grid
+						<Grid
                             ColumnDefinitions="*,*"
                             RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto">
 
-                            <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal" Spacing="6" Margin="0,10,0,4">
-                                <Border Background="#E8F0FE" CornerRadius="3" Padding="5,2" MinWidth="22" HorizontalAlignment="Center">
-                                    <TextBlock FontSize="12" Foreground="#1A73E8" FontWeight="Medium" Text="A" HorizontalAlignment="Center" />
-                                </Border>
-                                <TextBlock FontSize="12" Foreground="#555" VerticalAlignment="Center" Text="添加颜色点" />
-                            </StackPanel>
-                            <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" Spacing="6" Margin="0,10,0,4">
-                                <Border Background="#E8F0FE" CornerRadius="3" Padding="5,2" MinWidth="22" HorizontalAlignment="Center">
-                                    <TextBlock FontSize="12" Foreground="#1A73E8" FontWeight="Medium" Text="S" HorizontalAlignment="Center" />
-                                </Border>
-                                <TextBlock FontSize="12" Foreground="#555" VerticalAlignment="Center" Text="添加偏色点" />
-                            </StackPanel>
+							<StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal" Spacing="6" Margin="0,10,0,4">
+								<Border Background="#E8F0FE" CornerRadius="3" Padding="5,2" MinWidth="22" HorizontalAlignment="Center">
+									<TextBlock FontSize="12" Foreground="#1A73E8" FontWeight="Medium" Text="A" HorizontalAlignment="Center" />
+								</Border>
+								<TextBlock FontSize="12" Foreground="#555" VerticalAlignment="Center" Text="添加颜色点" />
+							</StackPanel>
+							<StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" Spacing="6" Margin="0,10,0,4">
+								<Border Background="#E8F0FE" CornerRadius="3" Padding="5,2" MinWidth="22" HorizontalAlignment="Center">
+									<TextBlock FontSize="12" Foreground="#1A73E8" FontWeight="Medium" Text="S" HorizontalAlignment="Center" />
+								</Border>
+								<TextBlock FontSize="12" Foreground="#555" VerticalAlignment="Center" Text="添加偏色点" />
+							</StackPanel>
 
-                            <StackPanel Grid.Row="1" Grid.Column="0" Orientation="Horizontal" Spacing="6" Margin="0,0,0,4">
-                                <Border Background="#E8F0FE" CornerRadius="3" Padding="5,2" MinWidth="22" HorizontalAlignment="Center">
-                                    <TextBlock FontSize="12" Foreground="#1A73E8" FontWeight="Medium" Text="D" HorizontalAlignment="Center" />
-                                </Border>
-                                <TextBlock FontSize="12" Foreground="#555" VerticalAlignment="Center" Text="添加多点色" />
-                            </StackPanel>
+							<StackPanel Grid.Row="1" Grid.Column="0" Orientation="Horizontal" Spacing="6" Margin="0,0,0,4">
+								<Border Background="#E8F0FE" CornerRadius="3" Padding="5,2" MinWidth="22" HorizontalAlignment="Center">
+									<TextBlock FontSize="12" Foreground="#1A73E8" FontWeight="Medium" Text="D" HorizontalAlignment="Center" />
+								</Border>
+								<TextBlock FontSize="12" Foreground="#555" VerticalAlignment="Center" Text="添加多点色" />
+							</StackPanel>
 
-                            <StackPanel Grid.Row="2" Grid.Column="0" Orientation="Horizontal" Spacing="6" Margin="0,0,0,4">
-                                <Border Background="#E8F0FE" CornerRadius="3" Padding="5,2" HorizontalAlignment="Center">
-                                    <TextBlock FontSize="12" Foreground="#1A73E8" FontWeight="Medium" Text="←↑↓→" HorizontalAlignment="Center" />
-                                </Border>
-                                <TextBlock FontSize="12" Foreground="#555" VerticalAlignment="Center" Text="微调鼠标" />
-                            </StackPanel>
-                            <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal" Spacing="6" Margin="0,0,0,4">
-                                <Border Background="#E8F0FE" CornerRadius="3" Padding="5,2" MinWidth="22" HorizontalAlignment="Center">
-                                    <TextBlock FontSize="12" Foreground="#1A73E8" FontWeight="Medium" Text="+" HorizontalAlignment="Center" />
-                                </Border>
-                                <TextBlock FontSize="12" Foreground="#555" VerticalAlignment="Center" Text="放大图片" />
-                            </StackPanel>
+							<StackPanel Grid.Row="2" Grid.Column="0" Orientation="Horizontal" Spacing="6" Margin="0,0,0,4">
+								<Border Background="#E8F0FE" CornerRadius="3" Padding="5,2" HorizontalAlignment="Center">
+									<TextBlock FontSize="12" Foreground="#1A73E8" FontWeight="Medium" Text="←↑↓→" HorizontalAlignment="Center" />
+								</Border>
+								<TextBlock FontSize="12" Foreground="#555" VerticalAlignment="Center" Text="微调鼠标" />
+							</StackPanel>
+							<StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal" Spacing="6" Margin="0,0,0,4">
+								<Border Background="#E8F0FE" CornerRadius="3" Padding="5,2" MinWidth="22" HorizontalAlignment="Center">
+									<TextBlock FontSize="12" Foreground="#1A73E8" FontWeight="Medium" Text="+" HorizontalAlignment="Center" />
+								</Border>
+								<TextBlock FontSize="12" Foreground="#555" VerticalAlignment="Center" Text="放大图片" />
+							</StackPanel>
 
-                            <StackPanel Grid.Row="3" Grid.Column="0" Orientation="Horizontal" Spacing="6" Margin="0,0,0,4">
-                                <Border Background="#E8F0FE" CornerRadius="3" Padding="5,2" MinWidth="22" HorizontalAlignment="Center">
-                                    <TextBlock FontSize="12" Foreground="#1A73E8" FontWeight="Medium" Text="-" HorizontalAlignment="Center" />
-                                </Border>
-                                <TextBlock FontSize="12" Foreground="#555" VerticalAlignment="Center" Text="缩小图片" />
-                            </StackPanel>
-                            <StackPanel Grid.Row="3" Grid.Column="1" Orientation="Horizontal" Spacing="6" Margin="0,0,0,4">
-                                <Border Background="#E8F0FE" CornerRadius="3" Padding="5,2" MinWidth="22" HorizontalAlignment="Center">
-                                    <TextBlock FontSize="12" Foreground="#1A73E8" FontWeight="Medium" Text="Tab" HorizontalAlignment="Center" />
-                                </Border>
-                                <TextBlock FontSize="12" Foreground="#555" VerticalAlignment="Center" Text="缩放图片" />
-                            </StackPanel>
+							<StackPanel Grid.Row="3" Grid.Column="0" Orientation="Horizontal" Spacing="6" Margin="0,0,0,4">
+								<Border Background="#E8F0FE" CornerRadius="3" Padding="5,2" MinWidth="22" HorizontalAlignment="Center">
+									<TextBlock FontSize="12" Foreground="#1A73E8" FontWeight="Medium" Text="-" HorizontalAlignment="Center" />
+								</Border>
+								<TextBlock FontSize="12" Foreground="#555" VerticalAlignment="Center" Text="缩小图片" />
+							</StackPanel>
+							<StackPanel Grid.Row="3" Grid.Column="1" Orientation="Horizontal" Spacing="6" Margin="0,0,0,4">
+								<Border Background="#E8F0FE" CornerRadius="3" Padding="5,2" MinWidth="22" HorizontalAlignment="Center">
+									<TextBlock FontSize="12" Foreground="#1A73E8" FontWeight="Medium" Text="Tab" HorizontalAlignment="Center" />
+								</Border>
+								<TextBlock FontSize="12" Foreground="#555" VerticalAlignment="Center" Text="缩放图片" />
+							</StackPanel>
 
-                            <StackPanel Grid.Row="4" Grid.Column="0" Orientation="Horizontal" Spacing="6" Margin="0,0,0,4">
-                                <Border Background="#E8F0FE" CornerRadius="3" Padding="5,2" MinWidth="22" HorizontalAlignment="Center">
-                                    <TextBlock FontSize="12" Foreground="#1A73E8" FontWeight="Medium" Text="F1" HorizontalAlignment="Center" />
-                                </Border>
-                                <TextBlock FontSize="12" Foreground="#555" VerticalAlignment="Center" Text="清空列表" />
-                            </StackPanel>
-                            <StackPanel Grid.Row="4" Grid.Column="1" Orientation="Horizontal" Spacing="6" Margin="0,0,0,4">
-                                <Border Background="#E8F0FE" CornerRadius="3" Padding="5,2" MinWidth="22" HorizontalAlignment="Center">
-                                    <TextBlock FontSize="12" Foreground="#1A73E8" FontWeight="Medium" Text="F2" HorizontalAlignment="Center" />
-                                </Border>
-                                <TextBlock FontSize="12" Foreground="#555" VerticalAlignment="Center" Text="快捷设置" />
-                            </StackPanel>
+							<StackPanel Grid.Row="4" Grid.Column="0" Orientation="Horizontal" Spacing="6" Margin="0,0,0,4">
+								<Border Background="#E8F0FE" CornerRadius="3" Padding="5,2" MinWidth="22" HorizontalAlignment="Center">
+									<TextBlock FontSize="12" Foreground="#1A73E8" FontWeight="Medium" Text="F1" HorizontalAlignment="Center" />
+								</Border>
+								<TextBlock FontSize="12" Foreground="#555" VerticalAlignment="Center" Text="清空列表" />
+							</StackPanel>
+							<StackPanel Grid.Row="4" Grid.Column="1" Orientation="Horizontal" Spacing="6" Margin="0,0,0,4">
+								<Border Background="#E8F0FE" CornerRadius="3" Padding="5,2" MinWidth="22" HorizontalAlignment="Center">
+									<TextBlock FontSize="12" Foreground="#1A73E8" FontWeight="Medium" Text="F2" HorizontalAlignment="Center" />
+								</Border>
+								<TextBlock FontSize="12" Foreground="#555" VerticalAlignment="Center" Text="快捷设置" />
+							</StackPanel>
 
-                            <StackPanel Grid.Row="5" Grid.Column="0" Orientation="Horizontal" Spacing="6">
-                                <Border Background="#E8F0FE" CornerRadius="3" Padding="5,2" HorizontalAlignment="Center">
-                                    <TextBlock FontSize="12" Foreground="#1A73E8" FontWeight="Medium" Text="Ctrl+V" HorizontalAlignment="Center" />
-                                </Border>
-                                <TextBlock FontSize="12" Foreground="#555" VerticalAlignment="Center" Text="导入剪贴板数据" />
-                            </StackPanel>
-                        </Grid>
-                        <Separator
+							<StackPanel Grid.Row="5" Grid.Column="0" Orientation="Horizontal" Spacing="6">
+								<Border Background="#E8F0FE" CornerRadius="3" Padding="5,2" HorizontalAlignment="Center">
+									<TextBlock FontSize="12" Foreground="#1A73E8" FontWeight="Medium" Text="Ctrl+V" HorizontalAlignment="Center" />
+								</Border>
+								<TextBlock FontSize="12" Foreground="#555" VerticalAlignment="Center" Text="导入剪贴板数据" />
+							</StackPanel>
+						</Grid>
+						<Separator
                             Margin="0,14,0,0"
                             Background="#E0E0E0"
                             Height="1" />
-                        <Border
+						<Border
                             Margin="0,12,0,0"
                             Padding="16,7"
                             HorizontalAlignment="Center"
@@ -435,72 +441,72 @@ d:DataContext="{d:DesignInstance vm:MainWindowViewModel}" // 在子组件中绑�
                             CornerRadius="19"
                             Cursor="Hand"
                             Tapped="Address_Tapped">
-                            <TextBlock
+							<TextBlock
                                 FontSize="12"
                                 Foreground="#1A73E8"
                                 Text="autox-community / ScriptGraphicHelper" />
-                        </Border>
-                        <TextBlock
+						</Border>
+						<TextBlock
                             Margin="0,12,0,0"
                             FontSize="11"
                             Foreground="#999"
                             HorizontalAlignment="Center"
                             Text="点击任意位置或按 Esc 关闭" />
-                    </StackPanel>
-                </Border>
-            </Panel>
+					</StackPanel>
+				</Border>
+			</Panel>
 
-        </Panel>
-    </Border>
+		</Panel>
+	</Border>
 
-    <!--快捷键-->
-    <Window.KeyBindings>
+	<!--快捷键-->
+	<Window.KeyBindings>
 
-        <!--A键 列表添加颜色-->
-        <KeyBinding
+		<!--A键 列表添加颜色-->
+		<KeyBinding
             Command="{Binding Key_AddColorInfo}"
             CommandParameter="A"
             Gesture="A" />
 
-        <!--S键 列表添加颜色-->
-        <KeyBinding
+		<!--S键 列表添加颜色-->
+		<KeyBinding
             Command="{Binding Key_AddColorInfo}"
             CommandParameter="S"
             Gesture="S" />
 
-        <!--D键 列表添加颜色-->
-        <KeyBinding
+		<!--D键 列表添加颜色-->
+		<KeyBinding
             Command="{Binding Key_AddColorInfo}"
             CommandParameter="D"
             Gesture="D" />
 
-        <!--F1键 清空颜色列表-->
-        <KeyBinding Command="{Binding Key_ColorInfo_Clear}" Gesture="F1" />
+		<!--F1键 清空颜色列表-->
+		<KeyBinding Command="{Binding Key_ColorInfo_Clear}" Gesture="F1" />
 
-        <!--F2键 打开设置界面-->
-        <KeyBinding Command="{Binding Key_SetConfig}" Gesture="F2" />
+		<!--F2键 打开设置界面-->
+		<KeyBinding Command="{Binding Key_SetConfig}" Gesture="F2" />
 
-        <!--"+" 加号 放大图片-->
-        <KeyBinding
+		<!--"+" 加号 放大图片-->
+		<KeyBinding
             Command="{Binding Key_ScaleFactorChanged}"
             CommandParameter="Add"
             Gesture="Add" />
 
-        <!--"-" 减号 缩小图片-->
-        <KeyBinding
+		<!--"-" 减号 缩小图片-->
+		<KeyBinding
             Command="{Binding Key_ScaleFactorChanged}"
             CommandParameter="Subtract"
             Gesture="Subtract" />
 
-        <!--tab 键 缩小图片-->
-        <KeyBinding
+		<!--tab 键 缩小图片-->
+		<KeyBinding
             Command="{Binding Key_ScaleFactorChanged}"
             CommandParameter="Tab"
             Gesture="Tab" />
 
-        <!--ctrl + v 获取剪贴板数据 (文件/文字)-->
-        <KeyBinding Command="{Binding Key_GetClipboardData}" Gesture="Ctrl+V" />
+		<!--ctrl + v 获取剪贴板数据 (文件/文字)-->
+		<KeyBinding Command="{Binding Key_GetClipboardData}" Gesture="Ctrl+V" />
 
-    </Window.KeyBindings>
+	</Window.KeyBindings>
 
 </Window>

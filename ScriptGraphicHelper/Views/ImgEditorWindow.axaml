@@ -10,7 +10,8 @@
     xmlns:ic="using:Avalonia.Xaml.Interactions.Core"
     xmlns:icc="using:ScriptGraphicHelper.Utils.ViewModel"
     xmlns:vm="using:ScriptGraphicHelper.ViewModels"
-    
+    x:DataType="vm:ImgEditorViewModel"
+	
     Title="图像编辑"
     Width="{Binding WindowWidth, Mode=TwoWay}"
     Height="{Binding WindowHeight, Mode=TwoWay}"
